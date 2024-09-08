@@ -8,6 +8,10 @@ We welcome contributions from the community! If you have suggestions for improve
 ## Future Updates
 - **Assignment Solutions**: Solutions to the assignments prepared by Necati Ergin will be uploaded to this repository in future updates. Stay tuned!
 
+
+## Acknowledgments
+This course is provided by [Rota Teknik](https://www.rota.net/tr), and I would like to extend my sincere thanks to the company for offering this opportunity. Their support has been instrumental in advancing my skills in C programming.
+
 ## Trainer
 [Necati Ergin](https://github.com/necatiergin)
 
