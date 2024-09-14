@@ -2960,7 +2960,299 @@ olur. Çünkü 2. for döngüsünün sonunda null statement `;` vardır.
 - İç içe döngülerde fonksiyonlara ayırarak kodun daha anlaşılır hale getirilebilir.
 
 >[!IMPORTANT] Necati Hoca daha erken olsa da kursun ilerleyen süreçlerinde yavaş yavaş [Leetcode](https://leetcode.com/) yazabilirsiniz dedi. 
+## Random Number Generation (Rastgele Sayı Üretimi)
 
->[!INFO] Bu dersin kalan kısmını 09.09.2024 tarihinde izlemeyi planlamaktayım.
+- True Random Number Generation
+	- Atmosferic Noise ...
+	- Deterministik değil
+- Sudo Random Number Generation
+	- Algoritmik yöntemle rastgele sayı üretimi
+	- Deterministiktir. (Aynı input -> Aynı Output)
 
 
+>[!WARNING]  C'nin standart kütüphanesindeki rastgelelik fonksiyonları profesyonel hayatta kullanım için uygun değildir. Bu fonksiyonlar rastgeleliğin önemli olmadığı ortamlarda kullanılabilir. Yeterli düzeyde fonksiyonlar değildir.
+
+- `stdlib.h` kütüphanesi farklı konularda destekler veren bir kütüphanedir.
+- `rand` ve `srand` fonksiyonları da bu kütüphanelerde bulunmaktadır.
+```c
+int rand(void);
+```
+- `RAND_MAX` makrosu fonksiyonun üretebileceği max değeri verir.
+- Random fonksiyonların inputlarına `seed value` denir. 
+- `srand` Seed parametresi ile verilen değeri kullanarak rasgele sayı üreticisini başlatır. Programın içinde rand() fonksiyonu kullanılmadan önce bir kez çağrılmalıdır.
+- `rand` fonksiyonu ise parametreye sahip olmayan ve int türünden bir değer döndüren bir fonksiyondur.
+
+```c
+int main(void){
+
+	for(int i = 0; i < 100; ++i){
+	
+		printf("%d\n",rand());
+	}
+
+}
+
+
+```
+
+- Her seed value için farklı random değerler üretilir.
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void){
+
+	for(int i = 7654; i < 7754; ++i){
+		
+		srand(i);
+		printf("seed value: %d\n",i);
+		for(int i = 0; i < 20; ++i){
+				
+			printf("%d\n",rand());	
+		}	
+	(void)getchar();
+	system("cls");
+	
+	}
+}
+```
+
+
+- 1-6 aralığında rastgele iki zar için dağılım **mod** operatörü ile yapılabilir fakat **profesyonel hayatta kodun uniform açısından doğruluğu için mod operatörü kullanılmaz.**
+
+
+```
+int main(void){
+
+	for(int i = 0; i < 100; ++i){
+	
+		printf("%d %d\n",(rand() % 6 + 1),(rand() % 6 + 1));
+	}
+
+}
+
+```
+- Yukarıdaki kodda her zaman aynı sayılar gelecektir.
+- Bunu aşabilmek için aşağıdaki gibi bir çözüm uygulanabilir.
+
+```c
+#include <time.h>
+int main(void){
+	srand(time(NULL));
+
+	for(int i = 0; i < 100; ++i){
+	
+		printf("%d %d\n",(rand() % 6 + 1),(rand() % 6 + 1));
+	}
+
+}
+```
+
+- time fonksiyonu epoche'dan geçen saniye veya milisaniye (derleyiciye göre değişebilir) sayısını argümanda belirtilen değişkene set eder. Argüman olarka `NULL` verilirse yalnızca bu değeri döndürür. Bu da random number generation için önemli bir true random generator olarak kullanılabilir. (ileride bu kütüphane daha detaylı anlatılacaktır.)
+
+>[!WARNING]  Bu çözümde parametresi `unsigned int` olan bir fonksiyona(srand) `time_t` cinsinden yani Long Long veya Long cinsinden bir değişken veriyoruz. Bu da karmaşıklığa ve derleyicinin uyarı mesajı vermesine neden olur.
+
+```c
+void randomize(void){
+
+	srand((unsigned)time(NULL));
+}
+```
+
+---
+# 10.09.2024
+
+- Random number generation olasılık hesaplamalarında da kullanılmaktadır.
+- Monte Carlo Yöntemi:
+
+- Problem: Yazı-Tura oyununda yazı gelme olasılığı?
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "nutility.h"
+
+#define NTOSS 100000
+#define HEADS 1
+
+int toss(void){
+
+return rand() % 2;
+
+}
+
+int main(void){
+	srand(time(NULL));
+	int head_count = 0;
+	for(int i = 0; i < NTOSS; ++i){
+		if(toss() == HEADS){
+			++head_count;
+	
+		}
+	}
+	printf("tura gelme olasiligi: %f\n",((double)head_count / NTOSS));
+}
+```
+
+ ---
+### Craps Oyunu Algoritması
+**Problem**:
+Oyuncu 2 zar atar
+- Toplamları:
+- 7 veya 11 ise oyuncu kazanır
+- 2, 3 veya 12 ise oyuncu kaybeder
+- diğer toplamlar geldiğince oyuncu ya ilk zarını atıp kazanacak ya da 7 atıp kaybedecek. 
+- Not: Uluslararası kumar win rate oranı: %49.20-%49.50 arasında bir değerdir.
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "nutility.h"
+
+#define NGAMES 10000000
+
+
+int roll_dice(void){
+
+	int dice1 = rand() % 6 + 1; // kotu teknik
+	int dice2 = rand() % 6 + 1; // kotu teknik
+	return dice1 + dice2;
+
+}
+
+int game_(int dice){
+	int new_dice;
+	while(1){
+		new_dice = roll_dice();
+		if(new_dice == dice){return 1;}
+		else if(new_dice == 7) {return 0;}
+	}
+	return 0;
+}
+
+// returns 1 for win, 0 for loss
+int game(void){
+	int dice = roll_dice();
+	switch(dice){
+	case 7:
+	case 11: return 1;
+	case 2:
+	case 3:
+	case 12: return 0;
+	default: return game_(dice);
+	}
+
+
+
+}
+
+int main(void){
+int win_count = 0;
+	for(int i = 0; i < NGAMES; ++i){
+		win_count += game();
+	
+	
+	}
+
+	printf("kazanma olasiligi: %f\n",((double)win_count * 100) / NGAMES);
+
+}
+```
+---
+
+## Type Conversions (Tür Dönüşümleri)
+
+- Implicit Type Conversions
+	- Bir talimat yokken yapılan otomatik dönüşümler.
+		- Atama Tür Dönüşümleri
+		- Basit Aritmetik Dönüşümler
+- Explicit Type Conversions
+	- Bir conversion talimatı ile yapılan dönüşümler. 
+
+- Sıklıkla hata yapılan bir konudur.
+
+### Basit Aritmetik Tür Dönüşümleri
+
+```c
+a + b
+x > y
+```
+- İşlemin yapılabilmesi için derleyici ya a yı b türüne ya da b yi a türüne dönüştürür. 
+- Veri kaybı olmayacak şekilde mümkünse yapılır. 
+- Her türün bir `rank` değeri vardır.
+	- long double
+	- double
+	- float
+	- long long
+	- long
+	- int
+	- short
+	- char
+	- `_Bool`
+	
+>[!NOTE] İşaretli tam sayı türlerinde overflow tanımsız davranış olurken, işaretsiz türlerde elde edilen değerin türün max alabileceği değerin bir fazlasına bölünmesi sonucunu verir.(**yüksek anlamlı bytle'lar gider.**)
+
+```c
+long long x = 2000000000000;
+long long y = 1000;
+
+printf("%llx\n",x * y);
+// TANIMSIZ DAVRANIŞ
+```
+
+
+
+- İşaret Operatörleri:
+```c
++x
+!x
+```
+
+- Taşma olmaması için genellikle daha büyük olan türe dönüştürülür.
+- signed - unsigned işleme sokulduğunda **sonuç unsigned olur.**
+
+>[!IMPORTANT] TÜR DÖNÜŞÜMÜ KALICI DEĞİLDİR.
+
+```C
+int main(void){
+
+	int x = 10;
+	x / 4.96; // Tür dönüşümü double -> int
+	x // X'İN TÜRÜ INT'DİR DOUBLE DEĞİL!!
+}
+
+```
+---
+#### Mülakat Sorusu:
+
+```c
+#include <stdio.h>
+int main(void){
+	int x = 10;
+	double dval = (x > 5 ? 5 : 5.) / 2;
+	printf("dval = %f\n",dval);
+
+}
+```
+
+- Yukarıdaki kodun çıktısı `2` **DEĞİL** 2.5 olur.
+>[!NOTE] Terminary operatorünün operandları arasında da tür dönüşümü gerçekleşir. 
+- 2. ve 3. operandlar arasında tür dönüşümü gerçekleşeceğinden değer `double` hale gelir.
+---
+### Atma Tür Dönüşümleri:
+```c
+-------------------------------------
+int x = expr; // expression return value not int
+-------------------------------------
+x = y; // y not int
+-------------------------------------
+void foo(int);
+foo(arg) // arg not int
+-------------------------------------
+int bar(.....){
+-------------------------------------
+return expr;//not int 
+}
+-------------------------------------
+```
