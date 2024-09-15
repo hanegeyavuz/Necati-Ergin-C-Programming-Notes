@@ -567,13 +567,13 @@ int w = '\054'   // Octal
 |            | `.`            | Structure and union member access                 |                                        |            |
 |            | `->`           | Structure and union member access through pointer |                                        |            |
 |            | `(type){list}` | Compound literal (C99)                            |                                        |            |
-|     2      | `++ --`        | Prefix increment and decrement[^1]                | Right-to-left                          |            |
+|     2      | `++ --`        | Prefix increment and decrement                | Right-to-left                          |            |
 |            | `+ -`          | Unary plus and minus                              |                                        |            |
 |            | `! ~`          | Logical NOT and bitwise NOT                       |                                        |            |
 |            | `(type)`       | Cast                                              |                                        |            |
 |            | `*`            | Indirection (dereference)                         |                                        |            |
 |            | `&`            | Address-of                                        |                                        |            |
-|            | `sizeof`       | Size-of[^2]                                       |                                        |            |
+|            | `sizeof`       | Size-of                                        |                                        |            |
 |            | `_Alignof`     | Alignment requirement (C11)                       |                                        |            |
 |     3      | `* / %`        | Multiplication, division, and remainder           | Left-to-right                          |            |
 |     4      | `+ -`          | Addition and subtraction                          |                                        |            |
@@ -586,18 +586,14 @@ int w = '\054'   // Octal
 |     10     | `              | `                                                 | Bitwise OR (inclusive OR)              |            |
 |     11     | `&&`           | Logical AND                                       |                                        |            |
 |     12     | `              |                                                   | `                                      | Logical OR |
-|     13     | `?:`           | Ternary conditional[^3]                           | Right-to-left                          |            |
-|   14[^4]   | `=`            | Simple assignment                                 |                                        |            |
+|     13     | `?:`           | Ternary conditional                           | Right-to-left                          |            |
+|   14   | `=`            | Simple assignment                                 |                                        |            |
 |            | `+= -=`        | Assignment by sum and difference                  |                                        |            |
 |            | `*= /= %=`     | Assignment by product, quotient, and remainder    |                                        |            |
 |            | `<<= >>=`      | Assignment by bitwise left shift and right shift  |                                        |            |
 |            | `&= ^=         | =`                                                | Assignment by bitwise AND, XOR, and OR |            |
 |     15     | `,`            | Comma                                             | Left-to-right                          |            |
 
-[^1]: Prefix increment and decrement
-[^2]: Size-of
-[^3]: Ternary conditional
-[^4]: Includes assignment operators such as `+=`, `-=`, etc.
 # 09.08.2024
 
 ## Operators Cont'd
