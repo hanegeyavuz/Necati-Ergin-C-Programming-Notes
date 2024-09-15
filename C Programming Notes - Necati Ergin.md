@@ -3256,3 +3256,96 @@ return expr;//not int
 }
 -------------------------------------
 ```
+
+- Eşitliğin sağ tarafındaki ifade **source type**, sol tarafındaki ifade ise **target type** olarak isimlendirilir.
+- **Tür dönüşümü her zaman target type a yapılır.**
+- Küçük tam sayı türlerinden büyük tam sayı türlerine dönüşümde bir kayıp olmadığı için herhangi bir önleme ihtiyaç yoktur.
+```c
+int x = 3614;
+long lval = x;
+```
+
+- **Büyük tam sayı türünden küçüj tam sayı türüne dönüşüm veri kaybı riski barındırır.**
+```c
+int x = 0x1acf34;
+unsigned short us = x;
+```
+- Yukarıdaki örnekte x in yeni değeri `cf34` olur.
+- Yüksek anlamlı byte'lar gider.
+- **Gerçek sayı türlerinden tam sayı türlerine dönüşümde ondalıklı kısım kaybolur.**
+```c
+double dval = 56.27;
+
+int ival = dval;
+
+printf("%d\n",ival); // ekrana 56 yazdırır.
+
+```
+
+>[!IMPORTANT] Gerçek sayı türlerinden tam sayı türlerine dönüşümde ondalıklı kısım atıldıktan sonra kalan sayı istenen türe sığmıyorsa undefined behaviour olur.
+
+## Type-Cast Operator
+
+- **`(target type)`**
+- Tür dönüşüm operatorü ile oluşturulan ifade **R Value Expression** olur.
+```c
+int main(void){
+
+	int x = 10;
+	int y = 3;
+	
+	double d1 =  x / y;
+	double d2  = (double)x / y;
+	double d3  = x / (double)y;
+	double d3  = (double)(x / y);
+	printf("d1 = %f\n",d1);
+	printf("d2 = %f\n",d2);
+	printf("d3 = %f\n",d3);
+	printf("d4 = %f\n",d4);
+
+}
+```
+***out:***
+`d1 = 3.000000`
+`d2 = 3.333333`
+`d3 = 3.333333`
+`d4 = 3.000000`
+
+- Bazı durumlarda yapılan dönüşümün bilerek yapıldığını belli etmek için de kullanılır.
+```c
+
+double foo(void);
+int main(void){
+
+	float f;
+	f = (float)foo(); // Type-cast operatorü kullanılmasaydı da dönüşüm yapılacaktı.
+}
+```
+
+
+Not:
+
+```c
+int main(void){
+
+	char c = 178;
+	if(c == 178) {
+		printf("dogru\n");
+	}
+	else{
+		printf("yanlis\n");
+	}
+	printf("c = %c\n",c);
+}
+```
+
+***out:***
+`yanlis`
+`-78`
+
+>[!INFO] Sebebi ise char değişkene int değer atanırken 178 değeri 0x2b ye eşit olduğundan dönüşüm esnasında işaretini korumak için yüksek bitleri 1 yapacaktır. Bu yüzden c nin değeri 178 olmaz. `c` değişkeni `unsigned char` olsaydı standart outputta `dogru` çıktısını görürdük.
+
+---
+# 12.09.2024
+
+## Arrays
