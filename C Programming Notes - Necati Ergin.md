@@ -3344,4 +3344,309 @@ int main(void){
 ---
 # 12.09.2024
 
-## Arrays
+## Comment Lines
+
+### Syntax
+- İlk standart için geçerli yorum satırları
+```c
+/*YORUM SATIRI*/
+```
+
+```C
+/*
+BU BİR
+UZUN YORUM SATIRI
+*/
+```
+- Açıklama satırları iç içe olamaz.
+```c
+/*
+/*
+DİLİN KURALLARINA GÖRE DOGRU DEGİL
+*/
+*/
+```
+
+- C99 ile birlikte dile eklenen yeni bir syntax vardır:
+```c
+// YORUM SATIRI
+```
+
+>[!IMPORTANT] Açıklama satırları önişlemci komutlarından önce ele alınır.
+
+- Kodun daha iyi anlaşılması için kullanılabilirler.
+- **Yorum satırı içinde kod olmamalıdır.**
+- Kodun genel formatlanması ve belgelenmesi (doxygen vs...)
+```c
+/*
+*   utility.h
+*   header file for utility functions
+*   author: Yavuz Hanege
+*/
+
+
+/*  Global Functions Declerations  */
+
+
+```
+
+
+```c
+
+/**
+ * @brief İki sayının toplamını hesaplar.
+ *
+ * Bu fonksiyon iki tam sayıyı alır ve bu sayıları toplar. 
+ * Toplama işlemi sonucunu döndürür.
+ *
+ * @param a Toplanacak ilk tam sayı.
+ * @param b Toplanacak ikinci tam sayı.
+ * @return int Toplama işlemi sonucunda elde edilen değer.
+ *
+ * @note Fonksiyon yalnızca tamsayılarla çalışır.
+ * 
+ * @warning Eğer sayıların toplamı tamsayının sınırlarını aşarsa taşma olabilir.
+ */
+int toplama(int a, int b) {
+    return a + b;
+}
+```
+
+>[!TIP] Doxygen formatting için function'ı chatgpt'ye vererek formatlama yaptırılabilir. Güzel bir yöntemdir.
+
+- Koşullu derleme komutlarında bilgilendirme amaçlı kullanılabilirler
+```c
+
+#ifdef NEC
+
+
+#endif // NEC
+```
+
+#### Nelere Dikkat Edilmeli?
+>[!INFO] En iyi açıklama hiç yapılmayan açıklamadır.
+- **Gereksiz açıklamadan kaçınılmalıdır.**
+- Bir kod parçasına yorum satır vermek yerine fonksiyon haline getirip işlevini anlatan bir isimle fonksiyon çağrısı tercih edilmelidir. 
+
+## Arrays (Diziler)
+
+- **Data Structures**: Verilerin çalışma zamanında işlenebilmesi için bellekte tutulması gerekmektedir. Bu düzene data structures denir.
+- Data structures üzerinde yapılacak işlemlerin nasıl yapılacağına ise **Algorithms** denir.
+- **Computational-Complexity**: Bir algoritmanın karmaşıklığını ifade eder. Veri yapısındaki öge sayısının artışı ile yapılacak işlem sayısı artışı arasındaki ilişkidir.
+- Bu ilişkileri sınıflandırmak için farklı notasyonlar keşfedilmiştir.
+- **Big-O Notation**: O(1) constant
+- O(n) linear
+- O(n2)...
+- C dilinde dilin sağladığı tek veri yapısı `arrays`'dir.
+- Bunlara `fixed-array` denir.
+- C'de dizilerdeki tüm elemanlar bellekte ardışıktır. 
+### Syntax
+
+- `a[constant expression]`
+
+```c
+int a[20];
+```
+
+```c
+int a[]; // geçersiz
+int a[0]; // geçersiz
+```
+
+```c
+int a[10], b[20], c[30]; //Geçerli fakat kullanılması önerilmez.
+
+```
+
+- Statik ömürlü, global ve auto değişken kuralları burada da geçerlidir.
+
+---
+## UNUTTUĞUM BİR KONU HAKKINDA HATIRLATMA
+
+C dilinde **statik yerel değişken**, **otomatik yerel değişken** ve **global değişken** arasında önemli farklar bulunmaktadır. Bu farklar, değişkenlerin **ömrü**, **kapsamı**, ve **başlangıç değeri** ile ilgilidir. Her birini detaylıca inceleyelim.
+
+### 1. Otomatik Yerel Değişken (Automatic Local Variable)
+- **Kapsam**: Otomatik yerel değişkenler, tanımlandıkları fonksiyon veya blok içindedir. Bu nedenle, sadece o fonksiyon ya da blok içinde erişilebilir.
+- **Ömür**: Otomatik yerel değişkenler, fonksiyon ya da blok çalışmaya başladığında yaratılır, fonksiyon tamamlandığında bellekten silinir.
+- **Başlangıç Değeri**: Otomatik yerel değişkenler, tanımlandıklarında eğer bir başlangıç değeri atanmazsa, bellek konumundaki rastgele bir değerle başlatılır.
+- **Tanımlama**: Otomatik yerel değişkenler varsayılan olarak otomatik (auto) olarak tanımlanır ve `auto` anahtar kelimesi kullanılmazsa bile otomatik olarak kabul edilir.
+
+#### Örnek:
+
+```c
+#include <stdio.h>
+
+void fonksiyon() {
+    int otomatikDegisken = 0; // Otomatik yerel değişken
+    printf("Otomatik değişken: %d\n", otomatikDegisken);
+    otomatikDegisken++;
+}
+
+int main() {
+    fonksiyon();
+    fonksiyon();
+    return 0;
+}
+```
+
+### Çıktı:
+```
+Otomatik değişken: 0
+Otomatik değişken: 0
+```
+
+**Açıklama**: `otomatikDegisken` her fonksiyon çağrıldığında yeniden yaratılır ve her seferinde sıfırdan başlar. Bu nedenle her çağrıda aynı çıktıyı alırız.
+
+---
+
+### 2. Statik Yerel Değişken (Static Local Variable)
+- **Kapsam**: Statik yerel değişkenler de yereldir, yani tanımlandıkları fonksiyonun ya da blokun dışında erişilemezler.
+- **Ömür**: Ancak, bir kez tanımlandıktan sonra program sonlanana kadar bellekte kalırlar ve değerlerini korurlar.
+- **Başlangıç Değeri**: Statik yerel değişkenler varsayılan olarak **0** ile başlatılır. Eğer bir başlangıç değeri atanmazsa, otomatik olarak sıfırdan başlar.
+- **Tanımlama**: `static` anahtar kelimesi kullanılarak tanımlanır.
+
+#### Örnek:
+
+```c
+#include <stdio.h>
+
+void fonksiyon() {
+    static int statikDegisken = 0; // Statik yerel değişken
+    printf("Statik değişken: %d\n", statikDegisken);
+    statikDegisken++;
+}
+
+int main() {
+    fonksiyon();
+    fonksiyon();
+    return 0;
+}
+```
+
+### Çıktı:
+```
+Statik değişken: 0
+Statik değişken: 1
+```
+
+**Açıklama**: `statikDegisken` değişkeni, fonksiyonlar arasında değerini korur. Yani ilk çağrıdan sonra değeri 1'e yükseltilir ve sonraki çağrıda bu değerden devam eder.
+
+---
+
+### 3. Global Değişken (Global Variable)
+- **Kapsam**: Global değişkenler, tanımlandıkları dosyanın her yerinden erişilebilirler. Fonksiyonlar arasında ortak olarak kullanılabilirler.
+- **Ömür**: Program başladığında yaratılır ve program sonlanana kadar bellekte kalırlar.
+- **Başlangıç Değeri**: Global değişkenler de varsayılan olarak **0** ile başlatılır.
+- **Tanımlama**: Global değişkenler fonksiyonların dışında tanımlanır.
+
+#### Örnek:
+
+```c
+#include <stdio.h>
+
+int globalDegisken = 0; // Global değişken
+
+void fonksiyon1() {
+    globalDegisken++;
+    printf("Fonksiyon1'de global değişken: %d\n", globalDegisken);
+}
+
+void fonksiyon2() {
+    globalDegisken += 10;
+    printf("Fonksiyon2'de global değişken: %d\n", globalDegisken);
+}
+
+int main() {
+    fonksiyon1();
+    fonksiyon2();
+    return 0;
+}
+```
+
+### Çıktı:
+```
+Fonksiyon1'de global değişken: 1
+Fonksiyon2'de global değişken: 11
+```
+
+**Açıklama**: `globalDegisken` her iki fonksiyon tarafından paylaşılır. `fonksiyon1` onu 1 artırır, `fonksiyon2` ise 10 ekler. Değişken, her iki fonksiyon arasında da aynı değeri korur.
+
+---
+
+### Farkların Özeti:
+| Özellik              | Otomatik Yerel Değişken       | Statik Yerel Değişken        | Global Değişken            |
+|----------------------|-------------------------------|------------------------------|----------------------------|
+| **Kapsam**            | Tanımlandığı fonksiyon/blok    | Tanımlandığı fonksiyon/blok   | Tüm program                |
+| **Ömür**              | Fonksiyon/blok süresince       | Program sonuna kadar          | Program sonuna kadar        |
+| **Başlangıç Değeri**  | Rastgele (tanımsız)           | Varsayılan olarak 0           | Varsayılan olarak 0         |
+| **Değer Koruma**      | Fonksiyon çağrıları arasında korunmaz | Fonksiyon çağrıları arasında korunur | Her yerden erişilebilir ve korunur |
+
+Bu farklar, C programlama dilinde verimli bellek yönetimi ve veri paylaşımı açısından büyük öneme sahiptir.
+
+---
+
+>[!IMPORTANT] `int a[12]` ifadesinin türü `int` değildir. `int[12]`'dir.
+
+- Bir fonksiyonun parametre değişken türü ve geri dönüş türü dizi türünden olamaz.
+>[!NOTE] Bir dizinin ismi bir ifade içinde kullanıldığında bazı istisnalar haricinde derleyici tarafından dizi ismi dizinin ilk elementinin adresine dönüştürülür.(Array Decay)
+
+```c
+int a[10];
+int b[20];
+
+a = b // Syntax Error (Array Decay Rule)
+
+```
+
+
+### Dizinin Elemanlarına Erişim
+
+```c
+
+int a[10]; // buradaki köşeli parantez bir operatör değil, declarator'dür.
+
+
+a[5]   // Buradaki köşeli parantez bir operatördür.
+
+```
+
+```c
+
+int a[10]; 
+// a[0]......a[9]
+
+a[6] = 10;
+```
+
+- Dizi indexlemesi kodu yazanın sorumluluğundadır derleyicinin değil.
+
+```c
+int a[10]; 
+
+int x = 5;
+int y = 10;
+int z = 43;
+
+
+a[x] = 13;
+a[y] = 8; //undefined behaviour
+int ival = a[z]; //undefined behaviour
+// NO SYNTAX ERROR!
+```
+
+- Dizinin index ifadesinde index sınırları dışında erişmeye çalışmak sık yapılan bir hatadır.
+- `[ ]` operatörü en yüksek öncelikli operatördür.
+- Genellikle dizi boyutları sembolik sabitler kullanılarak gösterilir.
+```c
+#define   SIZE    20
+
+int main(void) {
+	int a[SIZE];
+	a[3] = 20;
+}
+```
+
+- Otomatik ömürlü diziler ilk değer verilmediğinde `garbage value` ile başlar. Bunları kullanmak `undefined behaviour` oluşturur.
+- Statik ömürlü diziler ise ilk değer verilmediğinde tüm elemanlar 0 değeri ile başlar.
+#### Dizilere ilk Değer Verme Kuralları
+- 
