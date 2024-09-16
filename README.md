@@ -9,6 +9,24 @@ We welcome contributions from the community! If you have suggestions for improve
 - **Assignment Solutions**: Solutions to the assignments prepared by Necati Ergin will be uploaded to this repository in future updates. Stay tuned!
 
 
+## Commit Message Standard
+### Structure
+
+1. **Title (Summary)**: A brief summary of the change (max 50 characters).
+   - Should start with a verb (e.g., "Added", "Removed", "Updated").
+   - The first letter should be capitalized, and no period at the end.
+
+2. **Description** (optional): Include detailed information for complex changes. 
+
+### Icons
+
+- `[+]` A new feature or file was added.
+- `[-]` A feature, code, or file was removed.
+- `[*]` An existing feature or code was updated.
+- `[!]` A critical bug or security fix was made.
+- `[~]` Refactoring or code restructuring was done.
+- `[/]` A file or change was moved or renamed.
+
 ## Acknowledgments
 This course is provided by [Rota Teknik](https://www.rota.net/tr), and I would like to extend my sincere thanks to the company for offering this opportunity. Their support has been instrumental in advancing my skills in C programming.
 
