@@ -5,14 +5,13 @@
             "label": "C/C++: gcc.exe build active file",
             "type": "shell",
             "command": "gcc",
-            "args": [
-                "-I",
-                "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Inc",
-                "${file}",
-                "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Src\\nutility.c",
-                "-o",
-                "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Src\\${fileBasenameNoExtension}.exe"
-            ],
+        "args": [
+            "-I",
+            "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Inc",
+            "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Src\\*.c",
+            "-o",
+            "C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Src\\${fileBasenameNoExtension}.exe"
+        ],
             "group": {
                 "kind": "build",
                 "isDefault": true
