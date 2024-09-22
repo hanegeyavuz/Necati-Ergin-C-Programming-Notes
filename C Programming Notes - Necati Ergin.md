@@ -3649,4 +3649,29 @@ int main(void) {
 - Otomatik ömürlü diziler ilk değer verilmediğinde `garbage value` ile başlar. Bunları kullanmak `undefined behaviour` oluşturur.
 - Statik ömürlü diziler ise ilk değer verilmediğinde tüm elemanlar 0 değeri ile başlar.
 #### Dizilere ilk Değer Verme Kuralları
-- 
+- Diziye ilk değer verirken kendi boyutundan büyük initializer kullanmak sentaks hatasıdır.
+```c
+int a[10] = {1,2,3,4,5,6,7,8,9,1,1,1,1,};
+// Syntax Error
+```
+- - Diziye ilk değer verirken kendi boyutundan küçük initializer kullanmak sentaks hatası değildir. Diğer elemanlar 0 değerini alır.
+```c
+int a[10] = {0}; // Tüm elemanlar 0'dır.
+
+```
+
+```c
+int a[10] = { }; //C PROGRAMLAMA İÇİN GEÇERSİZDİR.
+```
+
+- Dizinin ilk elemanı 0. indisli elemanıdır.
+- Designated Initializer: 
+	- Dizinin farklı indislerine değer atamayı ve diğer değerin 0 ile başlamasını sağlayan özelliktir. **C99 standardı ile eklenmiştir.**
+	- Dizi boyutu yazılmazsa değer verilen en büyük indisin 1 fazlası olarak dizi boyutu alınır.
+```c
+int a[10] = {[4] = 10, [2] = 20, [5] = 40};
+```
+
+---
+# 13.09.2024
+
