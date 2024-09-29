@@ -4149,7 +4149,7 @@ int main(void)
 - **printf() fonksiyonuna %s kullanılarak da yazı yazdırılabilir.**
 
 ## Karakter dizisine ilk Değer Vermek
-
+- Comma seperated list
 ```c
 int main(void)
 {
@@ -4164,5 +4164,219 @@ int main(void)
 	 char s[] = {'K','U','B','A'}; // NTBS değil.
 	 puts(s); // TANIMSIZ DAVRANIS
 }
+```
+
+- Double Quote içinde yazılarak da ilk değer verilebilir. Bu kullanım **en sık kullanımdır.**
+```c
+int main(void)
+{
+	 char s[] = "yavuz"; // Sonuna \0 eklenir.
+	 puts(s); // Tanımsız davranış değil. 
+}
+```
+
+```c
+int main(void)
+{
+	 char s[4] = "mert"; // C++ da geçersiz fakat C de geçerli. SONUNDA NULL KARAKTER YOK.
+	 puts(s); // Tanımsız davranış. 
+}
+```
+
+### Yazının Sonunda Null Character `\0` Olmadığı Durumlar
+- Otomatik ömürlü bir diziye ilk değer verilmediği durumda
+- Boyutu verilmeyen diziye ilk değer verildiğinde
+- Dizi boyutu ile ilk değer sayısı aynı olduğunda
+
+```c
+
+  // getting string from standart input
+
+  #define   SIZE  100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+    scanf("%s", str);  
+    printf("You entered: (%s)\n", str);
+
+    // input -> Enter a string : Hello World
+    // output -> You entered : (Hello)
+  }
 
 ```
+
+- Scanf çağrısıyla içerisinde boşluk olan bir yazıyı yazdıramazsınız. Bunun için farklı yollar vardır.
+
+### Standart Inputtan Gelen Boşluk Karakteri içeren bir Yazıyı Almak
+
+ 1. Scanf'deki özel formatlama nitelikleri kullanılır.
+ 2. *C99 ile kaldırılan* `gets` fonksiyonuna çağrı yapılır.
+```c
+  #define   SIZE  100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+    gets(str);
+    printf("You entered: (%s)\n", str);
+  }
+```
+
+3. C11 standardı ile opsiyonel olarak kullanılan `gets_s` i çağırmak
+4. standart kütüphanenin ismi fgets olan ve aslında dosyalarla ilgili fonksiyonu çağırmak
+5. Kendi fonksiyonumuzu yazmak
+
+```c
+  #define   SIZE  100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+	int len = 0;
+	int ch;
+	while((ch = getchar()) != '\n'){
+		str[len++] = (char)ch;
+	}
+	str[len] = '\0';
+	printf("yazi (%s) uzunluk (%d)\n",str,len);
+  }
+```
+
+### Bir Yazının Uzunluğunu Bulmak
+
+```c
+#define SIZE 100
+
+int main(void)
+
+{
+    char str[SIZE];
+
+    int len = 0;
+
+  
+
+    printf("Enter a string: ");
+
+    sgets(str);
+
+    for (int i = 0; str[i] != '\0'; ++i)
+
+    {
+
+        len++;
+
+    }
+
+    printf("yazinin uzunlugu %d 'dir.", len);
+
+}
+
+
+```
+
+### Yazıyı Tersten Yazdırın
+
+```c
+#define SIZE 100
+
+  
+
+int main(void)
+
+{
+
+    char str[SIZE];
+
+  
+
+    printf("Bir yazi giriniz: ");
+
+    sgets(str);
+
+    int i = 0;
+
+    while(str[i]){
+
+        ++i;
+
+    }
+
+    while(i >= 0){
+
+        putchar(str[i--]);
+
+    }
+
+    putchar('\n');
+
+}
+
+```
+
+### Yazıyı Ters Çevirme
+
+```c
+int main(void){
+    char str[] = "hello galaxy";
+
+    int len = 0;
+    while (str[len])
+      ++len;
+
+    for (int i = 0; i < len / 2; ++i){
+      char temp = str[i];
+      str[i] = str[len - 1 - i];
+      str[len - 1 - i] = temp;
+    }
+
+    printf("%s\n", str);  // output -> yxalag olleh
+  }
+
+```
+
+---
+### Palindrom Homework
+- Palindrom
+	  - en iyi mese bese mi yine?
+	  - Ana, Naci Dede ne dedi Canan'a?
+	  - Tras neden sart?
+	  - Para hazir. Ama Riza harap!
+	  - at sahibi gibi hasta
+	  - A man, a plan, a canal, Panama
+
+  -  do not use another array
+  -  do not change array's elements
+  -  check if the string is palindrom
+
+
+---
+
+### String Birleştirme
+
+```c
+ // s3 dizisinde s1 ile s2 yazılarının birleşimini oluşturunuz.
+
+  int main(){
+    char str1[] = "Hello";
+    char str2[] = "World";
+    char str3[100];
+
+    int i;
+    for (i = 0; str1[i] != '\0'; ++i)
+      str3[i] = str1[i];
+
+    for(int k = 0; str2[k] != '\0'; ++k)
+      str3[i++] = str2[k];
+
+    str3[i] = '\0';
+
+    printf("(%s) + (%s) = (%s)\n", str1, str2, str3);
+    // output -> (Hello) + (World) = (HelloWorld)
+
+```
+

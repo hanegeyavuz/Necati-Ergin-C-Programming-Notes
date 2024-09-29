@@ -487,13 +487,12 @@ int main(void)
 	s[2] = 'S';
 	s[3] = 'A';
 	s[4] = '\0';
-	
+	//puts(&s[0]);
 	puts(s); // Fonksiyon dizinin adresini istiyor. Dizinin ismi yazıldığında ilk elemanın adresi verilmiş olur.
 }
 #endif
 
-
-#if 1
+#if 0
 int main(void)
 {
 	char s[100];
@@ -506,3 +505,107 @@ int main(void)
 	printf("isim = %s",s);
 }
 #endif
+
+#if 0
+int main(void)
+{
+	 char s[] = "yavuz"; // Sonuna \0 eklenir.
+	 puts(s); // Tanımsız davranış değil. 
+}
+#endif
+
+#if 0
+/*Tanımsız Davranış*/
+int main(void)
+{
+	 char s[4] = "mert"; // C++ da geçersiz fakat C de geçerli. SONUNDA NULL KARAKTER YOK.
+	 puts(s); // Tanımsız davranış. 
+}
+#endif
+/*Boşluk bulunduran bir yazıyı standart inputtan almak 1*/
+#if 0
+#define SIZE 100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+    gets(str);
+    printf("You entered: (%s)\n", str);
+
+  }
+#endif
+/*Boşluk bulunduran bir yazıyı standart inputtan almak 2*/
+#if 0
+#define SIZE 100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+	int len = 0;
+	int ch;
+	while((ch = getchar()) != '\n'){
+		str[len++] = (char)ch;
+	}
+	str[len] = '\0';
+	printf("yazi (%s) uzunluk (%d)\n",str,len);
+  }
+#endif
+/*sgets Funciton Test*/
+#if 0
+
+#define SIZE 100
+
+  int main(void){
+    char str[SIZE];
+
+    printf("Enter a string: ");
+	sgets(str);
+  }
+
+#endif
+
+/*Array Lenght Algorithm (strlen function implemetation) */
+#if 0
+#define SIZE 100
+
+int main(void)
+{
+	char str[SIZE];
+	int len = 0;
+
+	printf("Enter a string: ");
+	sgets(str);
+	for (int i = 0; str[i] != '\0'; ++i)
+	{
+		len++;
+	}
+	printf("yazinin uzunlugu %d 'dir.", len);
+}
+
+#endif
+
+/*Yaziyi Tersten Yazdirma*/
+#if 0
+#define SIZE 100
+
+int main(void)
+{
+	char str[SIZE];
+
+	printf("Bir yazi giriniz: ");
+	sgets(str);
+	int i = 0;
+	while(str[i]){
+		++i;
+	}
+	while(i >= 0){
+		putchar(str[i--]);
+	}
+	putchar('\n');
+}
+
+#endif
+
+
