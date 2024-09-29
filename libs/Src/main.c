@@ -77,7 +77,6 @@ int main(void){
 
 #endif
 
-
 #if 0
 
 int main(void){
@@ -168,7 +167,6 @@ int main(void)
 
 #endif
 
-
 // LINEAR SEARCH ALGORITHM
 #if 0
 
@@ -205,7 +203,7 @@ int main(void){
 // Fonksiyon her çağırıldığında 0-urand_max arasında rastgele sayı üretmeli.
 // bu durumda fonksiyon en fazla URAND_MAX kadar sayi üretebilir.
 // Daha fazla çağırılırsa unique random sayi kalmamışsa hata olarka -1 döndürmeli.
-#define URAND_MAX      20
+#define URAND_MAX 20
 
 int urand(void){
 
@@ -244,9 +242,8 @@ int main(void){
 
 #endif
 
-
 // Diziyi ters çevirme algoritması
-#if  0
+#if 0
 
 #define SIZE 20
 
@@ -263,3 +260,249 @@ int main(void){
 }
 #endif
 
+#if 0
+
+int main(void){
+	
+	printf("%zu",sizeof(long long int)); // NOT %zu size_t türü içindir.
+}
+#endif
+
+// DIZININ ELEMAN SAYISINI BULMAK:
+#if 0
+
+int main(void){
+
+	int a[100];
+
+	int array_element_num = sizeof(a) / sizeof(5); // 5 yerine herhangi bir elemanı gelebilir.
+	printf("dizinin eleman sayisi: %zu", array_element_num);
+
+}
+
+#endif
+
+#if 0
+
+//#define aasize(x) (sizeof(x)) / (sizeof(x[0]))
+int main(void){
+
+	int a[100];
+
+	int array_element_num = asize(a);
+	printf("dizinin eleman sayisi: %zu", array_element_num);
+
+}
+
+#endif
+
+/*MULAKAT SORUSU*/
+#if 0
+//#define asize(x) (sizeof(x) / sizeof(x[0])) zaten header file içerisinde tanımlı.
+int main(void){
+	int a[5] = {1,2,3,4,5};
+	
+	for(int i = -2; i < asize(a) - 2; ++i){
+		printf("%d",a[i+2]);
+	}
+}
+#endif
+
+/*ODEV2*/
+
+// dizinin elemaninin degeri kadar her seferinde yildiz bastır ekrana.
+// Sonrasında ise bu olusan goruntunun horizonal halini bastıran kodu yaz.
+#if 0
+#define SIZE 10
+int main(void)
+{
+
+	int a[SIZE];
+	randomize;
+	for (int i = 0; i < SIZE; ++i)
+	{
+		a[i] = rand() % 20 + 1;
+		printf("%d ", a[i]);
+	}
+	printf("\n");
+
+	for (int i = 0; i < SIZE; ++i)
+	{
+
+		for (int j = 0; j < a[i]; ++j)
+		{
+
+			putchar('*');
+		}
+		putchar('\n');
+	}
+}
+
+#endif
+
+/*BUBBLE SORT ALGORITHM*/
+#if 0
+#define SIZE 100
+int main(void)
+{
+
+	int a[SIZE];
+
+	randomize();
+
+	set_array_random(a, SIZE);
+
+	print_array(a, SIZE);
+	printf("\n");
+
+	for (int i = 0; i < SIZE - 1; ++i)
+	{
+		for (int k = 0; k < SIZE - 1 - i; ++k)
+		{
+			if (a[k] < a[k + 1])
+			{
+				int temp = a[k];
+				a[k] = a[k + 1];
+				a[k + 1] = temp;
+			}
+		}
+	}
+	print_array(a, SIZE);
+}
+#endif
+
+/*MERGE ALGORITHM*/
+#if 0
+#define SIZE 20
+int main(void)
+{
+	int idx_a = 0;
+	int idx_b = 0;
+	int a[SIZE];
+	int b[SIZE];
+	int c[SIZE * 2];
+
+	randomize();
+
+	set_array_random(a, SIZE);
+	set_array_random(b, SIZE);
+
+	sort_array(a, SIZE);
+	sort_array(b, SIZE);
+
+	print_array(a, SIZE);
+	print_array(b, SIZE);
+	for (int i = 0; i < 2 * SIZE; ++i)
+	{
+		if (idx_a == SIZE)
+		{
+			c[i] = b[idx_b++];
+		}
+		else if (idx_b == SIZE)
+		{
+			c[i] = a[idx_a++];
+		}
+		else if (a[idx_a] < b[idx_b])
+		{
+			c[i] = a[idx_a++];
+		}
+		else
+		{
+			c[i] = b[idx_b++];
+		}
+	}
+	print_array(c, SIZE * 2);
+}
+#endif
+
+/*Binary Search*/
+#if 0
+#define SIZE 20
+int main(void)
+{
+	int a[SIZE];
+	randomize();
+	set_array_random(a, SIZE);
+	sort_array(a, SIZE);
+	print_array(a, SIZE);
+
+	int idx_first = 0;
+	int idx_last = SIZE - 1;
+	int idx_mid;
+	int key;
+	printf("Aranacak degeri giriniz: ");
+	scanf("%d", &key);
+
+	while (idx_first <= idx_last)
+	{
+		idx_mid = (idx_first + idx_last) / 2;
+		if (a[idx_mid] < key)
+		{
+			idx_first = idx_mid + 1;
+		}
+		else if (a[idx_mid] > key)
+		{
+			idx_last = idx_mid - 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+	if(idx_first > idx_last)
+	{
+		printf("Bulunamadi");
+	}
+	else{
+	printf("aranilan deger dizinin %d indexinde bulunmaktadir.", idx_mid);
+	}
+}
+#endif
+
+/*STRINGS*/
+#if 0
+int main(void)
+{
+	char s[100];
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	for(int i = 0; s[i] != '\0'; ++i){
+		printf("%c",s[i]);
+		
+	}
+}
+#endif
+
+/*puts() fonksiyonu*/
+#if 0
+int main(void)
+{
+	char s[100];
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	puts(s); // Fonksiyon dizinin adresini istiyor. Dizinin ismi yazıldığında ilk elemanın adresi verilmiş olur.
+}
+#endif
+
+
+#if 1
+int main(void)
+{
+	char s[100];
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	printf("isim = %s",s);
+}
+#endif

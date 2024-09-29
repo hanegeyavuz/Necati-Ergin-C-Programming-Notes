@@ -3721,6 +3721,448 @@ int main(void){
 
 ## sizeof Operator
 
+ - sizeof bir keyword fakat operatör görevi de vardır.
+ - Bir türün storage ihtiyacını hesaplar.
+ - `size_t` türünden bir değer döndürür.
+	 - `size_t` türü derleyiciye göre değişebilen bir **tür eş ismidir.** 
+	 - Döndürdüğü değerin eş ismi olan tür değişse de kesinlikle **unsigned** olmak zorundadır.
+ - Bir sabit ifadesidir.
+ -   sizeof operatörünün operandı bir tür ismi ise parantez içinde olmak zorundadır. `sizeof(int)`
+ - sizeof operatörünün operandı bir türe ait değişken ise parantez içinde olmak zorunda değildir.
+```c
+double dval = 4.5;
+printf("%zu", sizeof dval);
+printf("%zu", sizeof(dval));
+/*Aynı anlama sahiptir.*/
+```
+
+>[!INFO] sizeof operatörünü risk almamak için her durumda parantez içinde yazmayı tercih ediyorum.
 
 
+---
+```c
+printf("%zu", sizeof(char1 + char2));
 
+```
+
+out:
+`4`
+**Sebebi:**
+- C dilinde iki `char` türünde değişken toplandığında sonuç bir `int` türüne dönüşür. Bunun nedeni, C dilinde aritmetik işlemler sırasında küçük türlerin (`char`, `short` gibi) daha geniş türlere, genellikle `int`'e genişletilmesidir. Buna **integer promotion** (tamsayı genişletmesi) denir. 
+
+Örneğin:
+
+```c
+char a = 10;
+char b = 20;
+int c = a + b;
+```
+
+- Burada `a + b` işlemi gerçekleştirilirken, hem `a` hem de `b` önce `int` türüne genişletilir ve sonuç da `int` türünde olur.
+
+- Bu durum, bellek taşmalarını önlemek ve işlemcinin daha verimli çalışması için tasarlanmıştır.
+
+---
+>[!NOTE] sizeof operatörü kullanımında **array decay** geçerli değildir. Yani dizinin ilk elemanının adresi operand olarak alınmaz.
+
+### Çok Kullanılan bir İfade
+
+```c
+int main(void){
+
+	int a[100];
+
+	int array_element_num = sizeof(a) / sizeof(5); // 5 yerine herhangi bir elemanı gelebilir.
+	printf("dizinin eleman sayisi: %zu", array_element_num);
+
+}
+```
+
+- Sık kullanılan makrolardan biridir.
+
+```c
+
+#define asize(x) ((sizeof(x)) / (sizeof(x[0]))
+
+
+int main(void){
+
+	int a[100];
+
+	int array_element_num = sizeof(a) / sizeof(5); // 5 yerine herhangi bir elemanı gelebilir.
+	printf("dizinin eleman sayisi: %zu", array_element_num);
+
+}
+
+```
+
+---
+
+>[!NOTE] C programlamada operatör içermesine rağmen derleyicinin bir işlem kodu üretmediği tek durum sizeof operatörüdür!
+
+```c
+int main(void){
+	int x = 99;
+	unsigned int y = sizeof(x++);
+	
+	printf("%zu\n",y);
+	printf("%d\n",x);
+}
+
+```
+
+out:
+```
+4
+99
+```
+
+---
+### Mülakat Sorusu
+
+```c
+#define asize(x) (sizeof(x) / sizeof(x[0]))
+int main(void){
+	int a[5] = {1,2,3,4,5};
+	
+	for(int i = -2; i < asize(a) - 2; ++i){
+		printf("%d",a[i+2]);
+	}
+}
+
+```
+
+out:
+`         `
+
+**Sebebi: for döngüsünde int ile unsigned int(sizeof operatoründen gelen değer) karşılaştırıldığında işlem unsigned int türünden yapılır. Bu sebebple döngü gövdesine girmez.**
+
+---
+
+## Odev2:
+- Dizinin elemanlarının değeri kadar ekrana yıldız bastır.
+- Yapılan işlemin çıktısının 90 derece saat yönünün tersine döndürülmüş halini ekrana bastır.
+```c
+#define SIZE 20
+
+int main(void){
+
+	int a[SIZE];
+	randomize;
+	for(int i = 0; i < SIZE; ++i){
+		a[i] = rand() % 20 + 1;
+		printf("%d",a[i]);
+	}
+	printf("\n");
+}
+
+```
+
+>[!NOTE] Çözümler Homeworks klasöründe olacaktır.
+
+---
+
+# 17.09.2024
+
+---
+## Odev 3
+
+>[!INFO] **subsequence** terimi bir dizinin ardışık elemanlarından oluşan dizidir.
+>
+
+Maximum Subsequence Problem:
+- En az bir negatif değere sahip bir dizide bulunan en büyük toplamı verecek subsequence bulunması gerekmektedir.
+
+## Odev 4 
+- Partition Point
+	- Bir dizideki çift elemanlar dizinin başına tekler ise sonuna gelmelidir. Bu örüntüyü bozan ilk eleman partition point olarak nitelendirilir. 
+	- Random bir dizi alın ve bunun partition pointini bulun
+
+## Odev 5
+- Linear Search algoritmasındaki karşılaştırma işlemleri 1 işlem, arttırma işlemleri 1 işlem olarak sayılır. Toplam 3 işlem olmaktadır. Bu problemi 2 işlem ile yapınız. **(Kolay bir soru değil)**
+```c
+#define SIZE 20
+int main(void){
+
+    int a[SIZE];
+
+    randomize();
+
+    set_array_random(a,SIZE);
+
+    print_array(a,SIZE);
+
+    int key;
+
+    int i;
+    printf("Aranacak degeri giriniz: ");
+
+    scanf("%d",&key);
+//                  1 islem   1 islem   1 islem
+    for(i = 0; i < SIZE && a[i] != key; ++i){
+
+        ; // null statement
+
+    }
+    if(i < SIZE){
+        printf("bulundu idx = %d\n",i);
+    }
+    else{
+        printf("bulunamadi\n");
+    }
+}
+```
+
+---
+## Sıralama Algoritmaları (Sorting Algorithms)
+
+-  Çok fazla sıralama algoritması vardır çünkü sıralama alogirtmalarında **tek önemli ölçüt comp. complexity değildir.**
+- Sıralama kriteri ile sıralama algoritması aynı şey değildir.
+### Bubble Sort
+- Algoritmanın mantığı şu şekildedir:
+	- Dizideki 2 eleman alınır. Bu elemanlar istenilen yerde değilse **swap** edilir.
+
+- Küçükten büyüğe sıralama:
+```c
+#define SIZE 100
+int main(void){
+
+    int a[SIZE];
+
+    randomize();
+
+    set_array_random(a,SIZE);
+
+    print_array(a,SIZE);
+
+	for(int i = 0; i < SIZE - 1; ++i){
+		for(int k = 0; k < SIZE - 1 - i; ++k){
+			if(a[k] > a[k+1]){
+				int temp = a[k];
+				a[k] = a[k+1];
+				a[k+1] = temp;
+			}
+		
+		}
+	
+	}
+	print_array(a,SIZE);
+}
+
+```
+
+
+>[!NOTE] Quick Sort gibi algortima karmaşıklığı daha az olan sıralama algoritmaları kullanılarak büyük verilerle yapılan işlemler çok çok daha kısa sürelerde yapılabilmektedir. 
+
+### Merge Algorithm
+
+```c
+#define SIZE 20
+
+int main(void)
+
+{
+    int idx_a = 0;
+    int idx_b = 0;
+
+    int a[SIZE];
+    int b[SIZE];
+    int c[SIZE * 2];
+    
+    randomize();
+    set_array_random(a, SIZE);
+    set_array_random(b, SIZE);
+
+    sort_array(a, SIZE);
+    sort_array(b, SIZE);
+
+    print_array(a, SIZE);
+    print_array(b, SIZE);
+
+    for (int i = 0; i < 2 * SIZE; ++i)
+    {
+        if (idx_a == SIZE)
+        {
+            c[i] = b[idx_b++];
+        }
+        else if (idx_b == SIZE)
+        {
+            c[i] = a[idx_a++];
+        }
+        else if (a[idx_a] < b[idx_b])
+        {
+           c[i] = a[idx_a++];
+        }
+        else
+        {
+            c[i] = b[idx_b++];
+        }
+    }
+    print_array(c, SIZE * 2);
+
+}
+```
+
+### Binary Search
+
+- Sıralı bir verideki istenilen değeri bulmaya yarayan algoritmadır.
+```c
+/*SIRALI VERIDEKI KEY'I BULMA*/
+
+#if 1
+
+#define SIZE 20
+
+int main(void)
+
+{
+
+    int a[SIZE];
+
+    randomize();
+
+    set_array_random(a, SIZE);
+
+    sort_array(a, SIZE);
+
+    print_array(a, SIZE);
+
+  
+
+    int idx_first = 0;
+
+    int idx_last = SIZE - 1;
+
+    int idx_mid;
+
+    int key;
+
+    printf("Aranacak degeri giriniz: ");
+
+    scanf("%d", &key);
+
+  
+
+    while (idx_first <= idx_last)
+
+    {
+
+        idx_mid = (idx_first + idx_last) / 2;
+
+        if (a[idx_mid] < key)
+
+        {
+
+            idx_first = idx_mid + 1;
+
+        }
+
+        else if (a[idx_mid] > key)
+
+        {
+
+            idx_last = idx_mid - 1;
+
+        }
+
+        else
+
+        {
+
+            break;
+
+        }
+
+    }
+
+    printf("aranilan deger dizinin %d indexinde bulunmaktadir.", idx_mid);
+
+}
+
+#endif
+
+```
+
+
+## Strings (Yazılar)
+- Üst seviye programlama dillerine nazaran C dilinde elemanları char olan bir dizide yazılar tutulur.
+- Dizinin uzunluğu da bizim için önemli bir parametredir.
+### Null-Terminated Byte String
+- Dizinin uzunluğunun belirlenemsi için dizi sonuna **null character `\0`** yerleştirilmesi işlemidir.
+
+```c
+int main(void)
+{
+	char s[100];
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	for(int i = 0; i != '\0'; ++i){
+		printf("%c",s[i]);
+	}
+}
+```
+- Aksi söylenmedikçe NTBS şeklinde implemente edilmiş bir koda sonu null character ile biten bir dizi verilmelidir. Aksi durumda ub olur.
+
+>[!IMPORTANT] Dizi eğer global tanımlı veya statik ömürlü olacak şekilde tanımlanmış bir dizi ise sonuna null karakter koyulmasa bile null karakter bulundurur. Çünkü statik ömürlü karakter dizilerinin tüm elemanları null karakter ile başlar.
+
+```c
+char s[100];
+int main(void)
+{
+
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	for(int i = 0; i != '\0'; ++i){
+		printf("%c",s[i]);
+	}
+}
+```
+
+```c
+
+int main(void)
+{
+	static char s[100];
+	s[0] = 'M';
+	s[1] = 'U';
+	s[2] = 'S';
+	s[3] = 'A';
+	s[4] = '\0';
+	
+	for(int i = 0; i != '\0'; ++i){
+		printf("%c",s[i]);
+	}
+}
+```
+
+- Bir diziyi yazdırıp sonraki satıra geçilmesi isteniyorsa bu durumda standart kütüphanelerde bulunan aşağıdaki iki fonksiyon kullanılabilir.
+	- `puts()`
+	- ``
+- **printf() fonksiyonuna %s kullanılarak da yazı yazdırılabilir.**
+
+## Karakter dizisine ilk Değer Vermek
+
+```c
+int main(void)
+{
+	 char s[100] = {'K','U','B','A'};
+	 puts(s);
+}
+```
+- **Yukarıdaki dizi null-terminated byte string'tir. Fakat dizinin uzunluğu verilmemiş olsaydı NTBS olmazdı.**
+```c
+int main(void)
+{
+	 char s[] = {'K','U','B','A'}; // NTBS değil.
+	 puts(s); // TANIMSIZ DAVRANIS
+}
+
+```

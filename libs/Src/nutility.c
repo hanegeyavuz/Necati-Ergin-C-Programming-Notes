@@ -21,3 +21,20 @@ void print_array(const int* pArr, int size){
   }
   printf("\n---------------------------------------\n");
 }
+
+void sort_array(int* pa, int size){
+
+  for(int i = 0; i < size - 1; ++i){
+    for(int k = 0; k < size - 1 - i; ++k){
+      if(pa[k] > pa[k+1]){
+        int temp;
+        temp = pa[k];
+        pa[k] = pa[k + 1];
+        pa[k + 1] = temp;
+      }
+
+    }
+
+  }
+
+}
