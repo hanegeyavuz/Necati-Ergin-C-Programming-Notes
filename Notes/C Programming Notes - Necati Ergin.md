@@ -4354,6 +4354,76 @@ int main(void){
   -  check if the string is palindrom
 
 
+Solution:
+
+```c
+void ispalindrom(char *pa, int len)
+
+{
+
+    int idx_start = 0;
+
+    int idx_end = len - 1;
+
+  
+
+    while (1)
+
+    {
+
+  
+
+        while (idx_start <= idx_end && !(isalpha(pa[idx_start])))
+
+        {
+
+            idx_start++;
+
+        }
+
+  
+
+        while (idx_start <= idx_end && !(isalpha(pa[idx_end])))
+
+        {
+
+            idx_end--;
+
+        }
+
+        if (idx_start > idx_end || tolower(pa[idx_start]) != tolower(pa[idx_end]))
+
+        {
+
+            break;
+
+        }
+
+        idx_start++;
+
+        idx_end--;
+
+    }
+
+    if (idx_start > idx_end)
+
+    {
+
+        printf("Bu bir palindromdur.\n");
+
+    }
+
+    else
+
+    {
+
+        printf("Bu bir palindrom degildir.\n");
+
+    }
+
+}
+```
+
 ---
 
 ### String Birleştirme
@@ -4380,3 +4450,51 @@ int main(void){
 
 ```
 
+---
+# 20.09.2024
+
+## Pointers
+- Adres anlamına gelmektedir.
+1. Object Pointers (nesnelerin adresleri)
+2. Function Pointers (Fonksiyonların Adresleri)
+
+ - Farklı türlerden değişkenlerin adresleri olan ifadeler farklı türden ifadelerdir.
+	- x herhangi bir "T" türünden bir değişken olsun. Eğer bir ifade x değişkeninin adresi anlamına geliyorsa bu ifadenin türü T*'dir.
+- Tüm adreslerin kapladığı bellek alanı aynıdır.
+	- int* -> pointer to int
+	- char* -> pointer to char
+- `int* ptr;` değeri **int** nesne adresi olan bir değişken
+- `float* ptr` değeri **float** nesne adresi olan bir değişken
+
+- Genellikle asterisk declerator'ü türe yapışık kullanılır. (opsiyonel)
+>[!NOTE] Virgüllerle ayrılmış listede pointer tanımı yalnızca ilk değişkene aittir.
+
+```c
+//int* p1, p2, p3;
+int* p1;
+int p2;
+int p3;
+
+//Aynı anlama gelmektedir.
+
+```
+
+- Ömür kavramı pointerlarda da değişkenler gibidir. 
+	- Auto Ömürlü pointer değişkenler
+	- Statik ömürlü pointer değişkenler
+```c
+int* gp; // Statik ömürlü global
+
+void foo(int* p){ // otomatik ömürlü parametre
+	int* a; // otomatik ömürlü yerel GARBAGE VALUE!
+	static int* b; // Statik ömürlü yerel
+}
+```
+
+```c
+int main(void){
+
+//	int* p = int türden bir nesne adresi; Burdaki yıldız türü simgeler.
+//	p = int türden bir nesne adresi 
+}
+```
