@@ -55,3 +55,36 @@ void sgets(char *p)
   }
   p[len] = '\0';
 }
+
+
+void ispalindrom(char *pa,int len)
+{
+    int idx_start = 0;
+    int idx_end =len - 1;
+
+    while (1)
+    {
+
+        while (idx_start <= idx_end && !(isalpha(pa[idx_start])))
+        {
+            idx_start++;
+        }
+
+        while (idx_start <= idx_end && !(isalpha(pa[idx_end])))
+        {
+            idx_end--;
+        }
+        if(idx_start > idx_end || tolower(pa[idx_start]) != tolower(pa[idx_end])){
+          break;
+        }
+        idx_start++;
+        idx_end--;
+    }
+    if(idx_start > idx_end){
+        printf("Bu bir palindromdur.\n");
+    }
+    else{
+      printf("Bu bir palindrom degildir.\n");
+
+    }
+}
