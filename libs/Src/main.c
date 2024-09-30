@@ -608,4 +608,35 @@ int main(void)
 
 #endif
 
+/*Palindrom Odevi */
+#if 0
+int main(void)
+{
+	char test_str1[255] = "en iyi mese bese mi yine?";
+	char test_str2[255] = "Ana, Naci Dede ne dedi Canan'a?";
+	char test_str3[255] = "Tras neden sart?";
+	char test_str4[255] = "Para hazir. Ama Riza harap!";
+	char test_str5[255] = "at sahibi gibi hasta";
+	char test_str6[255] = "A man, a plan, a canal, Panama";
+	char test_str7[255] = "A man, a plan, a canal, Panama?s^''";
+	int len1 = asize(test_str1);
+	int len2 = asize(test_str2);
+	int len3 = asize(test_str3);
+	int len4 = asize(test_str4);
+	int len5 = asize(test_str5);
+	int len6 = asize(test_str6);
+	int len7 = asize(test_str7);
+	printf(test_str1);printf("	");ispalindrom(test_str1, len1);
+	printf(test_str2);printf("	");ispalindrom(test_str2, len2);
+	printf(test_str3);printf("	");ispalindrom(test_str3, len3);
+	printf(test_str4);printf("	");ispalindrom(test_str4, len4);
+	printf(test_str5);printf("	");ispalindrom(test_str5, len5);
+	printf(test_str6);printf("	");ispalindrom(test_str6, len6);
+	printf(test_str7);printf("	");ispalindrom(test_str7, len7);
+}
+#endif
 
+#if 1
+
+
+#endif
