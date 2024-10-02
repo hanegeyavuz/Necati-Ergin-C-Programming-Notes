@@ -4498,3 +4498,234 @@ int main(void){
 //	p = int türden bir nesne adresi 
 }
 ```
+
+### Pointer Operators
+1. `[ ]` subscript / index
+2.  `->` member selection
+3.  `&`  adress of 
+4.  `*` dereferencing
+
+- Dizinin elemanına erişmek için de bir pointer operasyonu gerçekleştirilir.
+#### Adress of Operator
+- 2. öncelik seviyesinde
+- Unary prefix
+- right associative (öncelik sağdan sola)
+- Operand L Value olmak zorunda.
+- Bir değişkenin adresini belirtir.
+```c
+int x = 6; 
+int y = 10;
+
+int* ptr = &x; // ptr'ye x'in adresi initialize edildi.
+```
+- Bir pointer değişkene;
+	- Bir değişkenin adresi,
+	- array decay ile bir dizinin ilk elemanının adresi atanabilir.
+	- Kendi türünden bir değişken değeri atanabilir.
+##### Yapılmaması Gerekenler:
+- Pointer değişkene adres olmayan bir değer ataması yapılmamalıdır.
+```c
+int x = 6; 
+
+int* ptr = x; // C dilinde legal, C++ da illegal. İki dilde de yapılmaması gerekiyor. int ==> int* dönüşümü olur
+```
+
+- Farklı türden 
+```c
+int* p; 
+double dval = 4.5;
+p = &dval;
+```
+
+>[!NOTE] adress of operatörü ile oluşturulan ifade (&x) R Value expression olur.
+
+---
+
+
+- Pointer değişkenler `%p` ile formatlı bir şekilde yazdırılabilir.
+```c
+#include <stdio.h>
+
+int main()
+{
+    int x = 10;
+    int* a = &x;
+    printf("pointer variable value = %p",a);
+}
+
+/*
+out: 
+pointer variable value = 0x7ffd50efbf0c
+*/
+```
+
+- Bir pointer değişkenin değeri ve adresi farklıdır.
+```c
+int main()
+{
+    int x = 10;
+	int* ptr = &x;
+
+	printf("&x  = %p\n",&x);
+	printf("ptr  = %p\n",ptr);
+	printf("&ptr  = %p\n",&ptr);
+}
+
+/*out:
+&x  = 0x7ffd170b64dc
+ptr  = 0x7ffd170b64dc
+&ptr  = 0x7ffd170b64e0
+*/
+```
+
+#### Dereferencing Operator (`*`)
+- Unary Prefix
+- **Dereferencing operandı bir adres türünden olmak zorundadır.**
+	- * ptr (pointer variable)
+	- * &x (adress of operator)
+	- * a **(array decay)**
+- Operandı olan adresteki nesneye erişim sağlar.
+
+```c
+
+#if 0
+
+/*Dereferencing Operator*/
+
+int main()
+
+{
+
+    int x[] = {10,20,30};
+
+    printf("before assign. a[0] = %d\n",x[0]);
+
+    *x = 777;
+
+    printf("after assign. a[0] = %d\n",x[0]);
+
+}
+
+#endif
+```
+
+- ar bir dizi olmak üzere `ar[0]` ile `*ar` yazmak arasında hiçbir fark yoktur.
+- İçerik operatörü ile oluşturulan geçerli tüm ifadeler L value'dur.
+>[!IMPORTANT] Nesnenin değerine değil nesneye erişim sağlar. 
+
+```c
+#if 1
+int main()
+{
+	int x = 35;
+	printf("x = %d\n", x);
+
+	int *ptr = &x;
+
+	*ptr = 999;
+
+	printf("x = %d\n", x);
+	++*ptr;
+	printf("x = %d\n", x);
+}
+
+/*
+out:
+x = 35
+x = 999
+x = 1000
+*/
+#endif
+```
+
+- **Dereferencing ile nesneye erişerek atama yapılabilir. Dereference operatörü direkt nesneye erişim sağlar yalnızca nesnenin değerine değil!!**
+```c
+int main()
+{
+	int x = 35;
+	int y = 45;
+	int z = 55;
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+	printf("\n", x);
+
+	int *ptr = &x;
+		*ptr = 999;
+	ptr = &y;
+		*ptr = 999;
+	ptr = &z;
+		*ptr = 999;
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+}
+/*
+out:
+x = 35
+y = 45
+z = 55
+
+x = 999
+y = 999
+z = 999
+*/
+
+```
+
+### Pointer Ne İşe Yarar?
+- Fonksiyonlarda parametre geçerken call by reference yaparsak fonksiyona değişkenin kendisini göndeririz.
+- Call by value yaparsak yalnızca değişkenin değerini göndermiş oluruz.
+- **C dilinde call by reference pointer semantiği ile gerçekleşir.**
+```c
+void swap(int* a,int* b){
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}
+```
+
+- Test of function
+```c
+/*Test of swap fucntion with call by reference*/
+int main()
+{
+	int x = 31;
+	int y = 69;
+
+	int *p1 = &x;
+	int *p2 = &y;
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+
+	swap(&x, &y);
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+
+	swap(p1, p2);
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+}
+
+/*
+out:
+x = 31
+y = 69
+
+x = 69
+y = 31
+
+x = 31
+y = 69
+*/
+```
+
+---
+# 24.09.2024

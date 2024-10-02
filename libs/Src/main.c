@@ -636,7 +636,162 @@ int main(void)
 }
 #endif
 
-#if 1
+#if 0
+/*Pointer Variable formatting*/
+int main()
+{
+    int x = 10;
+    int* a = &x;
+    printf("pointer variable value = %p",a);
+}
+#endif
 
+#if 0
+/*adress of pointer variable*/
+int main()
+{
+    int x = 10;
+	int* ptr = &x;
 
+	printf("&x  = %p\n",&x);
+	printf("ptr  = %p\n",ptr);
+	printf("&ptr  = %p\n",&ptr);
+}
+
+/*out:
+&x  = 0x7ffd170b64dc
+ptr  = 0x7ffd170b64dc
+&ptr  = 0x7ffd170b64e0
+*/
+#endif
+
+#if 0
+/*Dereferencing Operator*/
+int main()
+{
+    int x[] = {10,20,30};
+	printf("before assign. a[0] = %d\n",x[0]);
+    *x = 777;
+    printf("after assign. a[0] = %d\n",x[0]);
+}
+#endif
+
+#if 0
+int main()
+{
+	int x = 35;
+	printf("x = %d\n", x);
+
+	int *ptr = &x;
+
+	*ptr = 999;
+
+	printf("x = %d\n", x);
+	++*ptr;
+	printf("x = %d\n", x);
+}
+
+/*
+out:
+x = 35
+x = 999
+x = 1000
+*/
+#endif
+
+#if 0
+int main()
+{
+	int x = 35;
+	int y = 45;
+	int z = 55;
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+	printf("\n", x);
+
+	int *ptr = &x;
+		*ptr = 999;
+	ptr = &y;
+		*ptr = 999;
+	ptr = &z;
+		*ptr = 999;
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+}
+/*
+out:
+x = 35
+y = 45
+z = 55
+
+x = 999
+y = 999
+z = 999
+*/
+#endif
+
+#if 0
+/*pointerların adresini takas etmek*/
+int main()
+{
+	int x = 10;
+	int y = 20;
+	int* p1 = &x;
+	int* p2 = &y;
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+
+	int* ptemp = p1;
+	p1 = p2;
+	p2 = ptemp;
+
+	++*p1;
+	--*p2;
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+}
+#endif
+
+#if 0
+/*Test of swap fucntion with call by reference*/
+int main()
+{
+	int x = 31;
+	int y = 69;
+
+	int *p1 = &x;
+	int *p2 = &y;
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+
+	swap(&x, &y);
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+
+	swap(p1, p2);
+
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("\n");
+}
+
+/*
+out:
+x = 31
+y = 69
+
+x = 69
+y = 31
+
+x = 31
+y = 69
+*/
 #endif
