@@ -88,3 +88,9 @@ void ispalindrom(char *pa,int len)
 
     }
 }
+
+void swap(int* a, int* b){
+	int temp = *a;
+	*a = *b;
+	*b = temp;
+}

@@ -14,6 +14,7 @@ void print_array(const int* pArr, int size);
 void sort_array(int* pa, int size);
 void sgets(char* p);
 void ispalindrom(char *pa,int len);
+void swap(int* a, int* b);
 
 
 #endif // UTILITY_H
