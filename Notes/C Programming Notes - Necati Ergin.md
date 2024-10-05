@@ -4686,7 +4686,9 @@ void swap(int* a,int* b){
 }
 ```
 
-- Test of function
+- Call by Reference fonksiyonlara parametre olarak:
+	- **adress of (&)** operatorü ile değişkenin adresi verilebilir.
+	- Değişkenin adresini tutan **pointer değişken** verilebilir.
 ```c
 /*Test of swap fucntion with call by reference*/
 int main()
@@ -4701,13 +4703,13 @@ int main()
 	printf("y = %d\n", y);
 	printf("\n");
 
-	swap(&x, &y);
+	swap(&x, &y); // adress of variables
 
 	printf("x = %d\n", x);
 	printf("y = %d\n", y);
 	printf("\n");
 
-	swap(p1, p2);
+	swap(p1, p2); // pointer variable of x and y variables
 
 	printf("x = %d\n", x);
 	printf("y = %d\n", y);
@@ -4729,3 +4731,317 @@ y = 69
 
 ---
 # 24.09.2024
+
+### Neden Call by Referance?
+- Bir fonksiyon aldığı nesneyi değiştirmek istiyorsa call by reference kullanılmalıdır.
+### Neden Bir Nesneyi Değiştirelim
+- Şimdiye kadar yazılan fonksiyonlarda bir değer iletmesi için **geri dönüş değeri** kullandık.
+- **Alternatif olarak call by reference kullanılarak değerin adresine değer iletilebilir.**
+
+```c
+#if 1
+/*Call by Reference and Call by Value at same example*/
+
+#define pi 3.1415926
+double get_circle_area_1(double radius){
+	 double area = pi * (radius * radius);
+	  return area;
+}
+
+void get_circle_area_2(double radius, double *p_area){
+	 *p_area = pi * (radius * radius);
+}
+
+int main(void)
+{
+    double radius = 20;
+	double area_1 = 0;
+	double area_2 = 0;
+	area_1 = get_circle_area_1(radius);
+	get_circle_area_2(radius,&area_2);
+	printf("area_1 = %d\n",area_1);
+	printf("area_2 = %d\n",area_2);
+}
+#endif
+
+/*out:
+area_1 = 1412872442
+area_2 = 1412872442
+*/
+```
+
+>[!IMPORTANT] Yukarıdaki örnekte eğer kullanılan değere başka hiçbir durumda ihtiyaç yoksa call by value daha avantajlıdır. Örneğin bir fonksiyon dairenin alanını parametre olarak alıyorsa yalnızca call by value ile aşağıdaki gibi yazılabilir. 
+
+```c
+double get_some_value(double area);
+
+int main(void)
+{
+	double r = 0;
+	double x = get_some_value(get_circle_area_1(r));
+}
+```
+
+### Call by Reference Avantajları
+- Maliyet
+- Birden fazla değer iletimi
+#### Maliyet
+- Değişkene kopyalama maliyeti çok daha azdır.
+- Bahsedilen maliyet int, double gibi basic tipler için çok önemli değil fakat user define tipler için bellekte kapladığı alan artabileceğinden çok daha büyük maliyetler ortaya çıkar.
+- **Call by Reference ile 100 bytle lık bir alanın bile kopyalanması için 4 bytle'lık maliyet (pointer değişkenlerin kapladığı maliyet) oluşur.**
+
+```c
+typedef struct {
+	int a[20][20];
+	int row, col;
+
+}Matrix;
+
+Matrix get_random_matrix_1(void);
+//                       out parameter
+void get_random_matrix_2(Matrix* m);
+
+int main()
+{
+	printf("sizeof(Matrix) = %zu\n",sizeof(Matrix)); //out: 1608 byte
+	Matrix m1,m2;
+	m1 = get_random_matrix(); // 1608 bytle'lık bir alan kopyalandı.
+	get_random_matrix_2(&m2); // 4 bytle'lık alan kopyalandı.
+}
+```
+#### Birden Fazla Dönüş Değeri
+- Bir fonksiyon ile birden fazla dönüş değeri isteniyorsa yani birden fazla değişkene değer iletilmek isteniyorsa **Call by Reference** kullanılır.
+
+```c
+// 3 out param's 
+void get_values(double d1, double d2, double* p_alpha, double* p_beta, double* p_gamma){
+
+	//some code...
+	// *p_alpha = exp1;
+	// *p_beta = exp2;
+	// *p_gamma = exp3;
+}
+
+int main()
+{
+    double dx = 5,6;
+    double dy = 4.4;
+	double alpha, beta, gamma;
+	get_values(dx,dy,&alpha, &beta, &gamma); // alpha beta ve gamma değişkenlerine değer iletildi.
+}
+```
+
+>[!NOTE] Bazı fonksiyon yazımlarında **input** olarak kullanılan fonksiyon parametreleri de kopyalama işlemi maliyeti sebebiyle call by reference olarak çağırılabilirler fakat bu değişkenlerin yalnızca değeri kullanılabildiği için **const** anahtar sözcüğü ile çağırılırlar. (İleriki kısımlarda daha detaylı bahsedilecektir.)
+
+```c
+void foo(T *p);// set function
+void bar(const T *p); // input parameter
+```
+
+- Bir örnek:
+
+```c
+typedef struct {
+	int a[20][20];
+	int row, col;
+
+}Matrix;
+               //in param        in param         out param  
+void add_matrix(const Matrix *x, const Matrix *y, Matrix *presult){
+
+}
+int main(void)
+{
+	Matrix m1;
+	Matrix m2;
+	Matrix result;
+	add_matrix(&m1, &m2, &result);
+}
+```
+
+#### Dizilerin Fonksiyonlarda Kullanılması
+
+- **Dizilerin fonksiyonlara parametre olarak verilmesi için call by value kullanılamaz.**
+```c
+void foo1(int* p);
+void foo2(int p[]);    
+//YUKARIDAKİ 2 FONKSİYON TANIMLAMASININ BİR FARKI YOKTUR. PARAMETRELERİ POINTER DEĞİŞKENDİR.
+
+int main(void)
+{
+int a[100] = {1, 2, 3, 4, 5};
+foo1(a);
+foo2(a);
+/*Array decay dolayısıyla aşağıdaki 2 fonksiyonu yukarıdaki 2 fonksiyon ile aynı anlama gelir. */
+foo1(&a[0]);
+foo2(&a[0]);
+}
+```
+
+## `const` Keyword
+- Değişkenin değerinin değişememesi yani değişkeni **Immutable** yapabilmek için kullanılan anahtar sözcüktür.
+- C/C++ gibi dillerde bir değişkenin değer açısından 2 çeşidi olabilir:
+	- Mutable: Değişkenin değerinin değişebilmesi 
+	- Immutable: Değişkenin değerinin değişememesi
+- C/C++ dillerinde **default** olarak değişkenler **Mutable**'dır.
+```c
+int x = 10; //Mutable
+const int y = 15; //Immutable
+```
+
+- Const anahtar sözcüğü ile ilk değer ataması yapılan değişkenlerin değerini değiştirmek amacıyla atama yapılması **syntax hatasıdır**.
+```c
+const int a = 12;
+a = 50; // Syntax error!
+```
+
+```c
+const int a[5] = {2,3,4,5};
+
+int b = a[3] + a[0]; // No Syntax Error
+
+```
+
+- `const` anahtar sözcüğü tür belirten sözcükten önce veya sonra gelebilir.
+```c
+const int a = 5;
+int const a = 5;
+// SAME expression
+```
+
+### `const` Anahtar Sözcüğünün Kullanım Senaryoları
+- Değeri değişmemesi gereken bir değişken tanımlanırken kullanılır. Güvenlik açısından önem arz eder.
+- Kodu okuyana ve derleyici optimizasyonuna yardımcı olmak için kullanılabilir. 
+
+--- 
+
+>[!IMPORTANT] Bir `const` değişkenin değerini pointer kullanarak değiştirmek **UNDEFINED BEHAVIOUR** örneğidir!!
+
+```c
+int main(void){
+	const int a = 50;
+	int* p = (int*) &a;
+	*p = 45; // UB
+}
+```
+
+>[!NOTE] Mülakatlarda sıklıkla sorulur.
+
+---
+### Makro ile `const` Kullanım Farkı
+1.  Derleyici bir makro tanımını derleme esnasında göremez. Bu sebeple bir **scope'a sahip değildir.**
+2.  `const` anahtar sözcüğü ile tanımlanan bir değişkenin adresine erişilebilirken; makrolar bir adrese sahip değildir.
+3.  `const` anahtar sözcüğü ile dizi tanımlanabilirken, makro tanımlaması ile dizi oluşturulamaz.
+4. `const` anahtar sözcüğü ile tanımlanmış değişkenlere sabit ilk değer atandıktan sonra o değişkenleri *C programlama dilinde* **sabit ifadeler gerektiren** yerlerde kullanamayız.
+```c
+#define SIZE 1000
+int main(void){
+const int size = 1000;
+int arr[size] = {0}; // C++ dilinde geçerli iken C dilinde geçerli değildir.
+int arr[SIZE] = {0}; // C/C++ dillerinde geçerli bir ifadedir.
+}
+```
+
+## Pointers & `const`
+- Pointer değişkenlerde `const` anahtar sözcüğünün kullanımı bulunduğu yere bağlı olarak değişiklik gösterir.
+```c
+int main(void){
+	int x = 10;
+	int* const p1 = &x;
+
+/* Bu iki ifade aynı anlama gelir.*/
+	const int* p2 = %x;
+	int const* p3 = &x;
+}
+```
+- p2 ile p3 aynı anlama gelirken p1 ile p2 ve p3 farklı anlamlara gelmektedir.
+
+- Asteriks `(*)` deklaratöründen sonra gelen `const` anahtar sözcüğü:
+	- ***const pointer to int*** veya ***top-level const pointer*** olarak isimlendirilir.
+	- **Pointer değişkenin değeri asla değişemez.**
+```c
+int main(void){
+	int x = 10;
+	int y = 45;
+	
+	int* const ptr = &x; // const pointer to int
+	
+	ptr = &y; // SYNTAX ERROR!
+	*ptr = 999; // LEGAL
+}
+```
+
+- Asteriks `(*)` deklaratöründen önce gelen `const` anahtar sözcüğü:
+	- ***pointer to const int*** veya ***Low-Level Const*** olarak isimlendirilir.
+	- pointer adresini tuttuğu değere yalnızca okuma yapabilir.
+	- **Nesne dereferance operatörü ile kullanılıp değeri değiştirilemez.**
+
+```c
+int main(void){
+	int x = 10;
+	int y = 45;
+	
+	const int* ptr = &x; // const pointer to int
+	
+	*ptr = 999; // SYNTAX ERROR
+	ptr = &y; // LEGAL
+}
+```
+
+- Fonksiyonların pointer parametreleri ile tanımlanmalarında 2 ayrı interface vardır. 
+```c
+void set(T* p); // Set function
+
+void get(const T* p); // get function
+```
+
+>[!IMPORTANT] fonksiyon tanımlamalarında `const` sözcüğünün kullanımı sanıldığından çok çok daha büyük bir öneme sahiptir!
+
+- `const` dizilerin fonksiyonlarda kullanılabilmesi için fonksiyon parametresinin `const` anahtar sözcüğü ile oluşturulmuş olması gerekmektedir.
+```c
+/*const keyword in functions with const arrays*/
+void printArray1(int* p, int size){
+	//some codes...
+}
+
+void printArray2(const int* p, int size){
+	for(int i = 0; i < (size -1); ++i){
+		//putchar(p[i]);
+		printf("%d ",p[i]);
+	}
+}
+
+int main(void){
+	const int daytabs[] = {31,28,31,30};
+	//printArray1(daytabs,asize(daytabs)); // HATA  note: expected 'int *' but argument is of type 'const int *'
+	printArray2(daytabs,asize(daytabs)); // LEGAL
+}
+```
+
+>[!NOTE] Bazı fonksiyonlar parametre olarak çağırıldıkları koddan adres isterler ve aldıkları adresin hem değerini kullanırlar hem de yeni bir değeri o değişkene yazarlar. Bu fonksiyon parametrelerine **in-out** parametreler denir.
+
+```c
+		//in-out
+void foo(int* p){}
+
+		//out      
+void bar(int* p){}
+
+int main(void){
+
+	int x;
+
+	bar(&x);
+	foo(&x); // UNDEFINED BEHAVIOUR!! x init value is garbage value!
+}
+```
+
+>[!NOTE] Asla in-out parametrelere garbage value değişken geçmeyiniz. Undefined Behaviour örneğidir.
+
+- **Asteriks deklaratörünün hem sağında hem solunda `const` ifadesi olduğunda pointer'ın işaret ettiği değişken ve o değişkenin değeri değiştirilemez!!**
+```c
+const int* const p = &x; // const pointer to const int
+```
+
+---
+# 26.09.2024

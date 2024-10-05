@@ -638,7 +638,7 @@ int main(void)
 
 #if 0
 /*Pointer Variable formatting*/
-int main()
+int main(void)
 {
     int x = 10;
     int* a = &x;
@@ -648,7 +648,7 @@ int main()
 
 #if 0
 /*adress of pointer variable*/
-int main()
+int main(void)
 {
     int x = 10;
 	int* ptr = &x;
@@ -667,7 +667,7 @@ ptr  = 0x7ffd170b64dc
 
 #if 0
 /*Dereferencing Operator*/
-int main()
+int main(void)
 {
     int x[] = {10,20,30};
 	printf("before assign. a[0] = %d\n",x[0]);
@@ -677,7 +677,7 @@ int main()
 #endif
 
 #if 0
-int main()
+int main(void)
 {
 	int x = 35;
 	printf("x = %d\n", x);
@@ -700,7 +700,7 @@ x = 1000
 #endif
 
 #if 0
-int main()
+int main(void)
 {
 	int x = 35;
 	int y = 45;
@@ -735,7 +735,7 @@ z = 999
 
 #if 0
 /*pointerların adresini takas etmek*/
-int main()
+int main(void)
 {
 	int x = 10;
 	int y = 20;
@@ -758,7 +758,7 @@ int main()
 
 #if 0
 /*Test of swap fucntion with call by reference*/
-int main()
+int main(void)
 {
 	int x = 31;
 	int y = 69;
@@ -794,4 +794,121 @@ y = 31
 x = 31
 y = 69
 */
+#endif
+
+#if 0
+/*Call by Reference and Call by Value at same example*/
+#define pi 3.1415926
+
+double get_circle_area_1(double radius){
+	 double area = pi * (radius * radius);
+	  return area;
+}
+
+void get_circle_area_2(double radius, double *p_area){
+	 *p_area = pi * (radius * radius);
+}
+
+int main(void)
+{
+    double radius = 20;
+	double area_1 = 0;
+	double area_2 = 0;
+	area_1 = get_circle_area_1(radius);
+	get_circle_area_2(radius,&area_2);
+	printf("area_1 = %d\n",area_1);
+	printf("area_2 = %d\n",area_2);
+}
+#endif
+
+
+#if 0
+/*Cost of Call by Reference and Call by Value*/
+typedef struct {
+	int a[20][20];
+	int row, col;
+
+}Matrix;
+
+Matrix get_random_matrix_1(void){};
+void get_random_matrix_2(Matrix* m){};
+
+int main(void)
+{
+	printf("sizeof(Matrix) = %zu\n",sizeof(Matrix)); //out: 1608 byte
+	Matrix m1, m2;
+	m1 = get_random_matrix_1(); // 1608 bytle'lık bir alan kopyalandı.
+	get_random_matrix_2(&m2); // 4 bytle'lık alan kopyalandı.
+}
+#endif
+
+#if 0
+/*const keyword for input parameters*/
+typedef struct {
+	int a[20][20];
+	int row, col;
+
+}Matrix;
+               //in param        in param         out param  
+void add_matrix(const Matrix *x, const Matrix *y, Matrix *presult){
+	// some codes here...
+}
+int main(void)
+{
+	Matrix m1;
+	Matrix m2;
+	Matrix result;
+	add_matrix(&m1, &m2, &result);
+}
+
+#endif
+
+#if 0
+/*const pointer to int or Top-Level Const Pointer*/
+int main(void){
+	int x = 10;
+	int y = 45;
+	
+	int* const ptr = &x; // const pointer to int
+	printf("x = %d\n",x); // out:x = 10
+	
+	//ptr = &y; // SYNTAX ERROR!
+	*ptr = 999; // LEGAL
+	printf("x = %d\n",x); // out:x = 999
+}
+#endif
+
+#if 0
+/* pointer to const int or Low-Level Const Pointer*/
+int main(void){
+	int x = 10;
+	int y = 45;
+	const int* ptr = &x; // const pointer to int
+	printf("*ptr = %d\n",*ptr); // out: *ptr = 10
+	
+	//*ptr = 999; // SYNTAX ERROR
+	ptr = &y; // LEGAL
+	printf("*ptr = %d\n",*ptr); // out: *ptr = 45
+}
+#endif
+
+#if 1
+/*const keyword in functions with const arrays*/
+void printArray1(int* p, int size){
+}
+
+void printArray2(const int* p, int size){
+	for(int i = 0; i < (size -1); ++i){
+		//putchar(p[i]);
+		printf("%d ",p[i]);
+	}
+}
+
+int main(void){
+	const int daytabs[] = {31,28,31,30};
+	//printArray1(daytabs,asize(daytabs)); // HATA  note: expected 'int *' but argument is of type 'const int *'
+	printArray2(daytabs,asize(daytabs)); // LEGAL
+	
+
+}
 #endif
