@@ -821,7 +821,6 @@ int main(void)
 }
 #endif
 
-
 #if 0
 /*Cost of Call by Reference and Call by Value*/
 typedef struct {
@@ -892,7 +891,7 @@ int main(void){
 }
 #endif
 
-#if 1
+#if 0
 /*const keyword in functions with const arrays*/
 void printArray1(int* p, int size){
 }
@@ -910,5 +909,512 @@ int main(void){
 	printArray2(daytabs,asize(daytabs)); // LEGAL
 	
 
+}
+#endif
+#if 0
+int main(void){
+	int a[10] = {0};
+	int* p = a + 7; //Geçerli
+	a + 5;//Geçerli
+	3 + a;//Geçerli
+	p - 5;//Geçerli
+	//3 - a;//Geçersiz
+	p + 1;//Geçerli
+	//p + a;//Geçersiz
+}
+
+#endif
+
+#if 0
+/*Pointer Arithmetics*/
+int main(void){
+	int a[10] = {0}; //int
+	for(int i = 0; i < 10; ++i){
+		printf("%d. indisli elemanin adresi %p\n",i,a + i);
+	}
+}
+#endif
+
+#if 0
+/*Pointer Arithmetics*/
+int main(void){
+	int a[10] = {0,1,2,3,4,5,6,7,8,9};
+	printf("%d",*(a+3));
+}
+/* 
+out: 3
+*/
+#endif
+
+#if 0
+int main(void)
+{
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	for (int i = 0; i < asize(a); ++i)
+	{
+		printf("%d %d %d\n", a[i], *(a + i), *(i + a));
+	}
+}
+/*
+out:
+0 0 0
+1 1 1
+2 2 2
+3 3 3
+4 4 4
+5 5 5
+6 6 6
+7 7 7
+8 8 8
+9 9 9
+*/
+#endif
+
+#if 0
+int main(void)
+{
+	int a[10] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+	int* p = a;
+	printf("%d\n",*p);
+	printf("%p\n",p);
+	++p; // p = p + 1 ----> p'nin değeri bir sonraki elemanın adresi olur.
+	printf("%d\n",*p);
+	printf("%p\n",p);
+}
+/*
+out:
+0
+0061FEF4
+10
+0061FEF8
+ */
+#endif
+
+#if 0
+/* Subscript Operator */
+int main(void)
+{
+
+	int x = 5;
+	int *ptr = &x;
+	printf("x = %d\n", x);
+
+	ptr[0] = 888;
+	printf("x = %d\n", x);
+}
+
+/*
+out:
+x = 5
+x = 888
+*/
+#endif
+
+#if 0
+
+int main(void)
+{
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	int *ptr = a + 5;
+
+	printf("x = %d\n", a[0]);
+	printf("x = %d\n", *ptr);
+	printf("x = %d\n", ptr[0]); // *(ptr + 0)
+
+	printf("x = %d\n", a[3]);	// third index
+	printf("x = %d\n", ptr[3]); // *(ptr + 3)
+
+	printf("x = %d\n", ptr[-4]); // *(ptr - 4)
+	printf("x = %d\n", 2 [ptr]); // *(2 + ptr)
+}
+/*
+out:
+x = 0
+x = 5
+x = 5
+x = 3
+x = 8
+x = 1
+x = 7
+*/
+#endif
+
+#if 0
+
+void foo(int *ptr, int size)
+{
+	/* First Method for printing array */
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%d ", ptr[i]);
+	}
+	printf("\n");
+	/* Second Method for printing array */
+	while (size--)
+	{
+		printf("%d ", *ptr);
+		ptr++;
+	}
+	printf("\n");
+}
+
+int main(void)
+{
+	int ex = 592;
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	foo(a, asize(a));
+}
+
+/*
+out:
+0 1 2 3 4 5 6 7 8 9
+0 1 2 3 4 5 6 7 8 9
+
+*/
+
+#endif
+#if 0
+
+/*Mülakat sorusu: dizideki 2,3 ve 4. indexli elemanları yazdır.*/
+void foo(const int *ptr, int size)
+{
+	/* First Method for printing array */
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%d ", ptr[i]);
+	}
+	printf("\n");
+	/* Second Method for printing array */
+	while (size--)
+	{
+		printf("%d ", *ptr);
+		ptr++;
+	}
+	printf("\n");
+}
+
+int main(void)
+{
+	int ex = 592;
+	int a[10] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+	foo((a + 2), 3);
+}
+
+#endif
+
+#if 0
+/*Önceden yazılan fonksiyonları tekrar yazmak*/
+#define SIZE 100
+
+void set_array_random_1(int* p, int size){
+	for(int i = 0; i < size; ++i){
+		p[i] = rand() % 1000;
+	}
+/*	SECOND WAY
+	while(--size){
+
+		*p = rand() % 1000;
+		++p;
+
+	}*/
+}
+void print_array_random_1(const int *ptr, int size)
+{
+	/* First Method for printing array */
+	for (int i = 0; i < size; ++i)
+	{
+		
+		if( i && !(i % 20)){
+			putchar('\n');
+		}
+		printf("%3d ", ptr[i]);
+	}
+	printf("\n-----------------------------------------\n");
+}
+
+int add_arr(const int* p, int size){
+	int sum = 0;
+	while(size--){
+		sum += *p;
+		++p;
+	}
+	// for(int i = 0; i < size ; ++i){
+	// 	sum += p[i];
+
+	// }
+	return sum;
+}
+
+
+int main(void)
+{	
+	int sum = 0;
+	int a[SIZE];
+	randomize();
+	set_array_random_1(a,asize(a));
+	print_array_random_1(a,asize(a));
+	sum = add_arr(a,asize(a));
+
+	printf("\n sum = %d\n",sum);
+}
+
+#endif
+
+#if 0
+/*elemanları int olan bir dizinin elemanlarının ortalamasını hesaplayan fonksiyon*/
+#define SIZE 100
+double get_mean(const int* p,int size){
+	return (double)(sum_arr(p,size) / size);
+
+}
+
+int main(void)
+{	
+	int sum = 0;
+	double mean = 0;
+	int a[SIZE];
+	randomize();
+	set_array_random(a,asize(a));
+	print_array(a,asize(a));
+	sum = sum_arr(a,asize(a));
+	mean = get_mean(a,asize(a));
+
+	printf("sum = %d\n",sum);
+	printf("mean = %f\n",mean);
+}
+
+#endif
+
+#if 0
+#include <math.h>
+/*elemanları int olan bir dizinin elemanlarının standart sapmasını hesaplayan fonksiyon*/
+#define SIZE 100
+double get_std_dev(const int *p, int size)
+{
+	double mean = get_mean(p, size);
+	double sum_square;
+	for (int i = 0; i < size; ++i)
+	{
+		sum_square += (p[i] - mean) * (p[i] - mean);
+	}
+	return sqrt(sum_square / (size - 1));
+}
+
+int main(void)
+{
+
+	int a[SIZE];
+	randomize();
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	printf("stardart deviation = %f\n", get_std_dev(a, asize(a)));
+}
+
+#endif
+#if 0
+#include <math.h>
+/*elemanları int olan bir diziyi reverse eden fonksiyon*/
+#define SIZE 10
+void get_reverse_array(int *p, int size)
+{
+
+	for (int i = 0; i < size / 2; ++i)
+	{
+		int temp = p[i];
+		p[i] = p[size - 1 - i];
+		p[size - 1 - i] = temp;
+	}
+}
+
+int main(void)
+{
+
+	int a[SIZE];
+	randomize();
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	get_reverse_array(a, asize(a));
+	print_array(a, asize(a));
+}
+
+#endif
+#if 0
+/*elemanları int olan bir dizinin max ve ming değerlerini bulan fonksiyonlar*/
+
+#define SIZE 10
+// int get_max_array(const int* p, int size){
+//   int max = 0;
+//   for(int i = 0; i < size; ++i){
+//     max = p[i] > max ? p[i] : max;
+//   }
+//   return max;
+
+// }
+
+// int get_min_array(const int* p, int size){
+//   int min = 0;
+//   for(int i = 0; i < size; ++i){
+//     min = p[i] < min ? p[i] : min;
+//   }
+//   return min;
+
+// }
+int main(void)
+{
+
+	int a[SIZE];
+	randomize();
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	printf("max = %d\n", get_max_array(a, asize(a)));
+	printf("min = %d\n", get_min_array(a, asize(a)));
+}
+#endif
+#if 0
+/*elemanları int olan bir dizinin max ve min değerini tek fonksiyon ile bulmak*/
+
+#define SIZE 10
+/*
+void get_max_min_array(const int* p, int size,int* max, int* min){
+  *min = *p;
+  *max = *p;
+  for(int i = 0; i < size; ++i){
+    *min = p[i] < *min ? p[i] : *min;
+    *max = p[i] > *max ? p[i] : *max;
+  }
+}
+
+*/
+int main(void)
+{
+	int max, min = 0;
+	int a[SIZE];
+	randomize();
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	printf("max = %d\n", get_max_array(a, asize(a)));
+	printf("min = %d\n", get_min_array(a, asize(a)));
+	get_max_min_array(a, asize(a), &max, &min);
+	printf("max = %d\n min = %d\n", max, min);
+}
+#endif
+
+#if 0
+/*Array Copy*/
+#define SIZE 10
+
+// void copy_array(int* pdest, const int* psource,int size){
+//   /*FIRST WAY*/
+// 	// for(int i = 0; i < size; ++i){
+//   //   pdest[i] = psource[i];
+// 	// }
+// /*SECOND WAY*/
+//   // while(size--){
+//   //   *pdest = *psource;
+//   //   ++pdest;
+//   //   ++psource;
+//   // }
+//   /*THIRD WAY */
+//     while(size--){
+//       *pdest++ = *psource++;
+//   }
+// }
+int main(void)
+{
+	int a[SIZE] = {0};
+	int b[SIZE] = {0};
+	randomize();
+	printf("Source Array: ");
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	printf("Destination Array: ");
+	print_array(b, asize(b));
+	printf("Copy array source to destination ... \n");
+	printf("Destination Array: ");
+	copy_array(b,a,SIZE);
+	print_array(b, asize(b));
+}
+#endif
+
+#if 0
+/*Copy Array with size*/
+#define SIZE 100
+int main(void)
+{
+	int a[SIZE] = {0};
+	int b[SIZE] = {0};
+	int idx_a = 0;
+	int idx_b = 0;
+	int n = 0;
+	randomize();
+	printf("Source Array: \n");
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	printf("kaynak arrayin kacinci indexinden baslayarak: ");
+	scanf("%d",&idx_a);
+	printf("hedef arrayin kacinci indexinden baslayarak: ");
+	scanf("%d",&idx_b);
+	printf("kac eleman kopyalansin: ");
+	scanf("%d",&n);
+	copy_array((b+idx_b),(a+idx_a),n);
+	print_array(b, asize(b));
+}
+#endif
+
+#if 0
+/*Bubble Sort Algorithm*/
+#define SIZE 20
+
+// void bubble_sort(int *p, int size)
+// {
+// 	for (int i = 0; i < size - 1; ++i)
+// 	{
+// 		for (int k = 0; k < size - 1 - i; ++k)
+// 		{
+// 			if (p[k] > p[k + 1])
+// 			{
+// 				swap((p + k), (p + k + 1));
+// 			}
+// 		}
+// 	}
+// }
+
+int main(void)
+{
+	int a[SIZE] = {0};
+	randomize();
+	set_array_random(a, asize(a));
+	print_array(a, asize(a));
+	bubble_sort(a,SIZE);
+	print_array(a, asize(a));
+
+}
+#endif
+
+#if 0
+/*Swap Array Algorithm*/
+#define SIZE 20
+
+// void swap_array(int *p1, int *p2, int size)
+// {
+
+// 	while (size--)
+// 	{
+// 		swap(p1++, p2++);
+// 	}
+// }
+
+int main(void)
+{
+	int a[SIZE] = {0};
+	int b[SIZE] = {0};
+	randomize();
+	set_array_random(a, asize(a));
+	set_array_random(b, asize(b));
+	print_array(a, asize(a));
+	print_array(b, asize(b));
+	swap_array(a, b, SIZE);
+	print_array(a, asize(a));
+	print_array(b, asize(b));
 }
 #endif

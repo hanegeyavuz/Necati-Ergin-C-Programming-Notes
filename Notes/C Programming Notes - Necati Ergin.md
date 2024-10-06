@@ -5036,7 +5036,7 @@ int main(void){
 }
 ```
 
->[!NOTE] Asla in-out parametrelere garbage value değişken geçmeyiniz. Undefined Behaviour örneğidir.
+>[!ERROR] Asla in-out parametrelere garbage value değişken geçmeyiniz. Undefined Behaviour örneğidir.
 
 - **Asteriks deklaratörünün hem sağında hem solunda `const` ifadesi olduğunda pointer'ın işaret ettiği değişken ve o değişkenin değeri değiştirilemez!!**
 ```c
@@ -5044,4 +5044,275 @@ const int* const p = &x; // const pointer to const int
 ```
 
 ---
-# 26.09.2024
+# Lesson-31 (26.09.2024)
+
+- Hatırlatma: Array decay sebebiyle aşağıdaki ifadenin türü int* 'dır.
+```c
+int a[4] = { 0 };
+const int b[4] = { 0 };
+
+//&a // ifadesinin türü int* 'dır.
+// &b // ifadesinin türü const int* 'dır.
+```
+
+>[!WARNING] T bir tür olmak üzere `const T*` türünden `T*` türüne dönüşüm legal değildir. `const cast` olarak adlandırılan birkaç istisna durum(daha sonra anlatılacak) hariç yapılmamalıdır.!
+
+```c
+int main(void){
+
+	const int* x = 12;
+	int* ptr;
+	ptr = &x
+/*
+warning: initialization of ‘const int *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion]
+*/
+}
+```
+
+
+## Pointer Aritmetiği
+- C dilinde aşağıdaki işlemler **geçersizdir**:
+	- bir tam sayıdan adresin çıkartılması 
+	- Bir adres ile bir adresin toplanması 
+	
+- C dilinde aşağıdaki işlemler **geçerlidir**:
+	- bir adresle bir tam sayının toplanması 
+	- bir tam sayı ile adresin toplanması
+	- bir adresten tam sayının çıkartılması
+
+```c
+int main(void){
+	int a[10] = {0};
+	int* p = a + 7; //Geçerli
+	a + 5;//Geçerli
+	3 + a;//Geçerli
+	p - 5;//Geçerli
+	3 - a;//Geçersiz invalid operands to binary + (have 'int *' and 'int *')
+	p + 1;//Geçerli
+	p + a;//Geçersiz invalid operands to binary + (have 'int *' and 'int *')
+}
+```
+
+- Geçerli işlemlerdeki operatörlerin ürettiği değer bir **adrestir.**
+- Bir nesnenin adresine 1 eklersek o nesnenin türündeki bir sonraki adresi elde edilir.
+
+>[!NOTE] Bir dizinin 5 indisli elemanının adresine 1 toplarsak o dizinin türünden bağımsız olarak 6 indisli elemanının adresini elde ederiz.
+
+>[!NOTE] **Bir sonraki indisli elemanın adresinin kaç olacağı türe bağlıdır!! Örneğin türü int olan bir dizinin x indisli elemanı ile x+1 indisli elemanı arasındaki fark 4 olacaktır.**
+
+
+```c
+int main(void){
+	int a[10] = {0}; //int
+	for(int i = 0; i < 10; ++i){
+		printf("%d. indisli elemanin adresi %p\n",i,a + i);
+	}
+}
+/*
+out:
+0. indisli elemanin adresi 0x7ffdeb735a40
+1. indisli elemanin adresi 0x7ffdeb735a44
+2. indisli elemanin adresi 0x7ffdeb735a48
+3. indisli elemanin adresi 0x7ffdeb735a4c
+4. indisli elemanin adresi 0x7ffdeb735a50
+5. indisli elemanin adresi 0x7ffdeb735a54
+6. indisli elemanin adresi 0x7ffdeb735a58
+7. indisli elemanin adresi 0x7ffdeb735a5c
+8. indisli elemanin adresi 0x7ffdeb735a60
+9. indisli elemanin adresi 0x7ffdeb735a64
+*/
+```
+
+```c
+int main(void){
+	char a[10] = {0}; //char
+	for(int i = 0; i < 10; ++i){
+		printf("%p\n", a + i);
+	}
+}
+/*
+out:
+0. indisli elemanin adresi 0x7ffe8f88581e
+1. indisli elemanin adresi 0x7ffe8f88581f
+2. indisli elemanin adresi 0x7ffe8f885820
+3. indisli elemanin adresi 0x7ffe8f885821
+4. indisli elemanin adresi 0x7ffe8f885822
+5. indisli elemanin adresi 0x7ffe8f885823
+6. indisli elemanin adresi 0x7ffe8f885824
+7. indisli elemanin adresi 0x7ffe8f885825
+8. indisli elemanin adresi 0x7ffe8f885826
+9. indisli elemanin adresi 0x7ffe8f885827
+*/
+```
+
+- pointer aritmetiği ile bir dizinin elemanlarına erişim sağlanabilir.
+
+```c
+/*Pointer Arithmetics*/
+int main(void){
+	int a[10] = {0,1,2,3,4,5,6,7,8,9};
+	printf("%d",*(a+3));
+}
+/* 
+out: 3
+*/
+```
+
+>[!TIP] `&a[3]` ile `a+3` arasında hiçbir fark yoktur.
+
+```c
+int main(void)
+{
+	short a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	for (int i = 0; i < asize(a); ++i)
+	{
+		printf("%d %d %d\n", a[i], *(a + i), *(i + a));
+	}
+}
+/*
+out:
+0 0 0
+1 1 1
+2 2 2
+3 3 3
+4 4 4
+5 5 5
+6 6 6
+7 7 7
+8 8 8
+9 9 9
+*/
+```
+
+- Bir pointer ++ veya -- gibi ifadelerle işlem yapıldığı zaman adresi bir önceki veya sonraki elemanın adresine eşitlenir ve adres değeri türe bağlı olarak değişir.
+
+```c
+int main(void)
+{
+	int a[10] = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
+	int* p = a;
+	printf("%d\n",*p);
+	printf("%p\n",p);
+	++p; // p = p + 1 ----> p'nin değeri bir sonraki elemanın adresi olur.
+	printf("%d\n",*p);
+	printf("%p\n",p);
+}
+/*
+out:
+0
+0061FEF4
+10
+0061FEF8
+ */
+
+```
+
+>[!NOTE] Bir adresten bir adres çıkarılması geçerli bir işlemdir fakat sonucunda işaretli türden bir tam sayı elde edilir.
+
+## Subscript Operator
+- Bir pointer erişim operatörüdür. Kullanılan pointer üzerinde aritmetik işlem yaparak yeni nesnenin değerine erişim sağlar.
+- Bu operatör `[ ]` ile kullanılır. 
+- Pointer'lar üzerinde kullanılır.
+- Operatör öncelik tablosunun en üst sırasında yer alır.
+- ptr bir pointer olmak üzere:
+	- **`ptr[5]` ifadesi `*(ptr + 5)` ifadesine eşittir.**
+```c
+/* Subscript Operator */
+int main(void)
+{
+	int x = 5;
+	int *ptr = &x;
+	printf("x = %d\n", x);
+	ptr[0] = 888;
+	printf("x = %d\n", x);
+}
+/*
+out:
+x = 5
+x = 888
+*/
+```
+
+```c
+int main(void)
+{
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	int *ptr = a + 5;
+
+	printf("x = %d\n", a[0]);
+	printf("x = %d\n", *ptr);
+	printf("x = %d\n", ptr[0]); // *(ptr + 0)
+
+	printf("x = %d\n", a[3]);	// third index
+	printf("x = %d\n", ptr[3]); // *(ptr + 3)
+
+	printf("x = %d\n", ptr[-4]); // *(ptr - 4)
+	printf("x = %d\n", 2 [ptr]); // *(2 + ptr)
+}
+/*
+out:
+x = 0
+x = 5
+x = 5
+x = 3
+x = 8
+x = 1
+x = 7
+*/
+```
+
+- **Yani, `a[0]` ile `a*` arasında bir fark bulunmamaktadır.**
+
+>[!NOTE] Sık kullanımdan dolayı köşeli parantez ifadesi yalnızca dizilerde kullanılıyormuş algısı oluşmaktadır. Köşeli parantez ifadesi subscript operatörü olarak da kullanılabilir bunu göz önünde bulundurmak gerekir.
+
+## Diziler Üstünde İşlem Yapan Fonksiyonlar
+
+- Bir fonksiyon bir **dizinin herhangi bir elemanını** ve dizinin **boyutunu** parametre olarak alırsa dizinin diğer elemanlarına da pointer aritmetiği yoluyla erişebilir.
+- Bir dizinin tüm elemanlarını yazdırmak istersek:
+```c
+void foo(const int *ptr, int size)
+{
+	/* First Method for printing array */
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%d ", ptr[i]);
+	}
+	printf("\n");
+	/* Second Method for printing array */
+	while (size--)
+	{
+		printf("%d ", *ptr);
+		ptr++;
+	}
+	printf("\n");
+}
+
+int main(void)
+{
+	int ex = 592;
+	int a[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	foo(a, asize(a));
+}
+
+/*
+out:
+0 1 2 3 4 5 6 7 8 9
+0 1 2 3 4 5 6 7 8 9
+
+*/
+```
+
+- Dersin ilerleyen kısımlarında çeşitli fonksiyon implementasyonları yazılmıştır. Bu implementasyonlara `main.c` ve `nutility.c` dosyalarından ulaşılabilir.
+
+>[!INFO] `void func(int* p,int size);` şeklinde yazılan fonksiyonlar için **alternatif bir yol** daha var. `void func(int p[],int size);` şeklinde kullanım da aynı anlama gelmektedir. Fakat bu yalnızca fonksiyon parametresi olan pointerlar için geçerlidir.
+
+```c
+void func(int* p,int size);
+void func(int p[],int size);
+/* IKI FONKSIYON DA AYNI ANLAMA GELMEKTEDİR.*/
+```
+
+>[!NOTE] Necati Hoca asla bu 2. kullanım şeklini kullanmıyor. Ben de kullanmayı düşünmüyorum.
+
+---
+# Lesson-32 (27.09.2024)
