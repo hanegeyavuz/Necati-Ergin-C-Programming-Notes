@@ -5316,3 +5316,4 @@ void func(int p[],int size);
 
 ---
 # Lesson-32 (27.09.2024)
+a
