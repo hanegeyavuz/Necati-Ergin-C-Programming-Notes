@@ -208,3 +208,22 @@ void swap_array(int *p1, int *p2, int size)
     swap(p1++, p2++);
   }
 }
+
+
+void reverse_copy(int* pdest, const int* psource,int size){
+
+	int start_idx = 0;
+	int end_idx = 0;
+	
+	pdest += size;
+	while(size--){
+		*--pdest = *psource++;
+
+	}
+}
+
+void printArray_alternative(const int* ps,const int* pe){
+	while(ps != pe){
+		printf("%3d ",ps++);
+	}
+}

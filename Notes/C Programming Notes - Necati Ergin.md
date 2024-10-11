@@ -5316,4 +5316,170 @@ void func(int p[],int size);
 
 ---
 # Lesson-32 (27.09.2024)
-a
+
+## Pointer Idioms
+
+- Bu kısımda bazı ifadelerin idiom mu syntax hatası mı olduğunu ele alınacaktır.
+```c
+int main(void){
+	int x = 5;
+	//++&x; /*Syntax Error*/
+	//&x++; /*Syntax Error*/
+	//&++x; /*Syntax Error*/
+}
+```
+
+
+```c
+int main(void){
+	int x[5] = {10,20,30,40,50};
+	int* ptr = a;
+	*ptr++ = 500; // Geçerli.
+	/*x dizisinin ilk elemanı 500 oldu. */
+}
+```
+
+```c
+int main(void){
+	int x[5] = {10,20,30,40,50};
+	int* ptr = a;
+	*++ptr = 700; // Geçerli.
+	/*x dizisinin ikinci elemanı 700 oldu. */
+}
+```
+
+## Adresler ve Karşılaştırma İşlemleri
+
+C dilinde 2 adresin eşit olma şartı :
+- İkisi de aynı nesneyi gösteriyorsa
+- İkisi de aynı dizinin bittiği yeri gösteriyorsa
+- İkisi de NULL pointer ise
+
+```c
+int main(void){
+	int x[5] = {10,20,30,40,50};
+	int* ptr = a;
+	int* ptr2 = a;
+
+	if(ptr == ptr2){
+		printf("iki pointer esittir.");
+	}
+}
+/*
+out: iki pointer esittir.
+*/
+```
+
+- Dizinin bittiği adrese ilişkin bir örnek:
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    
+    int a[5] = {10,20,30,40,50};
+    
+    int* p = a;
+    int* pend = a+5;
+    
+    while(p != pend){
+        printf("%d\n",*p++);
+    }
+}
+/*
+out:
+10
+20
+30
+40
+50
+*/
+```
+
+- printArray fonksiyonunun alternatif yazım biçimi:
+
+```c
+void printArray(const int* ps,const int* pe){
+	while(ps != pe){
+		printf("%3d ",*ps++);
+	}
+}
+```
+
+- Yukarıdaki fonksiyona parametre girilirken (a,a+SIZE) şeklinde girilmelidir.
+
+>[!NOTE] C ve C++ dillerinde değişkenler 1 elemanlı diziymiş gibi kullanılabilirler.
+
+```c
+int main(void){
+	int x = 10;
+	int* p1 = &x + 1;
+}
+
+```
+
+- ReverseArray fonksiyonuna alternatif yazım:
+```c
+void ReverseArray(int* p, int size){
+	int* plast = p + size - 1;
+	while(p < plast){
+		swap(p++,plast--);
+	}
+}
+```
+
+## Adres Döndüren Fonksiyonlar
+### Syntax
+ 
+```c
+int *foo(void); // Adres döndüren fonksiyon
+int bar(void); // Normal fonksiyon
+```
+
+>[!IMPORTANT] Bu şekilde yazılan fonksiyonların geri dönüş değerini **pointer** türünden bir değişkende tutmak gereklidir.
+
+```c
+int *foo(void); // Adres döndüren fonksiyon
+
+int main(void){
+
+	int* ptr = foo();
+}
+```
+
+```c
+
+int g = 10;
+int *foo(void){ // Adres döndüren fonksiyon
+    return &g;
+} 
+
+int main(void){
+
+	int* ptr = foo();
+	printf("g = %d\n",g);
+	*ptr = 999;
+	printf("g = %d\n",g);
+}
+/*
+out:
+g = 10
+g = 999
+*/
+```
+
+- **ÇOK SIK YAPILAN BİR HATA!!**
+```c
+int *foo(void){ // Adres döndüren fonksiyon
+    int x = 0; // Auto Variable
+	// codes...
+	x = 999;
+	return &x;
+} 
+```
+- Yukarıdaki ifadede `x` bir yerel değişkendir. **Auto ömürlüdür.** Bundan dolayı x'in adresi fonksiyon sonrasında x'e ait değildir. **UNDEFINED BEHAVIOUR**
+
+- Adres Döndüren Fonksiyonlar tanımsız davranış olmadan aşağıdaki adresleri döndürebilir:
+	1. Static Ömürlü nesne adresi döndürebilir.
+	2. Çağıran koddan aldığı adresi döndürebilir.
+	3. Dinamik ömürlü bir nesne adresi döndürebilir.

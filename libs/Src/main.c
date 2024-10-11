@@ -1418,3 +1418,69 @@ int main(void)
 	print_array(b, asize(b));
 }
 #endif
+
+
+#if 0 
+
+/*REVERSE COPY Array Algorithm*/
+#define SIZE 20
+
+void reverse_copy(int* pdest, const int* psource,int len){
+
+	int start_idx = 0;
+	int end_idx = 0;
+	
+	pdest += size;
+	while(len--){
+		*--pdest = *psource++;
+
+	}
+}
+
+int main(void)
+{
+	int a[SIZE] = {0};
+	int b[SIZE] = {0};
+	randomize();
+	set_array_random(a, asize(a));
+	set_array_random(b, asize(b));
+	print_array(a, asize(a));
+	print_array(b, asize(b));
+	reverse_copy(a, b, SIZE);
+	print_array(a, asize(a));
+	print_array(b, asize(b));
+}
+#endif
+
+#if 0
+/*Pointer equality*/
+int main(void)
+{
+    
+    int a[5] = {10,20,30,40,50};
+    
+    int* p = a;
+    int* pend = a+5;
+    
+    while(p != pend){
+        printf("%d\n",*p++);
+    }
+}
+/*
+out:
+10
+20
+30
+40
+50
+*/
+#endif
+
+#if 0
+/*Alternative printArray function*/
+void printArray(const int* ps,const int* pe){
+	while(ps != pe){
+		printf("%3d ",ps++);
+	}
+}
+#endif

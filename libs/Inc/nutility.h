@@ -26,5 +26,7 @@ void get_max_min_array(const int *p, int size, int *max, int *min);
 void copy_array(int *pdest, const int *psource, int size);
 void bubble_sort(int *p, int size);
 void swap_array(int *p1, int *p2, int size);
+void reverse_copy(int* pdest, const int* psource,int size);
+void printArray_alternative(const int* ps,const int* pe);
 
 #endif // UTILITY_H
