@@ -1419,7 +1419,6 @@ int main(void)
 }
 #endif
 
-
 #if 0 
 
 /*REVERSE COPY Array Algorithm*/
@@ -1484,3 +1483,149 @@ void printArray(const int* ps,const int* pe){
 	}
 }
 #endif
+
+#if 0
+/*Returning adress functions example */
+#define SIZE 10
+
+// int *get_Array_Max(const int *p, int size)
+// {
+
+// 	int *pmax = (int *)p;
+
+// 	for (int i = 0; i < size; ++i)
+// 	{
+
+// 		if (*(p + i) > *pmax)
+// 		{
+
+// 			pmax = (int *)(p + i);
+// 		}
+// 	}
+// 	return pmax;
+// }
+
+int main(void)
+{
+
+	int a[SIZE] = {0};
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+
+	int *p = get_Array_Max(a, SIZE);
+	printf("max = %d ve dizinin %d indisli elemani.\n", *p, (p - a));
+	*p = -23; // en büyük değer -23 oldu.
+
+	print_array(a, SIZE);
+}
+
+#endif
+
+#if 0
+/*Quick Homework: Print values between max and min*/
+#define SIZE 10
+int main(void)
+{
+
+	int a[SIZE] = {0};
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	
+	int *pamax = get_Array_Max(a, SIZE);
+	int *pamin = get_Array_Min(a, SIZE);
+	printf("max = %d dizinin %d indisli elemani\nmin = %d dizinin %d indisli elemani\n", *pamax, pamax - a, *pamin, pamin - a);
+	
+	if(pamax > pamin)
+		print_array(pamin, pamax - pamin);
+	else
+		print_array(pamax, pamin - pamax);
+
+}
+
+#endif
+
+
+#if 0
+#define SIZE 100
+
+// /*Selection Sort Algorithm*/
+// void selection_sort(int* p, int size){
+// 	for(int i = 0; i < size - 1; ++i){
+// 		swap(p+i,get_Array_Min(p+i,size-i));
+// 	}
+// }
+
+
+int main(void){
+
+	int a[SIZE] = {0};
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	selection_sort(a,SIZE);
+	print_array(a, SIZE);
+}
+#endif
+
+#if 0
+/*NULL Pointer*/
+int main(void){
+
+	FILE* f = fopen("abc.txt","r");
+
+	if(f == NULL){
+
+		printf("dosya acilamadi.");
+		return 1;
+	}
+	printf("dosya acildi.");
+}
+
+#endif
+
+#if 0
+/*NULL Pointer*/
+int main(void){
+
+	FILE* f = fopen("README.md","r");
+
+	if(f == NULL){
+
+		printf("dosya acilamadi.");
+		return 1;
+	}
+	printf("dosya acildi.");
+}
+
+#endif
+
+
+#if 1
+#define SIZE 100
+#include "string.h"
+/*NULL Pointer*/
+int main(void){
+
+	char str[SIZE];
+
+	printf("bir yazi giriniz: ");
+
+	scanf("%s",str);
+
+	char* p = strchr(str,'a'); /*Bu fonksiyon ileriki zamanlarda ayrintili islenecektir.*/
+
+	if(p){
+
+		printf("bulundu idx = %d\n",p-str);
+		puts(p); // sonraki kısmı yazdır
+	}
+	else{
+		printf("bulunamadi");
+	}
+}
+#endif
+
+
+

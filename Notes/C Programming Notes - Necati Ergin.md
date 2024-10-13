@@ -5483,3 +5483,120 @@ int *foo(void){ // Adres döndüren fonksiyon
 	1. Static Ömürlü nesne adresi döndürebilir.
 	2. Çağıran koddan aldığı adresi döndürebilir.
 	3. Dinamik ömürlü bir nesne adresi döndürebilir.
+
+- Bir fonksiyon bir adres döndürerek nesneye erişim sağlar. `Call by Reference` ile bir nesneyi doğrudan fonksiyona gönderebilirken adres döndüren fonksiyonlar ile de fonksiyonun nesnenin kendisini döndürmesini sağlayabiliriz.
+
+- Daha önceden yazılan max_array fonksiyonunu ele alalım. Bu fonksiyon arraydeki en büyük değeri döndürür fakat biz fonksiyonu kullanarak o değeri değiştiremeyiz. Bunu yapabilmek için fonksiyonun adres döndüren bir fonksiyon olması gerekmektedir.
+
+```c
+int* get_Array_Max(const int* p, int size){
+
+	int* pmax = (int*)p;
+
+	for(int i = 0; i < size; ++i){
+
+		if(*(p+i) > *pmax){
+
+			pmax = (int*)(p+i);
+		}
+	}
+	return pmax;
+}
+```
+
+### Selection Sort Algorithm Implementation
+
+```c
+/**
+ * @brief Sorts an array in ascending order using the selection sort algorithm.
+ *
+ * @param p Pointer to the first element of the array to be sorted.
+ * @param size The number of elements in the array.
+ * 
+ * @note The function assumes that the `swap` and `get_Array_Min` functions are
+ * defined elsewhere and work as expected.
+ */
+void selection_sort(int* p, int size){
+	for(int i = 0; i < size - 1; ++i){
+		swap(p+i, get_Array_Min(p+i, size-i));
+	}
+}
+```
+
+
+---
+# Lesson-33 (01.10.2024)
+
+- Bir Pointer değişken 2 state'de olabilir:
+	- Valid Pointer 
+	- Invalid Pointer -> Bir ptr bu durumdayken atama dışında hiçbir işlemde kullanılmamalıdır.
+
+- Invalid Pointers
+	- Auto ömürlü bir pointer değişken (garbage value)
+	- Dangling Pointers
+- Valid Pointers
+	- Hayatı devam eden bir nesneyi tutan pointer
+	-  Bir dizinin bittiği yerin adresini tutan pointerlar
+	-  **NULL Pointers**
+
+## NULL Pointer
+- **`NULL` bir anahtar sözcük değildir.**
+- `NULL` derleyici açısından bir isim değildir.
+- `NULL` bir makrodur.
+- `NULL` makrosu C'nin standart kütüphanesinin bazı başlık dosyalarında tanımlanmıştır (**stdio.h, stdlib.h,time.h** vs...).
+- NULL pointer bir adres sabitidir.
+- NULL pointer her türden değişkene ilk değer verilebilecek ve/veya atanabilecek bir adrestir.
+- **Semantik olarak bakılınca bir pointer'ın değerinin NULL pointer olması o pointer değişkenin hiçbir nesneyi göstermemesi demektir.**
+>[!note] NULL POINTER'ı dereference etmek undefined behaviour'dır.
+
+```c
+int main(void){
+	int* ptr = NULL; /*NULL Pointer*/
+	*ptr; /* UB */
+	++ptr; /* UB */
+	--ptr; /* UB */
+}
+```
+
+>[!TIP] C ve C++ dillerinde lojik ifade beklenen bir yerde bir pointer ifadesi (bir adres) kullanılabilir. Bu durumda lojik yorumlama pointer ifadesinin NULL pointer olup olmadığı sınamasıdır.
+
+```c
+int main(void){
+/*Aşağıdaki iki ifade aynı anlama gelmektedir. */
+	if(ptr != NULL)
+	if(ptr)
+/*Aşağıdaki iki ifade aynı anlama gelmektedir. */
+	if(ptr == NULL)
+	if(!ptr)
+	
+/*Aşağıdaki iki ifade aynı anlama gelmektedir. */
+	while(ptr != NULL)
+	while(ptr)
+
+/*Aşağıdaki iki ifade aynı anlama gelmektedir. */
+	p1 && p2
+	p1 != NULL && p2 != NULL
+}
+```
+
+- Statik ömürlü bir pointer değişkene ilk değer verilmezse hayatına `NULL Pointer` olarak başlar.
+>[!NOTE] Normal olarka bir pointer değişkene bir adres atanmalıdır. Örneğin bir pointer değişkene bir tamsayı ifadesi atanması yanlıştır. Ancak ..... bir istisna vardır. **Pointer değişkene 0 değeri *tam sayı sabiti olarak* atanırsa derleyici NULL Pointer ataması yapar.**
+
+```c
+int main(void){
+	int x = 0;
+	int* p1 = x; // Error. Its not integer constant
+	int* p2;
+	p2 = 12;       /* Error! */
+	int* ptr = 0; /* No error! */
+}
+```
+
+### NULL Pointer Ne İşe Yarar?
+- Tipik bazı temalar (senaryolar):
+	- Adres döndüren fonksiyonlarda fonksiyonun başarısız olması durumunda geri dönüş değeri olarak **NULL Pointer** döndürmesi en sık kullanılan senaryodur.
+	- Bazı adres döndüren arama (Search) fonksiyonlarında aranan değerin bulunamaması için kullanılır.
+
+- Bazı fonksiyonlara NULL Pointer parametre olarak geçilebilir ve bu özel bir durum yaratır. Bu fonksiyonun dokümanını okumayı ve bu durumun olup olmadığını kontrol etmeyi gerektirir.
+
+- **En son kaldığım yer: 1.54.59**

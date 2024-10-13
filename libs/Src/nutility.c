@@ -365,3 +365,20 @@ int *get_Array_Min(const int *p, int size)
     }
     return pmin;
 }
+
+
+/**
+ * @brief Sorts an array in ascending order using the selection sort algorithm.
+ *
+ * @param p Pointer to the first element of the array to be sorted.
+ * @param size The number of elements in the array.
+ * 
+ * @note The function assumes that the `swap` and `get_Array_Min` functions are
+ * defined elsewhere and work as expected.
+ */
+void selection_sort(int* p, int size){
+	for(int i = 0; i < size - 1; ++i){
+		swap(p+i, get_Array_Min(p+i, size-i));
+	}
+}
+
