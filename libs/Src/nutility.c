@@ -382,3 +382,15 @@ void selection_sort(int* p, int size){
 	}
 }
 
+int *search_in_array(const int *p, int size, int key)
+{
+	while (size--)
+	{
+		if (*p == key)
+		{
+			return (int *)p;
+		}
+		++p;
+	}
+	return NULL;
+}

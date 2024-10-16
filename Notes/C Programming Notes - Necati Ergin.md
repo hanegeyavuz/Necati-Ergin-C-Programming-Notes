@@ -5599,4 +5599,77 @@ int main(void){
 
 - Bazı fonksiyonlara NULL Pointer parametre olarak geçilebilir ve bu özel bir durum yaratır. Bu fonksiyonun dokümanını okumayı ve bu durumun olup olmadığını kontrol etmeyi gerektirir.
 
-- **En son kaldığım yer: 1.54.59**
+## Type Alias or Typedef Declaration(Tür Eş İsim Bildirimleri) 
+
+### Syntax
+```c
+typedef int Word; // Word isminin kullanıldığı her yerde int olarak değerlendirilir.
+
+typedef int Myint;
+
+Word foo(Word);
+
+int main(void){
+	int ival = 0;
+	Word x, y, z;
+	Woard ar[10];
+	Word* ptr = &ival;
+}
+```
+
+- Tüm türlere tür eş ismi verilebilir.
+```c
+typedef int* Iptr;
+
+int main(void){
+	Iptr p;
+
+}
+```
+
+- Comma seperated list olarak kullanıldıklarında tüm listeyi kapsarlar.
+```c
+typedef int* Iptr;
+
+int main(void){
+	Iptr p1,p2; // int* p1, int* p2
+	int* p3,p4; // int* p3, int p4
+
+}
+```
+
+>[!NOTE] `int a[20]` ifadesinin türü **int değildir.** İfadenin türü `int[20]`'dir. Bu da demek oluyor ki bu türe de tür eş ismi verilebilir.
+
+```c
+typedef int[20] ia20;
+
+int main(void){
+	ia20 a; // int a[20]; 
+
+}
+```
+
+>[!NOTE] Bir typedef yapmanın altın kuralı:
+>- Hangi türe eş isim vermek istiyorsanız o türden bir değişken tanımlayın
+>- Değişken tanımının başına typedef anahtar sözcüğü koyun
+>- Değişken isminin yerine vermek istediğiniz eş ismi koyun
+
+```c
+typedef int INTA20[20] ;
+```
+
+### Çok Önemli Bir Nokta
+>[!IMPORTANT] `const` anahtar sözcüğü ile birlikte tür eş ismi kullanıldığında türün kendisine `const` özelliği sağlanmış olur.
+
+```c
+typedef int* Iptr;
+
+int main(void){
+	const Iptr p1 = &x; // int* const p1 = &x
+
+
+	p = /*assignment*/; /*SYNTAX ERROR*/
+
+}
+
+```

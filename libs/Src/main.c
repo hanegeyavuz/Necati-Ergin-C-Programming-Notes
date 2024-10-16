@@ -1546,7 +1546,6 @@ int main(void)
 
 #endif
 
-
 #if 0
 #define SIZE 100
 
@@ -1601,8 +1600,7 @@ int main(void){
 
 #endif
 
-
-#if 1
+#if 0
 #define SIZE 100
 #include "string.h"
 /*NULL Pointer*/
@@ -1626,6 +1624,40 @@ int main(void){
 	}
 }
 #endif
+#if 0
+#define SIZE 100
+/*NULL Pointer - Search in Array Function*/
 
+// int *search_in_array(const int *p, int size, int key)
+// {
+// 	while (size--)
+// 	{
+// 		if (*p == key)
+// 		{
+// 			return (int *)p;
+// 		}
+// 		++p;
+// 	}
+// 	return NULL;
+// }
+int main(void)
+{
 
+	int a[SIZE];
+	int searched = 0;
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	printf("aranan deger giriniz: ");
+	scanf("%d", &searched);
+	int *ptr = search_in_array(a, SIZE, searched);
 
+	if (ptr)
+	{
+		printf("bulundu, %d indisli elemani\n", ptr - a);
+	}
+	else
+	{
+		printf("Bulunamadi");
+	}
+}
+#endif

@@ -31,5 +31,6 @@ void printArray_alternative(const int* ps,const int* pe);
 int *get_Array_Max(const int *p, int size);
 int *get_Array_Min(const int *p, int size);
 void selection_sort(int* p, int size);
+int *search_in_array(const int *p, int size, int key);
 
 #endif // NUTILITY_H
