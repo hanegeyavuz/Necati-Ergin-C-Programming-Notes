@@ -15,7 +15,7 @@ void randomize(void)
  * @param pArr Pointer to the array.
  * @param size Size of the array.
  */
-void set_array_random(int *pArr, int size)
+void set_array_random(int *pArr, size_t size)
 {
     while (size--)
         *pArr++ = rand() % 1000;
@@ -27,7 +27,7 @@ void set_array_random(int *pArr, int size)
  * @param pArr Pointer to the array.
  * @param size Size of the array.
  */
-void print_array(const int *pArr, int size)
+void print_array(const int *pArr, size_t size)
 {
     for (int i = 0; i < size; ++i)
     {
@@ -44,7 +44,7 @@ void print_array(const int *pArr, int size)
  * @param pa Pointer to the array.
  * @param size Size of the array.
  */
-void sort_array(int *pa, int size)
+void sort_array(int *pa, size_t size)
 {
     for (int i = 0; i < size - 1; ++i)
     {
@@ -83,10 +83,10 @@ void sgets(char *p)
  * @param pa Pointer to the string.
  * @param len Length of the string.
  */
-void ispalindrom(char *pa, int len)
+void ispalindrom(char *pa, size_t size)
 {
     int idx_start = 0;
-    int idx_end = len - 1;
+    int idx_end = size - 1;
 
     while (1)
     {
@@ -136,7 +136,7 @@ void swap(int *a, int *b)
  * @param size Size of the array.
  * @return The sum of the array elements.
  */
-int sum_arr(const int *p, int size)
+int sum_arr(const int *p, size_t size)
 {
     int sum = 0;
     while (size--)
@@ -154,7 +154,7 @@ int sum_arr(const int *p, int size)
  * @param size Size of the array.
  * @return The mean value of the array.
  */
-double get_mean(const int *p, int size)
+double get_mean(const int *p, size_t size)
 {
     return (double)(sum_arr(p, size) / size);
 }
@@ -166,7 +166,7 @@ double get_mean(const int *p, int size)
  * @param size Size of the array.
  * @return The standard deviation of the array.
  */
-double get_std_dev(const int *p, int size)
+double get_std_dev(const int *p, size_t size)
 {
     double mean = get_mean(p, size);
     double sum_square = 0;
@@ -183,7 +183,7 @@ double get_std_dev(const int *p, int size)
  * @param p Pointer to the array.
  * @param size Size of the array.
  */
-void get_reverse_array(int *p, int size)
+void get_reverse_array(int *p, size_t size)
 {
     for (int i = 0; i < size / 2; ++i)
     {
@@ -198,7 +198,7 @@ void get_reverse_array(int *p, int size)
  * @param size Size of the array.
  * @return The maximum value in the array.
  */
-int get_max_array(const int *p, int size)
+int get_max_array(const int *p, size_t size)
 {
     int max = *p;
     for (int i = 0; i < size; ++i)
@@ -215,7 +215,7 @@ int get_max_array(const int *p, int size)
  * @param size Size of the array.
  * @return The minimum value in the array.
  */
-int get_min_array(const int *p, int size)
+int get_min_array(const int *p, size_t size)
 {
     int min = *p;
     for (int i = 0; i < size; ++i)
@@ -233,7 +233,7 @@ int get_min_array(const int *p, int size)
  * @param max Pointer to store the maximum value.
  * @param min Pointer to store the minimum value.
  */
-void get_max_min_array(const int *p, int size, int *max, int *min)
+void get_max_min_array(const int *p, size_t size, int *max, int *min)
 {
     *min = *p;
     *max = *p;
@@ -251,7 +251,7 @@ void get_max_min_array(const int *p, int size, int *max, int *min)
  * @param psource Pointer to the source array.
  * @param size Size of the arrays.
  */
-void copy_array(int *pdest, const int *psource, int size)
+void copy_array(int *pdest, const int *psource, size_t size)
 {
     while (size--)
     {
@@ -265,7 +265,7 @@ void copy_array(int *pdest, const int *psource, int size)
  * @param p Pointer to the array.
  * @param size Size of the array.
  */
-void bubble_sort(int *p, int size)
+void bubble_sort(int *p, size_t size)
 {
     for (int i = 0; i < size - 1; ++i)
     {
@@ -286,7 +286,7 @@ void bubble_sort(int *p, int size)
  * @param p2 Pointer to the second array.
  * @param size Size of the arrays.
  */
-void swap_array(int *p1, int *p2, int size)
+void swap_array(int *p1, int *p2, size_t size)
 {
     while (size--)
     {
@@ -301,7 +301,7 @@ void swap_array(int *p1, int *p2, int size)
  * @param psource Pointer to the source array.
  * @param size Size of the arrays.
  */
-void reverse_copy(int *pdest, const int *psource, int size)
+void reverse_copy(int *pdest, const int *psource, size_t size)
 {
     pdest += size;
     while (size--)
@@ -331,7 +331,7 @@ void printArray_alternative(const int *ps, const int *pe)
  * @param size Size of the array.
  * @return Pointer to the maximum element.
  */
-int *get_Array_Max(const int *p, int size)
+int *get_Array_Max(const int *p, size_t size)
 {
     int *pmax = (int *)p;
 
@@ -352,7 +352,7 @@ int *get_Array_Max(const int *p, int size)
  * @param size Size of the array.
  * @return Pointer to the minimum element.
  */
-int *get_Array_Min(const int *p, int size)
+int *get_Array_Min(const int *p, size_t size)
 {
     int *pmin = (int *)p;
 
@@ -376,13 +376,23 @@ int *get_Array_Min(const int *p, int size)
  * @note The function assumes that the `swap` and `get_Array_Min` functions are
  * defined elsewhere and work as expected.
  */
-void selection_sort(int* p, int size){
+void selection_sort(int* p, size_t size){
 	for(int i = 0; i < size - 1; ++i){
 		swap(p+i, get_Array_Min(p+i, size-i));
 	}
 }
 
-int *search_in_array(const int *p, int size, int key)
+/**
+ * @brief Search spesific key in array function
+ *
+ * @param p Pointer to the first element of the array to be searched.
+ * @param size The number of elements in the array.
+ * @param key The key which is search in array
+ * 
+ * @return Adress of key in array if detect the key, otherwise NULL Pointer.
+ */
+
+int *search_in_array(const int *p, size_t size, int key)
 {
 	while (size--)
 	{

@@ -1661,3 +1661,170 @@ int main(void)
 	}
 }
 #endif
+
+#if 0
+void clear_array(int *p, size_t size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		*(p + i) = 0;
+	}
+}
+int main(void)
+{
+	size_t SIZE = 10;
+
+	int a[SIZE];
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	clear_array(a, SIZE);
+	print_array(a, SIZE);
+}
+
+#endif
+
+#if 0
+#define SIZE 100
+void myputs(const char* p){
+	/*First Way*/
+	// for(int i = 0; *(p+i) != '\0';++i){
+	// 	putchar(*(p+i));
+	// }
+	/*Second Way*/
+	while(*p){
+		putchar(*p++);
+	}
+
+	putchar('\n');
+}
+
+int main(void){
+	char str[SIZE] = "yavuz hanege";
+	myputs(str);
+}
+
+#endif
+
+#if 0
+/* string.h  test code*/
+#include <string.h>
+
+#define SIZE 100
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("(%s)\n",str);
+}
+
+#endif
+
+#if 0
+/* string.h */
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("(%s)\n",str);
+	size_t len = strlen(str);
+	printf("uzunluk: %zu\n",len);
+}
+
+#endif
+
+#if 0
+/* strlen function implementation by yourself */
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+
+size_t strlen_1(const char* p){
+
+	size_t len = 0;
+	for(int i = 0; *(p+i) != '\0'; ++i){
+		len++;
+	}
+	return len;
+}
+
+size_t strlen_2(const char* p){
+
+	size_t len = 0;
+	for(; *(p+len) != '\0'; ++len){
+		;
+	}
+	return len;
+}
+size_t strlen_3(const char* p){
+
+	size_t len = 0;
+	while(*(p+len)){
+		len++;
+	}
+	return len;
+}
+size_t strlen_4(const char* p){
+
+	const char* tempch = p;
+	while(*p){
+		++p;
+	}
+	return (size_t)(p-tempch); // dönüş türü ptrdiff_t olduğu için tür dönüşümü yapıldı
+}
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("(%s)\n",str);
+	size_t len = strlen_4(str);
+	printf("uzunluk: %zu\n",len);
+}
+
+#endif
+
+#if 1
+/*strchr function implementation*/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char* strchr_1(const char* p,int ch){
+	while(*p){
+		if(*p == ch){
+			return (char*)p;
+		}
+		p++;
+	}
+	if(ch == '\0'){
+		return (char*)p;
+	}
+	return NULL;
+}
+	
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("arancak karakteri giriniz: ");
+	int c = getchar();
+	char* p = strchr_1(str,c);
+	if(p == NULL){
+		printf("bulunamadi\n");
+	}
+	else{
+		printf("bulundu idx: %d\n",p - str);
+		*p = '*';
+		puts(str);
+	}
+
+}
+#endif

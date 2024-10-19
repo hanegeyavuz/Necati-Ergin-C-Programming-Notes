@@ -5659,6 +5659,7 @@ typedef int INTA20[20] ;
 ```
 
 ### Çok Önemli Bir Nokta
+
 >[!IMPORTANT] `const` anahtar sözcüğü ile birlikte tür eş ismi kullanıldığında türün kendisine `const` özelliği sağlanmış olur.
 
 ```c
@@ -5672,4 +5673,253 @@ int main(void){
 
 }
 
+```
+
+# Lesson 34
+
+### Typedef Bildirimleri ile Makro Tanımlamanın Farkı
+
+- **Bazı durumlarda** typedef in alternatifi olarak makrolar kullanılabilir.
+```c
+#define WORD int
+```
+
+- Önişlemci makrolarının **scope**'u yoktur. Typedef bildirimlerinin vardır.
+- Makrolar ile tanımlanmış türlerde comma seperated definition yapılamaz.
+- Dizi tür tanımlamaları makrolar ile yapılamaz. 
+
+### Kullanım Amaçları
+
+- Kodun okunmasını ve yazılmasını kolaylaştırmak
+	- function pointers
+	- structs
+
+
+
+- Standart kütüphanelerde sıklıkla kullanılmaktadır. (size_t, clock_t...)
+- Standart kütüphanelerdeki tür eş isimlerinin tanımlanması compiler'a bırakılmıştır.
+
+### `size_t` 
+### Standart Kütüphane
+
+- Yazıların uzunluğunu ifade eden tür.
+- sizeof operatörünün ürettiği değerin türü
+- Dizi boyutu türü
+- tane - adet isteyen parametreler için
+
+
+### `size_t` kullanımında Verbosity Problemi
+
+- `size_t` bir işaretsiz tür olduğundan dolayı işaretli türlerle karşılaştırılma yapıldığında tür dönüşümünden dolayı derleyiciler hata mesajı verebilir.
+
+```c
+#if 1
+void clear_array(int *p, size_t size)
+{
+	for (int i = 0; i < size; ++i)  /*warning: '<': signed/unsigned mismatch*/
+	{
+		*(p + i) = 0;
+	}
+}
+int main(void)
+{
+	size_t SIZE = 10;
+
+	int a[SIZE];
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	clear_array(a, SIZE);
+	print_array(a, SIZE);
+}
+
+#endif
+```
+
+- Bundan kurtulmak için:
+	- Döngü değişkeninin (i) türünü de `size_t` yapmak
+	- Type-cast
+	- `size_t` yerine işaretli bir tür kullanmak
+
+### Fixed Integer Types
+
+- C99 ile dile eklenen `stdint.h` kütüphanesiyle dile eklenen tür eş isimleridir.
+- Bit sayısını belirterek tanımlama yapılmasını sağlar.
+
+```c
+int16_t 
+uint8_t
+int8_t
+
+```
+
+```c
+int_least8_t // En az 8 bitlik
+
+uintptr_t // unsigned integer type capable of holding a pointer
+
+```
+
+#### Types
+
+|   |   |
+|---|---|
+|Defined in header `<stdint.h>`|   |
+|`**int8_t**`  <br>`**int16_t**`  <br>`**int32_t**`  <br>`**int64_t**`|signed integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>with no padding bits and using 2's complement for negative values  <br>(provided only if the implementation directly supports the type)|
+|`**int_fast8_t**`  <br>`**int_fast16_t**`  <br>`**int_fast32_t**`  <br>`**int_fast64_t**`|fastest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
+|`**int_least8_t**`  <br>`**int_least16_t**`  <br>`**int_least32_t**`  <br>`**int_least64_t**`|smallest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
+|`**intmax_t**`|maximum width integer type|
+|`**intptr_t**`|integer type capable of holding a pointer|
+|`**uint8_t**`  <br>`**uint16_t**`  <br>`**uint32_t**`  <br>`**uint64_t**`|unsigned integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>(provided only if the implementation directly supports the type)|
+|`**uint_fast8_t**`  <br>`**uint_fast16_t**`  <br>`**uint_fast32_t**`  <br>`**uint_fast64_t**`|fastest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
+|`**uint_least8_t**`  <br>`**uint_least16_t**`  <br>`**uint_least32_t**`  <br>`**uint_least64_t**`|smallest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
+|`**uintmax_t**`|maximum width unsigned integer type|
+|`**uintptr_t**`|unsigned integer type capable of holding a pointer|
+
+## Standart Library
+
+### `string.h`
+- Yazı işlemlerini içerir.
+- C de yazıların neredeyse default tutulma biçimi **Null Terminated Byte String**'tir. 
+- Bir fonksiyon eğer bir yazıyı yalnızca okumak için kullanmak isterse dizinin boyutunu bilmek zorunda değildir. (Null Terminated Byte String)
+```c
+#define SIZE 100
+void myputs(const char* p){
+	/*First Way*/
+	// for(int i = 0; *(p+i) != '\0';++i){
+	// 	putchar(*(p+i));
+	// }
+	/*Second Way*/
+	while(*p){
+		putchar(*p++);
+	}
+
+	putchar('\n');
+}
+
+int main(void){
+	char str[SIZE] = "yavuz hanege";
+	myputs(str);
+}
+```
+
+- Eğer fonksiyon
+	- Adresini aldığı diziye bir yazı yerleştirecek ise
+	- Adresini aldığı dizideki yazıyı büyütme ihtimaliyle değiştirecekse
+	- Dizinin boyut bilgisi kodun güvenliği açısından önemlidir.
+
+>[!NOTE] Standart kütüphanedeki çoğu fonksiyon boyut bilgisini almaz. Taşma riskini kullanıcının sorumluluğuna bırakır.
+```c
+void strcopy(char* pdest, const char* psource){
+
+}
+int main(void){
+	char str[SIZE] = "yavuz hanege";
+	myputs(str);
+}
+```
+
+####  `strlen` Fonksiyonu
+- bir yazının uzunluğunu döndüren fonksiyondur.
+```c
+size_t strlen(const char*);
+```
+
+```c
+/* string.h */
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("(%s)\n",str);
+	size_t len = strlen(str);
+	printf("uzunluk: %zu\n",len);
+}
+```
+
+
+```c
+/* strlen function implementation by yourself */
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+
+size_t strlen_1(const char* p){
+
+	size_t len = 0;
+	for(int i = 0; *(p+i) != '\0'; ++i){
+		len++;
+	}
+	return len;
+}
+
+size_t strlen_2(const char* p){
+
+	size_t len = 0;
+	for(; *(p+len) != '\0'; ++len){
+		;
+	}
+	return len;
+}
+size_t strlen_3(const char* p){
+
+	size_t len = 0;
+	while(*(p+len)){
+		len++;
+	}
+	return len;
+}
+size_t strlen_4(const char* p){
+
+	const char* tempch = p;
+	while(*p){
+		++p;
+	}
+	return (size_t)(p-tempch); // dönüş türü ptrdiff_t olduğu için tür dönüşümü yapıldı
+}
+
+int main(void){
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("(%s)\n",str);
+	size_t len = strlen_4(str);
+	printf("uzunluk: %zu\n",len);
+}
+```
+#### `strchr` Fonksiyonu
+
+- Yazıda karakter arayan fonksiyondur.
+- NULL Pointer konvensiyonunu implemente eden standart bir C fonksiyonudur.
+
+```c
+char* strchr(const char* p,int ch){
+	int cnt = 0;
+	for(; p[cnt] != ch; ++cnt){
+		if(p[cnt] == '\0'){
+			break;
+		}
+	}
+	if(p[cnt] == ch){
+		return p+cnt
+	}
+	else{
+		return NULL;
+	}
+	
+}
+int main(void){
+	char str[SIZE];
+	int c = 0;
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("arancak karakteri giriniz: ");
+	int c = getchar();
+	char* p = strchr(str,c);
+}
 ```
