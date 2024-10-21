@@ -5818,7 +5818,7 @@ int main(void){
 }
 ```
 
-####  `strlen` Fonksiyonu
+###  `strlen` Fonksiyonu
 - bir yazının uzunluğunu döndüren fonksiyondur.
 ```c
 size_t strlen(const char*);
@@ -5892,7 +5892,7 @@ int main(void){
 	printf("uzunluk: %zu\n",len);
 }
 ```
-#### `strchr` Fonksiyonu
+### `strchr` Fonksiyonu
 
 - Yazıda karakter arayan fonksiyondur.
 - NULL Pointer konvensiyonunu implemente eden standart bir C fonksiyonudur.
@@ -5923,3 +5923,143 @@ int main(void){
 	char* p = strchr(str,c);
 }
 ```
+
+İlk karakter null character olursa fonksiyon doğru çalışmadığından tam implementasyonu:
+
+```c
+char* strchr_1(const char* p,int ch){
+	while(*p){
+		if(*p == ch){
+			return (char*)p;
+		}
+		p++;
+	}
+	if(ch == '\0'){
+		return (char*)p;
+	}
+	return NULL;
+}
+
+```
+
+# Lesson 35
+
+### `strrchr` Fonksiyonu
+- Yazıyı sondan başlayarak arar.
+
+```c
+char *strrchr_1(const char *p, int ch)
+{
+	char *pfound = NULL;
+	while (*p)
+	{
+		if (*p == ch)
+		{
+			pfound = (char *)p;
+		}
+		++p;
+	}
+	if (ch == '\0')
+	{
+		return (char *)p;
+	}
+	return pfound;
+}
+```
+
+### Önemli Bir Not:
+
+- NULL Pointer ile NULL Character aynı şey değildir!
+```c
+/* ASAGIDAKI IKI IFADE AYNI ANLAMA GELMEKTEDİR! */
+if(p != NULL && *p != '\0')
+
+if(p && *p)
+
+/* ASAGIDAKI IKI IFADE AYNI ANLAMA GELMEKTEDİR! */
+if(p == NULL || *p == '\0')
+
+if(!p || !*p)
+
+```
+
+### `strstr()` Function Homework
+- Yazı içinde yazı arayan standart kütüphanedeki `strstr` fonksiyonunu yazınız.
+
+```c
+char *strstr_1(const char *hay, const char *needle)
+{
+	size_t needle_size = strlen(needle);
+	while (*hay)
+	{
+		if (*hay == *needle)
+		{
+			needle++;
+			if (*needle == '\0')
+			{
+				return (char *)(hay - needle_size + 1);
+			}
+		}
+		hay++;
+	}
+	return NULL;
+}
+```
+
+### `strpbrk()` Function
+
+- Bir yazı içerisinde başka bir yazıyla gösterilen karakterler kümesinden birinin arandığı fonksiyondur.
+
+```c
+char *strpbrk_1(const char *ps, const char *pchars)
+{
+	for(int i = 0; ps[i] != '\0'; ++i){
+		if(strchr(pchars,ps[i])){
+			return (char*) (ps+i);
+		}
+	}
+	return NULL;
+}
+```
+
+### `strcpy` Function
+
+- string copy fonksiyonudur.
+
+>[!NOTE] C dilinde tipik olarak bir diziye bir yazı yerleştiren ya da bir dizideki yazıyı değiştiren fonksiyonlar aldıkları adresi döndürürler.
+
+```c
+char *strcpy_1(char *pdest, const char *psource)
+{
+	char *pret = pdest;
+	while (*psource)
+	{
+		*pdest++ = *psource++;
+
+	}
+	*pdest = '\0';
+	return pret;
+}
+
+```
+
+
+>[!ERROR] Aynı bellek bloğunda okuma ve yazma işlemlerinin yapılmasını her fonksiyon desteklemez! **OVERLAPPED BLOCKS**
+ 
+```c
+int main(void){
+	char str[SIZE];
+	printf("bir isim girniz"); //gulden ismi girilirse "den" kısmı overlapped olur.
+	scanf("%s",str);
+
+	if(strlen(str) >= 3){
+		strcpy(str+3,str); //undefined behaviour!!
+	}
+
+	printf("%s",str);
+}
+```
+
+### `strcat` Function
+- **Concatanate** fonksiyonu
+- ilk parametredeki yazının sonuna 2. parametredeki yazıyı ekler.

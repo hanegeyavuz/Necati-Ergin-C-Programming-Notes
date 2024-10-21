@@ -1790,7 +1790,7 @@ int main(void){
 
 #endif
 
-#if 1
+#if 0
 /*strchr function implementation*/
 #include <string.h>
 #include <stdint.h>
@@ -1827,4 +1827,197 @@ int main(void){
 	}
 
 }
+#endif
+
+#if 0
+/*strrchr function implementation*/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char *strrchr_1(const char *p, int ch)
+{
+	char *pfound = NULL;
+	while (*p)
+	{
+		if (*p == ch)
+		{
+			pfound = (char *)p;
+		}
+		++p;
+	}
+	if (ch == '\0')
+	{
+		return (char *)p;
+	}
+	return pfound;
+}
+
+int main(void)
+{
+	char str[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("arancak karakteri giriniz: ");
+	int c = getchar();
+	char *p = strrchr_1(str, c);
+	if (p == NULL)
+	{
+		printf("bulunamadi\n");
+	}
+	else
+	{
+		printf("bulundu idx: %d\n", p - str);
+		*p = '*';
+		puts(str);
+	}
+}
+#endif
+
+#if 0
+/** HOMEWORK
+ ** strstr function implementation*/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char *strstr_1(const char *hay, const char *needle)
+{
+	size_t needle_size = strlen(needle);
+	while (*hay)
+	{
+		if (*hay == *needle)
+		{
+			needle++;
+			if (*needle == '\0')
+			{
+				return (char *)(hay - needle_size + 1);
+			}
+		}
+		hay++;
+	}
+	return NULL;
+}
+/**/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+int main(void)
+{
+	char str[SIZE];
+	char key[SIZE];
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	printf("arancak karakteri giriniz: ");
+	sgets(key);
+	char *pfound = strstr_1(str, key);
+	if (pfound)
+	{
+		printf("bulundu idx = %d\n", pfound - str);
+		puts(pfound);
+	}
+	else
+	{
+		printf("bulunamadi");
+	}
+}
+#endif
+
+#if 0
+/*strpbrk() Function*/
+
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char *strpbrk_1(const char *ps, const char *pchars)
+{
+	for(int i = 0; ps[i] != '\0'; ++i){
+		if(strchr(pchars,ps[i])){
+			return (char*) (ps+i);
+		}
+	}
+	return NULL;
+}
+/**/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+int main(void)
+{
+	char str[SIZE];
+	char scars[SIZE] = "prtnl";
+	printf("bir yazi giriniz: ");
+	sgets(str);
+	char *pfound = strpbrk_1(str, scars);
+	if (pfound)
+	{
+		printf("bulundu idx = %d karakteri %c\n", pfound - str,*pfound);
+	}
+	else
+	{
+		printf("bulunamadi");
+	}
+}
+
+#endif
+
+#if 1
+/*strcpy() Function*/
+
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char *strcpy_1(char *pdest, const char *psource)
+{
+	char *pret = pdest;
+	while (*psource)
+	{
+		*pdest++ = *psource++;
+
+	}
+	*pdest = '\0';
+	return pret;
+}
+int main(void)
+{
+	char source[SIZE];
+	char dest[SIZE];
+	printf("source string: ");
+	sgets(source);
+	puts(strcpy_1(dest,source));
+}
+
+#endif
+
+#if 1
+/*strcat() Function*/
+
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+char *strcat_1(char *pdest, const char *psource)
+{
+	char *pret = pdest;
+	while (*psource)
+	{
+		*pdest  ++ = *psource++;
+
+	}
+	*pdest = '\0';
+	return pret;
+}
+int main(void)
+{
+	char source[SIZE];
+	char dest[SIZE];
+	printf("source string: ");
+	sgets(source);
+	puts(strcpy_1(dest,source));
+}
+
 #endif
