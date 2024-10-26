@@ -567,13 +567,13 @@ int w = '\054'   // Octal
 |            | `.`            | Structure and union member access                 |                                        |            |
 |            | `->`           | Structure and union member access through pointer |                                        |            |
 |            | `(type){list}` | Compound literal (C99)                            |                                        |            |
-|     2      | `++ --`        | Prefix increment and decrement                | Right-to-left                          |            |
+|     2      | `++ --`        | Prefix increment and decrement                    | Right-to-left                          |            |
 |            | `+ -`          | Unary plus and minus                              |                                        |            |
 |            | `! ~`          | Logical NOT and bitwise NOT                       |                                        |            |
 |            | `(type)`       | Cast                                              |                                        |            |
 |            | `*`            | Indirection (dereference)                         |                                        |            |
 |            | `&`            | Address-of                                        |                                        |            |
-|            | `sizeof`       | Size-of                                        |                                        |            |
+|            | `sizeof`       | Size-of                                           |                                        |            |
 |            | `_Alignof`     | Alignment requirement (C11)                       |                                        |            |
 |     3      | `* / %`        | Multiplication, division, and remainder           | Left-to-right                          |            |
 |     4      | `+ -`          | Addition and subtraction                          |                                        |            |
@@ -586,8 +586,8 @@ int w = '\054'   // Octal
 |     10     | `              | `                                                 | Bitwise OR (inclusive OR)              |            |
 |     11     | `&&`           | Logical AND                                       |                                        |            |
 |     12     | `              |                                                   | `                                      | Logical OR |
-|     13     | `?:`           | Ternary conditional                           | Right-to-left                          |            |
-|   14   | `=`            | Simple assignment                                 |                                        |            |
+|     13     | `?:`           | Ternary conditional                               | Right-to-left                          |            |
+|     14     | `=`            | Simple assignment                                 |                                        |            |
 |            | `+= -=`        | Assignment by sum and difference                  |                                        |            |
 |            | `*= /= %=`     | Assignment by product, quotient, and remainder    |                                        |            |
 |            | `<<= >>=`      | Assignment by bitwise left shift and right shift  |                                        |            |
@@ -838,18 +838,18 @@ Bu örneklerde:
 - Statements with the same variable on each side of the equals sign
 - May use the shortcut assignment operators (compound assignment)
 
-|Operator|Operation|Example|Result|
-|---|---|---|---|
-|+=|Compound  <br>Assignment|x += y|x = x + y|
-|-=|Compound  <br>Assignment|x -= y|x = x - y|
-|*=|Compound  <br>Assignment|x *= y|x = x * y|
-|/=|Compound  <br>Assignment|x /= y|x = x / y|
-|%=|Compound  <br>Assignment|x %= y|x = x % y|
-|&=|Compound  <br>Assignment|x &= y|x = x & y|
-|^=|Compound  <br>Assignment|x ^= y|x = x ^ y|
-|\|=|Compound  <br>Assignment|x \|= y|x = x \| y|
-|«=|Compound  <br>Assignment|x <<= y|x = x << y|
-|»=|Compound  <br>Assignment|x >>= y|x = x >> y|
+| Operator | Operation                | Example | Result     |
+| -------- | ------------------------ | ------- | ---------- |
+| +=       | Compound  <br>Assignment | x += y  | x = x + y  |
+| -=       | Compound  <br>Assignment | x -= y  | x = x - y  |
+| *=       | Compound  <br>Assignment | x *= y  | x = x * y  |
+| /=       | Compound  <br>Assignment | x /= y  | x = x / y  |
+| %=       | Compound  <br>Assignment | x %= y  | x = x % y  |
+| &=       | Compound  <br>Assignment | x &= y  | x = x & y  |
+| ^=       | Compound  <br>Assignment | x ^= y  | x = x ^ y  |
+| \|=      | Compound  <br>Assignment | x \|= y | x = x \| y |
+| «=       | Compound  <br>Assignment | x <<= y | x = x << y |
+| »=       | Compound  <br>Assignment | x >>= y | x = x >> y |
 
 ### Sequence Point
 
@@ -3574,12 +3574,12 @@ Fonksiyon2'de global değişken: 11
 ---
 
 ### Farkların Özeti:
-| Özellik              | Otomatik Yerel Değişken       | Statik Yerel Değişken        | Global Değişken            |
-|----------------------|-------------------------------|------------------------------|----------------------------|
-| **Kapsam**            | Tanımlandığı fonksiyon/blok    | Tanımlandığı fonksiyon/blok   | Tüm program                |
-| **Ömür**              | Fonksiyon/blok süresince       | Program sonuna kadar          | Program sonuna kadar        |
-| **Başlangıç Değeri**  | Rastgele (tanımsız)           | Varsayılan olarak 0           | Varsayılan olarak 0         |
-| **Değer Koruma**      | Fonksiyon çağrıları arasında korunmaz | Fonksiyon çağrıları arasında korunur | Her yerden erişilebilir ve korunur |
+| Özellik              | Otomatik Yerel Değişken               | Statik Yerel Değişken                | Global Değişken                    |
+| -------------------- | ------------------------------------- | ------------------------------------ | ---------------------------------- |
+| **Kapsam**           | Tanımlandığı fonksiyon/blok           | Tanımlandığı fonksiyon/blok          | Tüm program                        |
+| **Ömür**             | Fonksiyon/blok süresince              | Program sonuna kadar                 | Program sonuna kadar               |
+| **Başlangıç Değeri** | Rastgele (tanımsız)                   | Varsayılan olarak 0                  | Varsayılan olarak 0                |
+| **Değer Koruma**     | Fonksiyon çağrıları arasında korunmaz | Fonksiyon çağrıları arasında korunur | Her yerden erişilebilir ve korunur |
 
 Bu farklar, C programlama dilinde verimli bellek yönetimi ve veri paylaşımı açısından büyük öneme sahiptir.
 
@@ -5761,19 +5761,19 @@ uintptr_t // unsigned integer type capable of holding a pointer
 
 #### Types
 
-|   |   |
-|---|---|
-|Defined in header `<stdint.h>`|   |
-|`**int8_t**`  <br>`**int16_t**`  <br>`**int32_t**`  <br>`**int64_t**`|signed integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>with no padding bits and using 2's complement for negative values  <br>(provided only if the implementation directly supports the type)|
-|`**int_fast8_t**`  <br>`**int_fast16_t**`  <br>`**int_fast32_t**`  <br>`**int_fast64_t**`|fastest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
-|`**int_least8_t**`  <br>`**int_least16_t**`  <br>`**int_least32_t**`  <br>`**int_least64_t**`|smallest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
-|`**intmax_t**`|maximum width integer type|
-|`**intptr_t**`|integer type capable of holding a pointer|
-|`**uint8_t**`  <br>`**uint16_t**`  <br>`**uint32_t**`  <br>`**uint64_t**`|unsigned integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>(provided only if the implementation directly supports the type)|
-|`**uint_fast8_t**`  <br>`**uint_fast16_t**`  <br>`**uint_fast32_t**`  <br>`**uint_fast64_t**`|fastest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
-|`**uint_least8_t**`  <br>`**uint_least16_t**`  <br>`**uint_least32_t**`  <br>`**uint_least64_t**`|smallest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively|
-|`**uintmax_t**`|maximum width unsigned integer type|
-|`**uintptr_t**`|unsigned integer type capable of holding a pointer|
+|                                                                                                   |                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Defined in header `<stdint.h>`                                                                    |                                                                                                                                                                                                                                |
+| `**int8_t**`  <br>`**int16_t**`  <br>`**int32_t**`  <br>`**int64_t**`                             | signed integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>with no padding bits and using 2's complement for negative values  <br>(provided only if the implementation directly supports the type) |
+| `**int_fast8_t**`  <br>`**int_fast16_t**`  <br>`**int_fast32_t**`  <br>`**int_fast64_t**`         | fastest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively                                                                                                                                     |
+| `**int_least8_t**`  <br>`**int_least16_t**`  <br>`**int_least32_t**`  <br>`**int_least64_t**`     | smallest signed integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively                                                                                                                                    |
+| `**intmax_t**`                                                                                    | maximum width integer type                                                                                                                                                                                                     |
+| `**intptr_t**`                                                                                    | integer type capable of holding a pointer                                                                                                                                                                                      |
+| `**uint8_t**`  <br>`**uint16_t**`  <br>`**uint32_t**`  <br>`**uint64_t**`                         | unsigned integer type with width of  <br>exactly 8, 16, 32 and 64 bits respectively  <br>(provided only if the implementation directly supports the type)                                                                      |
+| `**uint_fast8_t**`  <br>`**uint_fast16_t**`  <br>`**uint_fast32_t**`  <br>`**uint_fast64_t**`     | fastest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively                                                                                                                                   |
+| `**uint_least8_t**`  <br>`**uint_least16_t**`  <br>`**uint_least32_t**`  <br>`**uint_least64_t**` | smallest unsigned integer type with width of  <br>at least 8, 16, 32 and 64 bits respectively                                                                                                                                  |
+| `**uintmax_t**`                                                                                   | maximum width unsigned integer type                                                                                                                                                                                            |
+| `**uintptr_t**`                                                                                   | unsigned integer type capable of holding a pointer                                                                                                                                                                             |
 
 ## Standart Library
 
@@ -6063,3 +6063,348 @@ int main(void){
 ### `strcat` Function
 - **Concatanate** fonksiyonu
 - ilk parametredeki yazının sonuna 2. parametredeki yazıyı ekler.
+
+
+```c
+char *strcat_1(char *pdest, const char *psource)
+{
+	char *pret = pdest;
+	while (*psource)
+	{
+		*pdest  ++ = *psource++;
+
+	}
+	*pdest = '\0';
+	return pret;
+}
+```
+
+# Lesson 36
+### `strcmp` Function
+- Karşılaştırma fonksiyonudur.
+```c
+int strcmp(const char* lhs, const char* rhs);
+```
+
+Compares two null-terminated byte strings lexicographically.
+
+The sign of the result is the sign of the difference between the values of the first pair of characters (both interpreted as unsigned char) that differ in the strings being compared.
+
+The behavior is undefined if lhs or rhs are not pointers to null-terminated byte strings.
+
+### Return value
+
+- Negative value if lhs appears before rhs in lexicographical order.
+
+- Zero if lhs and rhs compare equal.
+
+- Positive value if lhs appears after rhs in lexicographical order.
+
+```c
+if(!strcmp(s1,s2)) // s1 ve s2 nin eşit olup olmadığının karşılaştırılması
+```
+
+- Function implementation
+```c
+int strcmp_1(const char *p1, const char *p2)
+{
+	while(*p1 == *p2){
+		if(*p1 == '\0')
+			return 0;
+		++p1;
+		++p2;
+	}
+	return *p1 - *p2;
+}
+```
+
+## String Literals
+
+- Bir C derleyicisi kod içindeki **çift tırnak** ile yazılmış bir yazı gördüğünde bir dizi oluşturur ve bu yazıyı dizinin içine koyar.
+- Dizi boyutu **yazının uzunluğu + 1** uzunluğunda olur.
+- Türü **char dizisi**'dir. **Array decay** dolayısıyla bir adrese dönüştürülür. `char*` türüne atama yapılabilir.
+```c
+
+int main(void){
+	char* ptr = "kadir";
+}
+```
+
+>[!NOTE] C dililnde string literalleri statik ömürlüdür.
+
+>[!ERROR] Her ne kadar statik ömürlü programlama dillerinde string literal'leri char dizisi olsa da bir string literalinin değiştirilmesi işlemi **UNDEFINED BEHAVIOUR** olur.
+
+```c
+int main(void){
+	char* ptr = "yavuz";
+	puts(p);
+	p[0] = 'g'; /*UNDEFINED BEHAVIOUR*/
+	puts(p);
+}
+```
+
+- Salt okuma amaçlıdır.
+
+```c
+int main(void){
+	char* ptr = "yavuz";
+	strcpy(ptr,"kerem"); /*UNDEFINED BEHAVIOUR!*/
+}
+```
+
+- Bir fonksiyona eğer bir string literal gönderilecekse o fonksiyonun parametresi kesinlikle `const char*` olmalıdır.
+
+
+>[!NOTE] Bir pointer değişkeninin bir string literal i göstermesi istendiğinde pointer değişken `const` anahtar sözcüğüyle tanımlanmalıdır. Aksi halde kod c++ dilinde geçerli olmayacaktır ve değişime uğradığı durumda derleyici hata vermeyecektir.
+
+```c
+int main(void){
+	const char* ptr = "yavuz";
+	// *p; syntax error
+	// p[3]; syntax error
+}
+
+```
+
+---
+## Mülakatlarda En Fazla Sorular Sorulardan Biri
+
+```c
+int main(void){
+	char str[] = "selami"
+	char* p = "kelami"
+}
+```
+
+- Bu iki ifade arasındaki fark nedir?
+	- İlk ifadenin ömrü program sonuna kadar duramaz. char dizisinin initialization işlemidir.
+	- İlk ifadedeki dizinin elemanı değiştirilebilir.
+	- İkinci ifade statik ömürlüdür. 
+	- İkinci ifadede bir char pointer değişkenine derleyici tarafından tanımlanan bir dizi atanmıştır.(array decay ile)
+	- İkinci ifadedeki dizinin bir elemanı değiştirilemez, değiştirilmesi UB olur.
+	- İkinci ifadenin const olarak tanımlanması daha uygundur.
+---
+
+>[!NOTE] Özdeş string literallerinin aynı adrese sahip olup olmayacağı derleyiciye bağlıdır.
+
+```c
+
+  int main(void)
+  {
+    char* p1 = "hello world";
+    char* p2 = "hello world";
+    // when same string literals 
+    // used as a static storage duration array more than once
+    // depends on the compiler, it will store that literal once or more
+    // inside the read only memory (unspecified behaviour)
+
+    if (p1 == p2) {} // unspecified behaviour
+  }
+```
+
+
+
+---
+## HATIRLATMA
+
+C programlamada tek tırnak (`' '`) ile çift tırnak (`" "`) arasındaki fark, bu karakterlerin dildeki kullanımlarının temelde farklı türleri temsil etmesinden kaynaklanır. Resmi C standartlarına göre:
+
+1. **Tek Tırnak (`' '`) - Karakter Sabitleri**:
+   - Tek tırnak içinde yazılan ifadeler **char** türünde bir karakter sabiti olarak değerlendirilir. Tek bir karakter içerir ve bellekte karakterin ASCII veya Unicode değerini temsil eden bir **integer** (tam sayı) değeri olarak saklanır.
+   - Örneğin, `'A'` ifadesi, C derleyicisinde `65` değerine eşdeğerdir. Bu durumda `'A'`, bir karakter sabiti olup `sizeof('A')` 1 bayt tutar.
+
+2. **Çift Tırnak (`" "`) - Karakter Dizileri (String Literals)**:
+   - Çift tırnak içinde yazılan ifadeler bir karakter dizisi olarak değerlendirilir. Bu durumda C, ifade sonuna `\0` adlı null karakteri ekleyerek diziyi sonlandırır.
+   - `"A"` ifadesi bir `char` dizi (`char[2]`) olarak saklanır ve `sizeof("A")` 2 bayt tutar (bir bayt `A` karakteri için, bir bayt `\0` için). Bu yapı, dizi işlemlerinde güvenli sonlandırmayı sağlar.
+
+### Özetle
+- Tek tırnak (`' '`) ile yazılanlar tek bir **char** karakteri ifade ederken, çift tırnak (`" "`) ile yazılanlar **char** dizisi olarak kabul edilir ve otomatik olarak null karakter ile sonlandırılır.
+- Tek tırnaklı karakterler matematiksel işlemler için uygun olup integer değer olarak kullanılabilirken, çift tırnaklı ifadeler dizilerle işleme girmeye elverişlidir.
+
+Bu ayrım, C dilinin karakter işlemleri ve bellek yönetimi üzerinde sıkı bir yapı sunmasını sağlarken, programın güvenilirliğini ve taşınabilirliğini artırır.
+
+---
+
+
+```c
+#define SIZE 100
+int main(void)
+{
+	char old_file_name[SIZE] = {0};
+	char new_file_name[SIZE] = {0};
+	printf("bir dosya ismi giriniz: ");
+	scanf("%s", old_file_name);
+	strcpy(new_file_name, old_file_name);
+	char *p = strstr(new_file_name, ".");
+	if (p)
+	{
+		if (!strcmp(p, ".jpg"))
+		{
+			strcpy(p, ".gif");
+		}
+		else if (!strcmp(p, ".xls"))
+		{
+			//strcpy(p, "");
+			*p = '\0';
+		}
+	}
+	else
+	{
+		strcat(new_file_name, ".txt");
+	}
+	printf("old file name = (%s)\nnew file name = (%s)\n", old_file_name, new_file_name);
+}
+
+#endif
+```
+
+```c
+  #include <string.h> // strlen
+
+  void foo(char p[])
+  {
+    printf("[8] -> %zu\n", sizeof(p));
+  }
+
+  int main(void)
+  {
+    char str[] = "hello";
+    char* p = "world";
+
+    printf("[1] -> %zu\n", sizeof(str));    // output -> [1] -> 6
+    // "sizeof(str)" is a constant expression (compile time constant)
+
+    printf("[2] -> %zu\n", strlen(str));    // output -> [2] -> 5
+    // strlen function is executed at run-time
+
+    printf("[3] -> %zu\n", sizeof(*str));   // output -> [3] -> 1
+    // when sizeof operators operand is an expression
+    // it will check the size of the type of the expression
+    // "*str" is an expression and its data type is char
+
+    printf("[4] -> %zu\n", sizeof(p));      // output -> [4] -> 8
+    
+    printf("[5] -> %zu\n", sizeof(p++));    // output -> [5] -> 8
+    // no operation code will be generated for p++ expression
+
+    printf("[6] -> %zu\n", strlen(p));      // output -> [6] -> 5
+
+    printf("[7] -> %zu\n", sizeof(p[900])); // output -> [7] -> 1
+    // "p[900]" is an expression and its data type is char
+    // because of no operation code will be generated 
+    // for p[900] expression, it won't be an UB
+
+    foo("Istanbul Ankara Izmir");           // output -> [8] -> 8
+
+    printf("[9] -> %zu\n", sizeof(""));     // output -> [9] -> 1
+
+    printf("[10] -> %zu\n", strlen(""));    // output -> [10] -> 0
+  }
+
+```
+
+- Güzel bir örnek:
+```c
+int main(void)
+{
+	printf("%d elma\n",2["elma"]-1["elma"]);
+	printf("%d elma\n","elma"[2]-"elma"[1]);
+	printf("%d elma\n",'m'-'l');
+}
+```
+
+out:
+```c
+1 elma
+1 elma
+1 elma
+```
+
+
+- Escape karakter kullanılabilir.
+```c
+int main(void)
+{
+	printf("\"yavuz\"");
+}
+/*
+out:
+"yavuz"
+*/
+```
+
+
+>[!IMPORTANT] Bir string literali bir satırda başlayıp diğer satırda doğrudan devam ettirilemez. Farklı çözüm yolları vardır.
+
+- Ters bölü karakter `\` yazının sonuna getirilerek bir sonraki satırdan devam ettirilebilir. (Çok kullanılan bir yöntem değildir.)
+```c
+"yavuz\
+hanege"
+```
+
+- Farklı çift tırnaklar içerisinde kullanılması ile oluşturulabilir.
+
+```c
+char* p = "yavuz"
+		  "hanege"
+		  "yildiz"
+		  "teknik";
+
+```
+
+## Pointer Arrays
+
+- Elemanları pointer değişkeni olan dizilerdir.
+
+```c
+int* foo(void);
+
+int* ar[10];
+int x = 10;
+int b[35];
+
+int* ptr = &x;
+
+ar[2] = ptr;
+ar[3] = &x;
+ar[4] = b;
+ar[5] = foo();
+
+```
+
+- Bir örnek:
+```c
+int x,y,z,t;
+int main(void){
+
+	int* ar[] = {&x,&y,&z,&t};
+	*ar[0] = 999; /* x = 999;*/
+	*ar = 999; /* x = 999;*/
+
+}
+```
+
+- Dereferencing işlemlerindeki arttırma azaltma operatörlerine dikkat edilmelidir.
+
+```c
+/*Pointer Arrays*/
+int x, y, z, t;
+int a[] = {10,20,30,50};
+
+
+int main(void)
+{
+
+	int *ar[] = {&x,a ,&y, &z, &t};
+	//*ar[0] = 999; /* x = 999;*/
+	**ar = 999; /* x = 999;*/
+	printf("%d\n",*++ar[1]); 
+	printf("%d\n",++*ar[1]);
+}
+
+/*
+out:
+20
+21
+*/
+```

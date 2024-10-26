@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <stdint.h>
 #include "nutility.h"
 
 #if 0
@@ -1964,7 +1966,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 /*strcpy() Function*/
 
 #include <string.h>
@@ -1993,7 +1995,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 /*strcat() Function*/
 
 #include <string.h>
@@ -2018,6 +2020,275 @@ int main(void)
 	printf("source string: ");
 	sgets(source);
 	puts(strcpy_1(dest,source));
+}
+
+#endif
+
+#if 0
+/*strcmp() Function*/
+
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+int strcmp_1(const char *p1, const char *p2)
+{
+	while(*p1 == *p2){
+		if(*p1 == '\0')
+			return 0;
+		++p1;
+		++p2;
+	}
+	return *p1 - *p2;
+}
+int main(void)
+{
+	char p1[SIZE];
+	char p2[SIZE];
+	printf("p1 string: ");
+	sgets(p1);
+	printf("p2 string: ");
+	sgets(p2);
+	if(!strcmp_1(p1,p2)){
+		printf("iki yazi birbirine esittir.");
+	}
+	else{
+		printf("yazilar esit degildir.");
+	}
+}
+#endif
+
+#if 0
+/*yazinin sonunda bir yazi olup olmadigini sinama*/
+#include <string.h>
+#include <stdint.h>
+
+#define SIZE 100
+
+// bool return value
+int ends_with(const char *psource, const char *pkey)
+{
+	int len_key = strlen(pkey);
+	int len_source = strlen(psource);
+	if (len_source <= len_key)
+	{
+		return 0;
+	}
+	else
+	{
+		/*USE STD LIBRARY FUNCTIONS DO NOT WRITE HARD CODED STYLE*/
+		// while (*(psource + len_source - len_key) == *pkey)
+		// {
+		// 	if (*(psource + len_source - len_key) == '\0')
+		// 	{
+		// 		return 1;
+		// 	}
+
+		// 	++pkey;
+		// 	++psource;
+		// }
+		// return 0;
+		return !strcmp((psource + len_source - len_key), pkey);
+	}
+}
+
+int main(void)
+{
+	char p1[SIZE];
+	char p2[SIZE];
+	printf("p1 string: ");
+	sgets(p1);
+	printf("p2 string: ");
+	sgets(p2);
+	if (!ends_with(p1, p2))
+	{
+		printf("ilk yazinin icinde ikinci yazi yok.");
+	}
+	else
+	{
+		printf("ilk yazinin icinde ikinci yazi var.");
+	}
+}
+
+#endif
+
+#if 0
+/*string literals*/
+char* get_name(void){
+	// static char str[100] = "yavuz";
+	// return str;
+	return "yavuz";
+}
+int main(void)
+{
+	//char* ptr = "yavuz";
+	char* ptr = get_name();
+	printf("%s",ptr);
+}
+#endif
+
+#if 0
+/*string literals*/
+
+int main(void)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		char *ptr = "yavuz hanege";
+		printf("%p\n", ptr + i);
+	}
+}
+#endif
+
+#if 0
+/*string literals can not modified*/
+int main(void){
+	char* ptr = "yavuz";
+	puts(ptr);
+	ptr[0] = 'g'; /*UNDEFINED BEHAVIOUR*/
+	puts(ptr);
+}
+#endif
+
+#if 0
+/*NO UB IN THIS EXAMPLE*/
+int main(void){
+	char ptr[100] = {0};
+	puts(ptr);
+	strcpy(ptr,"kerem"); 
+	puts(ptr);
+	strcat(ptr,"emre"); 
+	puts(ptr);
+}
+#endif
+
+#if 0
+/*Yeni dosya adına eski dosya adını kopyalayınız.
+Sonrasında dosya adında bir uzantı yoksa .txt uzantısı ekleyiniz.
+Dosyanın uzantısı .jpg ise uzantısını .gif yapınız
+Dosyanın uzantısı .xls ise uzantısı olmasın
+
+
+*/
+#define SIZE 100
+int main(void)
+{
+	char old_file_name[SIZE] = {0};
+	char new_file_name[SIZE] = {0};
+	printf("bir dosya ismi giriniz: ");
+	scanf("%s", old_file_name);
+	strcpy(new_file_name, old_file_name);
+	char *p = strstr(new_file_name, ".");
+	if (p)
+	{
+		if (!strcmp(p, ".jpg"))
+		{
+			strcpy(p, ".gif");
+		}
+		else if (!strcmp(p, ".xls"))
+		{
+			//strcpy(p, "");
+			*p = '\0';
+		}
+	}
+	else
+	{
+		strcat(new_file_name, ".txt");
+	}
+	printf("old file name = (%s)\nnew file name = (%s)\n", old_file_name, new_file_name);
+}
+
+#endif
+
+#if 0
+/*String Literal with strlen function and sizeof operator */
+
+  void foo(char* p)
+  {
+    printf("[8] -> %zu\n", sizeof(p));
+  }
+
+  int main(void)
+  {
+    char str[] = "hello";
+    char* p = "world";
+
+    printf("[1] -> %zu\n", sizeof(str));    // output -> [1] -> 6
+    // "sizeof(str)" is a constant expression (compile time constant)
+
+    printf("[2] -> %zu\n", strlen(str));    // output -> [2] -> 5
+    // strlen function is executed at run-time
+
+    printf("[3] -> %zu\n", sizeof(*str));   // output -> [3] -> 1
+    // when sizeof operators operand is an expression
+    // it will check the size of the type of the expression
+    // "*str" is an expression and its data type is char
+
+    printf("[4] -> %zu\n", sizeof(p));      // output -> [4] -> 8
+    
+    printf("[5] -> %zu\n", sizeof(p++));    // output -> [5] -> 8
+    // no operation code will be generated for p++ expression
+
+    printf("[6] -> %zu\n", strlen(p));      // output -> [6] -> 5
+
+    printf("[7] -> %zu\n", sizeof(p[900])); // output -> [7] -> 1
+    // "p[900]" is an expression and its data type is char
+    // because of no operation code will be generated 
+    // for p[900] expression, it won't be an UB
+
+    foo("Istanbul Ankara Izmir");           // output -> [8] -> 8
+
+    printf("[9] -> %zu\n", sizeof(""));     // output -> [9] -> 1
+
+    printf("[10] -> %zu\n", strlen(""));    // output -> [10] -> 0
+  }
+
+#endif
+
+#if 0
+int main(void)
+{
+	printf("%d elma\n",2["elma"]-1["elma"]);
+	printf("%d elma\n","elma"[2]-"elma"[1]);
+	printf("%d elma\n",'m'-'l');
+}
+#endif
+
+#if 0
+/*escape char.*/
+int main(void)
+{
+	printf("\"yavuz\"");
+}
+#endif
+
+#if 0
+/*Pointer Arrays*/
+int x, y, z, t;
+int main(void)
+{
+
+	int *ar[] = {&x, &y, &z, &t};
+	//*ar[0] = 999; /* x = 999;*/
+	**ar = 999; /* x = 999;*/
+	printf("%d", **ar);
+}
+#endif
+
+#if 1
+/*Pointer Arrays*/
+int x, y, z, t;
+int a[] = {10,20,30,50};
+
+
+int main(void)
+{
+
+	int *ar[] = {&x,a ,&y, &z, &t};
+	//*ar[0] = 999; /* x = 999;*/
+	**ar = 999; /* x = 999;*/
+	printf("%d\n",*++ar[1]); 
+	printf("%d\n",++*ar[1]);
 }
 
 #endif
