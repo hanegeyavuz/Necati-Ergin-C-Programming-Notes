@@ -14,7 +14,7 @@ void set_array_random(int *pArr, size_t size);
 void print_array(const int *pArr, size_t size);
 void sort_array(int *pa, size_t size);
 void sgets(char *p);
-void ispalindrom(char *pa, size_t size);
+int ispalindrom(char *pa, size_t size);
 void swap(int *a, int *b);
 int sum_arr(const int *p, size_t size);
 double get_mean(const int *p, size_t size);

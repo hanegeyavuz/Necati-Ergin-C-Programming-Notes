@@ -9,7 +9,7 @@
   -  do not use another array
   -  do not change array's elements
   -  check if the string is palindrom*/
-void ispalindrom(char *pa, int len)
+int ispalindrom(char *pa, int len)
 {
     int idx_start = 0;
     int idx_end = len - 1;
@@ -35,10 +35,10 @@ void ispalindrom(char *pa, int len)
     }
     if (idx_start > idx_end)
     {
-        printf("Bu bir palindromdur.\n");
+        return 1;
     }
     else
     {
-        printf("Bu bir palindrom degildir.\n");
+        return 0;
     }
 }

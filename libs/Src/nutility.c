@@ -82,8 +82,9 @@ void sgets(char *p)
  * 
  * @param pa Pointer to the string.
  * @param len Length of the string.
+ * @return non-zero if input is palindrom, otherwise zero
  */
-void ispalindrom(char *pa, size_t size)
+int ispalindrom(char *pa, size_t size)
 {
     int idx_start = 0;
     int idx_end = size - 1;
@@ -108,11 +109,11 @@ void ispalindrom(char *pa, size_t size)
     }
     if (idx_start > idx_end)
     {
-        printf("Bu bir palindromdur.\n");
+        return 1;
     }
     else
     {
-        printf("Bu bir palindrom degildir.\n");
+        return 0;
     }
 }
 
