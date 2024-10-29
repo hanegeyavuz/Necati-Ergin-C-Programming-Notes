@@ -2275,7 +2275,7 @@ int main(void)
 }
 #endif
 
-#if 1
+#if 0
 /*Pointer Arrays*/
 int x, y, z, t;
 int a[] = {10,20,30,50};
@@ -2290,5 +2290,280 @@ int main(void)
 	printf("%d\n",*++ar[1]); 
 	printf("%d\n",++*ar[1]);
 }
+#endif
+
+#if 0
+int x = 10;
+int y = 20;
+int z = 30;
+int t = 40;
+int main(void)
+{
+	int *p[] = {&x, &y, &z, &t};
+	// code
+
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		**(p + i) = 31;
+	}
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+	printf("t = %d\n", t);
+}
 
 #endif
+#if 0
+int x = 10;
+int y = 20;
+int z = 30;
+int t = 40;
+int main(void)
+{
+	int* const p1[] = {&x, &y, &z, &t};
+	const int* p2[] = {&x, &y, &z, &t};
+	// code
+	// p1[2] = error
+	//*p1[2] = 90; legal
+	//**(p1 + 2) = 90; // legal
+
+	p2[2] = NULL; // legal
+	//*p2[2] = 90; error
+	//**(p2+2) = 90; // error
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+	printf("t = %d\n", t);
+}
+
+#endif
+
+#if 0
+char* x = "0";
+int main(void)
+{
+
+	 char* pdays[] = {"pzt", "sali", "cars", "pers", "cuma", "cumartesi", "pazar"};
+
+	//printf("%s\n",*pdays[2]);
+	
+	for (size_t i = 0; i < asize(pdays); ++i)
+	{
+		puts(*(pdays + i));
+	}
+}
+#endif
+
+#if 0
+char *x = "0";
+int main(void)
+{
+
+	char *pdays[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+
+	char buf[20];
+	printf("bir gun ismi giriniz: ");
+	scanf("%s", buf);
+	for (size_t i = 0; i < asize(pdays); i++)
+	{
+		int p = strcmp(pdays[i], buf);
+		if (!p)
+		{
+			printf("%d", i + 1);
+			return 0;
+		}
+	}
+	printf("gecersiz bir gun ismi girildi.");
+}
+#endif
+
+#if 0
+int main(void)
+{
+
+	const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+
+		putchar(p[i][strlen(p[i])- 1]);
+		/*Way 1*/
+		//printf("%c", *pdays[i]);
+		/*Way 2*/
+		
+		/*Way 3*/
+		//printf("%c", **(pdays + i));
+	}
+}
+#endif
+#if 0
+int main(void)
+{
+	printf("bir karakter giriniz: ");
+	int ch = getchar();
+	const char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		char *ret = strchr(p[i], ch);
+		if (ret)
+		{
+			//puts(p[i]);
+			printf("%s\n",p[i]);
+		} 
+		else
+		{
+			continue;
+		}
+	}
+}
+#endif
+
+#if 0
+/*ODEV!
+DIZIDEKI YAZILARDAN ICINDE HERHANGI BIR KARAKTERDEN BIRDEN FAZLA OLANLAR YAZDIRILACAK
+*/
+
+int has_repeated_char(const char *pa)
+{
+	for (int i = 'a'; i < 'z'; ++i)
+	{
+		char *pin = strchr(pa, i);
+		if (pin)
+		{
+			// printf("%s yazisinda %c harfinden bir adet bulundu.",pa,i);
+			if (strchr((pin + 1), i))
+			{
+				// printf("%s yazisinda %c harfinden iki adet bulundu.",pa,i);
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int main(void)
+{
+	const char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		if (has_repeated_char(p[i]))
+		{
+			printf("%s\n", p[i]);
+		}
+	}
+}
+#endif
+
+#if 0
+/*No Undefined Behaviour in this example, no change in string literals;
+it changes elemnets of array
+*/
+int main(void)
+{
+	char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < 1000; ++i)
+	{
+		size_t idx1 = rand() % asize(p);
+		size_t idx2 = rand() % asize(p);
+		char* ptemp = p[idx1];
+		p[idx1] = p[idx2];
+		p[idx2] = ptemp;
+	}
+	for (size_t i = 0; i < asize(p); ++i)
+	{	
+		printf("%s\n",p[i]);
+	}
+	
+}
+
+#endif
+
+#if 0
+/*
+ * Uzunluğa ve alfabetik Sıraya göre diziyi sıralayınız.
+ */
+int main(void)
+{
+	const char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < asize(p) - 1; ++i)
+	{
+		for (int k = 0; k < asize(p) - i - 1; ++k)
+		{
+			if ( strlen(p[k]) > strlen(p[k+1]) || ( strlen(p[k]) == strlen(p[k+1]) && strcmp(p[k],p[k+1]) > 0) ) 
+			{
+				const char* ptemp = p[k];
+				p[k] = p[k + 1];
+				p[k + 1] = ptemp;
+			}
+		}
+	}
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		printf("%s\n", p[i]);
+	}
+}
+#endif
+
+#if 0
+/*Birlestirme*/
+int main(void){
+
+	static const char* p[] = {"emine","hande","kubilay","yavuz","hanege"};
+
+	char buff[100] = {0};
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		strcat(buff,p[i]);
+		/* code */
+	}
+	
+	puts(buff);
+}
+#endif
+
+#if 0
+/* Pointer to Pointer */
+int main(void){
+
+	int x = 10;
+	int* p = &x;
+	
+	printf("&x = %p\n",&x);
+	printf("p =  %p\n",p);
+	printf("&p = %p\n",&p);
+}
+
+#endif
+
+#if 0
+/* Pointer to Pointer */
+int main(void){
+
+	int x = 10;
+	int* p = &x; /* Pointer to int */
+	int** ptr = &p; /* Pointer to pointer to int*/
+	printf("x = %d\n",x);
+	*p = 99;
+	printf("x = %d\n",x);
+	**ptr = 31;
+	printf("x = %d\n",x);
+	++**ptr;
+	printf("x = %d\n",x);
+}
+
+#endif
+
+#if 0
+/* Pointer to Pointer */
+int main(void){
+
+	int x = 10;
+	int* p = &x;
+	
+	printf("&x = %p\n",&x);
+	printf("p =  %p\n",p);
+	printf("&p = %p\n",&p);
+}
+#endif
+

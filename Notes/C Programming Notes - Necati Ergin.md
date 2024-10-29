@@ -6352,6 +6352,10 @@ char* p = "yavuz"
 
 ```
 
+
+---
+# Lesson 37
+
 ## Pointer Arrays
 
 - Elemanları pointer değişkeni olan dizilerdir.
@@ -6408,3 +6412,234 @@ out:
 21
 */
 ```
+
+- `const` anahtar kelimesi dizinin elemanlarına erişimi ve/veya elemanların gösterdiği değişkenin değerinin değiştirilmesini sınırlandırabilir.
+
+```c
+int x = 10;
+int y = 20;
+int z = 30;
+int t = 40;
+int main(void)
+{
+	int* const p1[] = {&x, &y, &z, &t};
+	const int* p2[] = {&x, &y, &z, &t};
+	// code
+	// p1[2] = error
+	//*p1[2] = 90; legal
+	//**(p1 + 2) = 90; // legal
+
+	p2[2] = NULL; // legal
+	//*p2[2] = 90; error
+	//**(p2+2) = 90; // error
+	printf("x = %d\n", x);
+	printf("y = %d\n", y);
+	printf("z = %d\n", z);
+	printf("t = %d\n", t);
+}
+```
+
+- Bir pointer dizisinde iki adet dereferencing operatörünün kullanılmasına **double dereferencing** denmektedir.
+
+```c
+int main(void)
+{
+
+	const char* pdays[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+
+	for (size_t i = 0; i < asize(pdays); ++i)
+	{
+		/*Way 1*/
+		printf("%c", *pdays[i]);
+		/*Way 2*/
+		printf("%c", pdays[i][0]);
+		/*Way 3*/
+		printf("%c", **(pdays + i)); /*Double Dereferencing*/
+	}
+}
+```
+- Yukarıdaki örnekte 3 işlem de aynı sonucu vermektedir.
+
+### Odev 5
+
+```c
+/*ODEV!
+DIZIDEKI YAZILARDAN ICINDE HERHANGI BIR KARAKTERDEN BIRDEN FAZLA OLANLAR YAZDIRILACAK
+*/
+
+int has_repeated_char(const char *pa)
+{
+	for (int i = 'a'; i < 'z'; ++i)
+	{
+		char *pin = strchr(pa, i);
+		if (pin)
+		{
+			// printf("%s yazisinda %c harfinden bir adet bulundu.",pa,i);
+			if (strchr((pin + 1), i))
+			{
+				// printf("%s yazisinda %c harfinden iki adet bulundu.",pa,i);
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int main(void)
+{
+	const char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		if (has_repeated_char(p[i]))
+		{
+			printf("%s\n", p[i]);
+		}
+	}
+}
+
+```
+
+
+>[!NOTE] String literallerinin değiştirilmesi tanımsız davranış oldıuğundan dolayı string literal dizilerinin `const char*` olarak tanımlanması güvenlik açısından daha iyidir.
+
+```c
+int main(void)
+{
+	const char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		*p[i] = '*';
+	}
+}
+```
+
+#### Alfabetik Sıraya Göre Bir String Literal dizisini Sıramala
+
+```c
+int main(void)
+{
+	char *p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+	for (size_t i = 0; i < asize(p) - 1; ++i)
+	{
+		for (int k = 0; k < asize(p) - i - 1; ++k)
+		{
+			if (strcmp(p[k],p[k+1]) > 0)
+			{
+				char *ptemp = p[k];
+				p[k] = p[k + 1];
+				p[k + 1] = ptemp;
+			}
+		}
+	}
+	for (size_t i = 0; i < asize(p); ++i)
+	{
+		printf("%s\n", p[i]);
+	}
+}
+
+```
+
+
+>[!NOTE] Elemanları `const` olan diziler farklı bir sebep olmadığı durumlarda genellikle her seferinde init edilmemesi için `static` anahtar sözcüğüyle tanımlanır. 
+
+```c
+	char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilebilir (Undefined Behaviour)
+	
+	const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilemez.
+	
+	static const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilemez ve her defasında initialize edilmez.
+```
+
+### Pointer Dizileri ile İlgili Idiomatik Yapılar
+- Bazen pointer dizilerinin son elemanına `NULL` pointer verilir.
+```c
+int i = 0;
+while(p[i]){
+	puts(p[i++]);
+}
+```
+
+
+- Bazen index sayısı ile dizideki elemanların sayısını aynı yapabilmek için başına `" "` NULL string koyulur
+```c
+static const char* p[] = {"", "pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"};
+```
+
+## Pointer to Pointer 
+
+- **Pointer değişkenin değeri olan adress ile pointer değişkenin kendi adresi farklı şeylerdir.**
+
+```c
+int main(void){
+
+	int x = 10;
+	int* p = &x;
+	
+	printf("&x = %p\n",&x);
+	printf("p = %p\n",p);
+	printf("&p = %p\n",&p);
+}
+```
+
+- Yukarıdaki kodda ilk iki printf çağrısı aynı adresi yazdırırken üçüncü printf çağrısı farklı bir adresi yazdırır.
+>[!NOTE] `int` değişkeni gösteren bir pointer değişkenin adresini gösteren pointer değişkeninin türü `int**`'dır.
+
+```c
+int main(void){
+
+	int x = 10;
+	int* p = &x; /* Pointer to int */
+	int** ptr = &p; /* Pointer to pointer to int*/
+	printf("&x = %p\n",&x);
+	printf("p = %p\n",p);
+	printf("&p = %p\n",&p);
+}
+```
+
+- `pointer to pointer` ile de değişkene erişim sağlanabilir.
+```c
+/* Pointer to Pointer */
+int main(void){
+
+	int x = 10;
+	int* p = &x; /* Pointer to int */
+	int** ptr = &p; /* Pointer to pointer to int*/
+	printf("x = %d\n",x);
+	*p = 99;
+	printf("x = %d\n",x);
+	**ptr = 31;
+	printf("x = %d\n",x);
+	++**ptr;
+	printf("x = %d\n",x);
+}
+
+/*
+out:
+x = 10
+x = 99
+x = 31
+x = 32
+*/
+```
+
+>[!ERROR] **Double Pointer** diye bir şey yoktur!!!
+
+- bir ismin(identifier)'ın oluşturduğu ifadeler     L value'dur.
+- adres operatorü(&) ile oluşturulan tüm ifadeler   R value'dur.
+- içerik operatörü(*) ile oluşturulan tüm ifadeler  L value'dur. 
+
+| Expression | Data type | Value Category(L / R) |
+| ---------- | --------- | --------------------- |
+| x          | int       | L                     |
+| &x         | int*      | R                     |
+| p          | int*      | L                     |
+| &p         | int**     | R                     |
+| *p         | int       | L                     |
+| pp         | int**     | L                     |
+| &pp        | int***    | R                     |
+| *pp        | int*      | L                     |
+
+
+
+
+
