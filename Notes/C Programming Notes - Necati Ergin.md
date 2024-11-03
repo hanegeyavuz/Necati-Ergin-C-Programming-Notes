@@ -6639,7 +6639,500 @@ x = 32
 | &pp        | int***    | R                     |
 | *pp        | int*      | L                     |
 
+---
+
+# Lesson 38
+
+```c
+int main(void)
+{
+	double dval[] = {3.4, 5.6, 7.23, 30.0};
+	printf("dval[2] = %f\n", dval[2]);
+	double *dp = dval;
+	double **ptr = &dp;
+	(*ptr)[2]++;
+	printf("dval[2] = %f\n", dval[2]);
+}
+
+/*
+out:
+dval[2] = 7.230000
+dval[2] = 8.230000
+*/
+```
+
+## Pointer to Pointer Ne İşe Yarar?
+
+- Pointer değişkene erişim onunla işlem yapmak isteyen fonksiyonlarda `call by reference` için kullanılır.
+
+```c
+void foo(int** ptr);
+
+int main(void){
+	int* p;
+	foo(&p);
+
+}
+
+```
+
+
+>[!TIP] Bir fonksiyon parametre olarak pointer değişkeni alıyorsa o fonksiyon `call by reference` yoluyla değişkenin kendisini değiştirebilir fakat pointer değişkeni değiştiremez. Pointer değişkeninin değiştirilebilmesi için fonksiyona parametre olarak pointer değişkenin adresinin verilmesi gerekmektedir.
+
+```c
+int main(void){
+	int x = 10;
+	int* p = &x;
+	//foo(p); // yalnızca x i değiştirebilir.
+	//bar(&p); // hem x i hem de p yi değiştirebilir.
+}
+```
 
 
 
 
+```c
+int g = 31;
+
+void foo(int *ptr)
+{
+	*ptr = 777;
+}
+void bar(int **ptr)
+{
+	*ptr = &g;
+}
+
+int main(void)
+{
+	int x = 10;
+	int *p = &x;
+
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+	foo(p);
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+	bar(&p);
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+}
+
+/*
+out:
+x = 10
+x = 10
+x = 777
+x = 777
+x = 777
+x = 31
+*/
+```
+
+- Bir `pointer dizisi` bir fonksiyona parametre olarak geçilirken fonksiyon parametresi `call by reference` dolayısıyla **pointer to pointer** olmalıdır.
+
+```c
+void print_pointees(int* const* pa, int size)
+{
+	/*WAY 1*/
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%d\t", **(pa + i));
+	}
+	/*WAY 2*/
+	while (size--)
+	{
+		printf("%d\t", **(pa));
+		pa++;
+	}
+	printf("\n");
+}
+
+int main(void)
+{
+	int x = 10;
+	int y = 20;
+	int z = 30;
+	int t = 40;
+	int* a[] = {&x, &y, &z, &t};
+	print_pointees(a, asize(a));
+}
+
+/*
+out:
+10    20    30    40
+*/
+```
+
+### `const` Doğruluğu
+
+```c
+/*const Corrections*/
+int main(void)
+{
+	int x = 10;
+	int y = 35;
+	int *p1 = &x;
+	int *p2 = &y;
+
+	int **ptr = &p1;
+	// int ** const ptr = &p1; // Durum 1
+	// int *const* ptr = &p1; // Durum 2
+	// const int ** ptr = &p1; // Durum 3
+
+	ptr = &p2;	 // Durum 1 için ERROR
+	*ptr = &x;	 // Durum 2 için ERROR
+	**ptr = 999; // Durum 3 için ERROR
+}
+```
+
+## Dizinin Adresini Tutan Değişkenler
+- Öyle bir pointer değişkeni olsun ki dereference edildiğinde dizinin kendisini göstersin
+
+```c
+int a[5] = {0,10,20,30,40};
+int (*p)[5] = &a;
+
+```
+
+- Burdaki ifadede `*p` ifadesi `a` dizidir.
+```c
+/*Dizinin adresini tutan değişkenler*/
+int main(void)
+{
+	int a[5] = {0, 10, 20, 30, 40};
+	int(*p)[5] = &a;
+
+	for (int i = 0; i < 5; i++)
+	{
+		printf("%d ", (*p)[i]);
+		/* code */
+	}
+}
+
+/*
+out:
+
+0 10 20 30 40
+
+*/
+```
+
+- **`**p` ise a dizisinin ilk elemanı demektir.**
+```c
+/*Dizinin adresini tutan değişkenler*/
+int main(void)
+{
+	int a[5] = {0, 10, 20, 30, 40};
+	int(*p)[5] = &a;
+
+	++**p;
+	for (int i = 0; i < 5; i++)
+	{
+		printf("%d ", (*p)[i]);
+		/* code */
+	}
+}
+
+/*
+out:
+1 10 20 30 40 
+*/
+```
+
+- Fonksiyon parametresi olarak da `int (*p)[5]` girilebilir.
+
+>[!NOTE] fonksiyon parametresi olarak pointer to pointer parametre girilirken `int** p` ile `int* p[]` aynı anlama gelmektedir.
+
+
+## `void` Pointer
+
+- `void` da `int` gibi bir türdür.
+- Bir değişkenin türü `void` olamaz.
+- `sizeof(void)` syntax error.
+- Bir ifadenin türü `void` olabilir.
+	- Non-return Functions
+	- Type-cast operator
+	- Parametresi olmayan fonksiyonlar
+
+
+>[!NOTE] C++ dilinde aşağıdaki iki gösterimin farkı yoktur. Fakat C dilinde farkı vardır. `bar` fonksiyonunun parametre parantezinin boş bırakılması `void` olduğu anlamına **GELMEZ**. Fonksiyon hakkında bilgi verilmemesi anlamına gelir. 
+
+```c
+void foo(void);
+void bar();
+```
+
+- Lojik ifade beklenen yerlerde `void` türünden bir ifade kullanılamaz.
+
+```c
+void foo(int);
+
+int main(void){
+	if(foo(2)){ /*Syntax Error*/
+	}
+}
+```
+
+- `void*` bir object pointer türüdür.
+- **`void*` türünden bir değişkene legal olarak ve doğru olarak herhangi bir türden nesnenin adresini atayabiliriz.**
+```c
+void foo(int);
+
+int main(void){
+	int x = 5;
+	double dval = 3.4;
+	char str[] = "burhanettin";
+
+	int* p;
+	void* vp;
+	p = &x;
+	//p = &dval; /*Syntax Error*/
+	vp = &dval; /*Legal*/
+}
+
+```
+
+>[!INFO] `void` pointer'ın varlık nedeni çoğu zaman herhangi bir türden değişkenin adresini tutabilmesidir.
+
+
+>[!WARNING]  `void pointer` değişkenlerine yalnızca adres atayınız legal olmasına güvenerek (C++ da Legal Değil) tam sayı veya gerçek sayı değerlerini atamayınız.
+
+>[!ERROR] void pointer adresini tuttuğu nesnenin türünü compiler bilemeyeceğinden **dereference edilmez**!!
+
+>[!ERROR] Pointer aritmetiği void pointerlar ile kullanılamaz!!
+
+>[!NOTE] C ve C++ programlama dillerinde başka bir türden `void*` türüne dönüşüm yapılabillir fakat `void*` türünden diğer türlere dönüşüm yalnızca C dilinde Legal ve doğrudur.
+
+```c
+int main(void){
+
+	int x = 10;
+	void* vp = &x; /*int* ==> void* type cast */ /*C and C++ Legal*/
+	int *iptr = vp; /* void* ==> int* type cast*/ /*C++ illegal*/
+
+}
+
+```
+
+---
+
+# Lesson 39
+
+### `void*` Ne İşe Yarar?
+
+#### Generic Programming
+- Türden bağımsız programlamadır. (Mesela: generic function)
+```c
+void gswap(void *vp, void *vp2, size_t size)
+{
+	
+}
+```
+
+- generic fonksiyonlar aldıkları nesnenin türünü bilmediklerinden aldıkları nesneyi `char*` türüne atayıp nesnenin ardışık byte'larıyla işlem yapabilirler.
+
+```c
+int main(void){
+	double x = 34.7823;
+	double y;
+
+	//y = x;
+	const char* px = (const char*)&x;
+	char* py = (char*)&y;
+	size_t size = sizeof(x);
+	while(size--){
+	
+		*py++ = *px++;
+	}
+	printf("x = %f\n",x);
+	printf("y = %f\n",y);
+
+}
+
+```
+- Yukarıdaki örnekte y değişkenine x i direkt atamak yerine char* kullanılarak atama yapılmıştır.
+
+
+- Objeyi kopyalayan bir **generic function** implementation aşağıdaki gibidir:
+```c
+void copy_object(void* vpdest,const void* vpsource,size_t n){
+	const char* psource = (const char*)vpsource;
+	char* pdest = (char*)vpdest;
+	while(n--){
+		*pdest++ = *psource++;
+	}
+}
+
+int main(void){
+
+	double d1 = 873.97664;
+	double d2;
+
+	int i1 = 6789;
+	int i2;
+	int a[] = {3,6,1,2,3,56,9};
+	int b[7];
+
+	copy_object(&d2,&d1,sizeof(double));
+	copy_object(&i2,&i1,sizeof(int));
+	copy_object(&b,&a,sizeof(b));
+
+	printf("d1 = %f\n",d1);
+	printf("d2 = %f\n",d2);
+	printf("i1 = %d\n",i1);
+	printf("i2 = %d\n",i2);
+	print_array(a,asize(a));
+	print_array(b,asize(b));
+}
+/*
+out:
+
+d1 = 873.976640
+d2 = 873.976640
+i1 = 6789
+i2 = 6789
+  3   6   1   2   3  56   9
+---------------------------------------
+  3   6   1   2   3  56   9
+---------------------------------------
+*/
+```
+
+- generic swap fonksiyonu:
+```c
+void gswap(void *vp, void *vp2, size_t size)
+{
+	char ctemp;
+	char *cp1 = (char *)vp;
+	char *cp2 = (char *)vp2;
+	/*WAY 1*/
+	// for(int i = 0; i < size;++i){
+	// 	ctemp = cp1[i];
+	// 	cp1[i] = cp2[i];
+	// 	cp2[i] = ctemp;
+	// }
+	/*WAY 2*/
+	while (size--)
+	{
+		ctemp = *cp1;
+		*cp1++ = *cp2;
+		*cp2++ = ctemp;
+	}
+}
+
+int main(void)
+{
+
+	int x = 5, y = 475;
+	double dx = 69.69;
+	double dy = 31.31;
+
+	printf("x = %d\t y = %d\n", x, y);
+	gswap(&x, &y, sizeof(x));
+	printf("x = %d\t y = %d\n", x, y);
+	printf("x = %f\t y = %f\n", dx, dy);
+	gswap(&dx, &dy, sizeof(dx));
+	printf("x = %f\t y = %f\n", dx, dy);
+}
+```
+
+
+- Generic reverse_array fonksiyonu
+```c
+/*generic reverse array function*/
+void gswap(void *vp, void *vp2, size_t size)
+{
+	char ctemp;
+	char *cp1 = (char *)vp;
+	char *cp2 = (char *)vp2;
+	/*WAY 1*/
+	// for(int i = 0; i < size;++i){
+	// 	ctemp = cp1[i];
+	// 	cp1[i] = cp2[i];
+	// 	cp2[i] = ctemp;
+	// }
+	/*WAY 2*/
+	while (size--)
+	{
+		ctemp = *cp1;
+		*cp1++ = *cp2;
+		*cp2++ = ctemp;
+	}
+}
+// size -> sizeof 1 elements in array
+void g_get_reverse_array(void *vp,size_t len, size_t size)
+{
+	char *p = (char *)vp;
+	for (int i = 0; i < (len / 2); ++i)
+	{
+		gswap((p + i * size), (p + (len - 1 - i) * size), size);
+	}
+}
+
+int main(void)
+{
+	int a[5] = {0, 2, 4, 5, 31};
+	print_array(a, asize(a));
+	g_get_reverse_array(a, asize(a), sizeof(int));
+	print_array(a, asize(a));
+}
+
+```
+
+- Alternatif Implementation
+```c
+void g_get_reverse_array(void *vp,size_t len, size_t size)
+{
+	char *p = (char *)vp; // first element of array
+	char *pe = (char*)vp + (len-1) * size; // end of array
+
+	while(p < pe){
+		gswap(p,pe,size);
+		p += size
+		p -= size
+	}
+
+}
+```
+
+- Türden bağımsız bir diziyi küçükten büyüğe sıralayan bir fonksiyon yazılabilir mi?
+	- Şu anki bilgilere göre hayır.
+	- `p[k] > p[k+1]` karşılaştırılması tür bilinmediğinden dolayı yapılamaz.
+	- **Function Pointers** ile bu işlem yapılabilir. Bir sonraki konuda anlatılacaktır.
+
+### Standart Kütüphane Temel Generic Functions
+
+- Bu fonksiyonlar `string.h`'da yer alır.
+- Isimleri genellikle **mem** ile başlar
+	- memset
+		- Bir bellek bloğunun bütün byte'larına aynı tam sayı değerini yazan fonksiyondur.
+		- `void* memset(void* vp, int val, size_t sz)`
+	- memcpy
+		- Bir bellek bloğunu bir yerden başka bir yere kopyalar
+			- `void* memcpy(void* vpdest,const void* vpsource,size_t sz)`
+	- memmove
+		- memcpy ile aynı işleve sahiptir aralarında sadece 1 fark bulunur.
+			- `void* memcpy(void* vpdest,const void* vpsource,size_t sz)`
+	- memchr
+		- Bir bellek bloğunda bir byte arayan fonksiyondur.
+			- ` void* memchr(const void* vp, int val, size_t sz)`
+	- memcmp
+		- İki bellek bloğunu karşılaştıran fonksiyondur
+			- `int memcmp(const void* vp1, const void* vp2, size_t sz)`
+
+## `memset` Function
+
+- Bir değişkenin değerini 0 yapmak:
+```c
+int main(void)
+{
+	int x = 10;
+	printf("x = %d\n",x);
+	memset(&x,0,sizeof(x));
+	printf("x = %d\n",x);
+}
+
+```
+
+1.17.37

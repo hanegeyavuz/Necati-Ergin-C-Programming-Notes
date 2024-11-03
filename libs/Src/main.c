@@ -2567,3 +2567,475 @@ int main(void){
 }
 #endif
 
+#if 0
+
+int main(void)
+{
+	double dval[] = {3.4, 5.6, 7.23, 30.0};
+	printf("dval[2] = %f\n", dval[2]);
+	double *dp = dval;
+	double **ptr = &dp;
+	(*ptr)[2]++;
+	printf("dval[2] = %f\n", dval[2]);
+}
+
+#endif
+
+#if 0
+int g = 31;
+
+void foo(int *ptr)
+{
+	*ptr = 777;
+}
+void bar(int **ptr)
+{
+	*ptr = &g;
+}
+
+int main(void)
+{
+	int x = 10;
+	int *p = &x;
+
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+	foo(p);
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+	bar(&p);
+	printf("x = %d\n", x);
+	printf("x = %d\n", *p);
+}
+
+#endif
+
+#if 0
+/*Pointer to Pointer Exmaple Function*/
+void pswap(int** const p1, int** const p2){
+	int* ptemp = *p1;
+	*p1 = *p2;
+	*p2 = ptemp;
+
+}
+
+int main(void)
+{
+	int x = 10;
+	int y = 45;
+	int *p1 = &x;
+	int *p2 = &y;
+	printf("*p1 = %d\t*p2 = %d\n",*p1,*p2);
+	pswap(&p1,&p2);
+	printf("*p1 = %d\t*p2 = %d\n",*p1,*p2);
+}
+
+#endif
+
+#if 0
+/*max ve min değerlerin adreslerini döndüren fonksiyon*/
+void p_getminmax(const int* arr, int size, int** ppmax,  int** ppmin){
+	*ppmax = (int*)arr;
+	*ppmin = (int*)arr;
+	
+	for(int i = 0; i < size;++i){
+
+		*ppmax = arr[i] > **ppmax ? (int*)(arr + i) : *ppmax;
+		*ppmin = arr[i] < **ppmin ? (int*)(arr + i) : *ppmin;
+	}
+}
+
+int main(void){
+	int a[10];
+	randomize();
+	set_array_random(a,10);
+	print_array(a,10);
+	int* pmin, *pmax;
+	p_getminmax(a,asize(a),&pmax,&pmin);
+	printf("min = %d dizisinin %d indexli elemani\n",*pmin,pmin-a);
+	printf("max = %d dizisinin %d indexli elemani\n",*pmax,pmax-a);
+
+}
+
+#endif
+
+#if 0
+void print_pointees(int *const *pa, int size)
+{
+	/*WAY 1*/
+	for (int i = 0; i < size; ++i)
+	{
+		printf("%d\t", **(pa + i));
+	}
+	/*WAY 2*/
+	while (size--)
+	{
+		printf("%d\t", **(pa));
+		pa++;
+	}
+	printf("\n");
+}
+
+int main(void)
+{
+	int x = 10;
+	int y = 20;
+	int z = 30;
+	int t = 40;
+	int *a[] = {&x, &y, &z, &t};
+	print_pointees(a, asize(a));
+}
+#endif
+
+#if 0
+void cpswap(char**p1,char**p2){
+	char* ptemp = *p1;
+	*p1 = *p2;
+	*p2 = ptemp;
+
+}
+
+void print_names(char **p, size_t size)
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		printf("%s ", p[i]);
+	}
+}
+
+void bubble_sort_char(char **p, size_t size)
+{
+	for (int i = 0; i < size - 1; ++i)
+	{
+		for (int k = 0; k < size - i - 1; ++k)
+		{
+			if (strcmp(p[k], p[k + 1]) > 0)
+			{
+				cpswap(&p[k],&p[k+1]);
+			}
+		}
+	}
+}
+int main(void)
+{
+
+	char *p[] = {"emine", "hande", "kubilay", "yavuz", "hanege"};
+
+	print_names(p, asize(p));
+	bubble_sort_char(p, asize(p));
+
+	(void)getchar();
+	system("cls");
+
+	print_names(p, asize(p));
+}
+
+#endif
+
+#if 0
+/*const Corrections*/
+int main(void)
+{
+	int x = 10;
+	int y = 35;
+	int *p1 = &x;
+	int *p2 = &y;
+
+	int **ptr = &p1;
+	// int ** const ptr = &p1; // Durum 1
+	// int *const* ptr = &p1; // Durum 2
+	// const int ** ptr = &p1; // Durum 3
+
+	ptr = &p2;	 // Durum 1 için ERROR
+	*ptr = &x;	 // Durum 2 için ERROR
+	**ptr = 999; // Durum 3 için ERROR
+}
+
+#endif
+
+#if 0
+/*Dizinin adresini tutan değişkenler*/
+int main(void)
+{
+	int a[5] = {0, 10, 20, 30, 40};
+	int(*p)[5] = &a;
+
+	++**p;
+	for (int i = 0; i < 5; i++)
+	{
+		printf("%d ", (*p)[i]);
+		/* code */
+	}
+}
+#endif
+
+#if 0
+/* void pointer */
+int main(void)
+{
+	int x = 5;
+	double dval = 3.4;
+	char str[] = "burhanettin";
+
+	int *p;
+	void *vp;
+	p = &x;
+	// p = &dval; /*Syntax Error*/
+	vp = &dval; /*Legal*/
+	vp = &x;	/*Legal*/
+	vp = &str;	/*Legal*/
+	vp = &vp;	/*Legal*/
+	//vp = x; /*Syntax Error*/
+}
+
+#endif
+
+#if 0
+int main(void){
+
+	int x = 10;
+	void* vp = &x; /*int* ==> void* type cast */ /*C and C++ Legal*/
+	int *iptr = vp; /* void* ==> int* type cast*/ /*C++ illegal*/
+
+}
+#endif
+
+#if 0
+/*Generic Programming with void pointer*/
+
+void gswap(void *vp, void *vp2, size_t size)
+{
+
+}
+
+int main(void)
+{
+
+	int x = 5, y = 475;
+
+	gswap(&x, &y, sizeof(x));
+}
+#endif
+
+#if 0
+/*y = x*/
+int main(void){
+	double x = 34.7823;
+	double y;
+
+	//y = x;
+	const char* px = (const char*)&x;
+	char* py = (char*)&y;
+	size_t size = sizeof(x);
+	while(size--){
+	
+		*py++ = *px++;
+	}
+	printf("x = %f\n",x);
+	printf("y = %f\n",y);
+
+}
+#endif
+
+#if 0
+void copy_object(void* vpdest,const void* vpsource,size_t n){
+	const char* psource = (const char*)vpsource;
+	char* pdest = (char*)vpdest;
+	while(n--){
+		*pdest++ = *psource++;
+	}
+}
+
+int main(void){
+
+	double d1 = 873.97664;
+	double d2;
+
+	int i1 = 6789;
+	int i2;
+	int a[] = {3,6,1,2,3,56,9};
+	int b[7];
+
+	copy_object(&d2,&d1,sizeof(double));
+	copy_object(&i2,&i1,sizeof(int));
+	copy_object(&b,&a,sizeof(b));
+
+	printf("d1 = %f\n",d1);
+	printf("d2 = %f\n",d2);
+	printf("i1 = %d\n",i1);
+	printf("i2 = %d\n",i2);
+	print_array(a,asize(a));
+	print_array(b,asize(b));
+}
+#endif
+
+#if 0
+/*Generic swap function*/
+
+void gswap(void *vp, void *vp2, size_t size)
+{
+	char ctemp;
+	char *cp1 = (char *)vp;
+	char *cp2 = (char *)vp2;
+	/*WAY 1*/
+	// for(int i = 0; i < size;++i){
+	// 	ctemp = cp1[i];
+	// 	cp1[i] = cp2[i];
+	// 	cp2[i] = ctemp;
+	// }
+	/*WAY 2*/
+	while (size--)
+	{
+		ctemp = *cp1;
+		*cp1++ = *cp2;
+		*cp2++ = ctemp;
+	}
+}
+
+int main(void)
+{
+
+	int x = 5, y = 475;
+	double dx = 69.69;
+	double dy = 31.31;
+
+	printf("x = %d\t y = %d\n", x, y);
+	gswap(&x, &y, sizeof(x));
+	printf("x = %d\t y = %d\n", x, y);
+	printf("x = %f\t y = %f\n", dx, dy);
+	gswap(&dx, &dy, sizeof(dx));
+	printf("x = %f\t y = %f\n", dx, dy);
+}
+#endif
+
+#if 0
+/*generic reverse array function*/
+void gswap(void *vp, void *vp2, size_t size)
+{
+	char ctemp;
+	char *cp1 = (char *)vp;
+	char *cp2 = (char *)vp2;
+	/*WAY 1*/
+	// for(int i = 0; i < size;++i){
+	// 	ctemp = cp1[i];
+	// 	cp1[i] = cp2[i];
+	// 	cp2[i] = ctemp;
+	// }
+	/*WAY 2*/
+	while (size--)
+	{
+		ctemp = *cp1;
+		*cp1++ = *cp2;
+		*cp2++ = ctemp;
+	}
+}
+// size -> sizeof 1 elements in array
+void g_get_reverse_array(void *vp,size_t len, size_t size)
+{
+	char *p = (char *)vp;
+	for (int i = 0; i < (len / 2); ++i)
+	{
+		gswap((p + i * size), (p + (len - 1 - i) * size), size);
+	}
+}
+
+int main(void)
+{
+	int a[5] = {0, 2, 4, 5, 31};
+	print_array(a, asize(a));
+	g_get_reverse_array(a, asize(a), sizeof(int));
+	print_array(a, asize(a));
+}
+
+#endif
+
+#if 0
+/*Alternative Generic reverse array implementation*/
+void gswap(void *vp, void *vp2, size_t size)
+{
+	char ctemp;
+	char *cp1 = (char *)vp;
+	char *cp2 = (char *)vp2;
+	/*WAY 1*/
+	// for(int i = 0; i < size;++i){
+	// 	ctemp = cp1[i];
+	// 	cp1[i] = cp2[i];
+	// 	cp2[i] = ctemp;
+	// }
+	/*WAY 2*/
+	while (size--)
+	{
+		ctemp = *cp1;
+		*cp1++ = *cp2;
+		*cp2++ = ctemp;
+	}
+}
+
+void g_get_reverse_array(void *vp,size_t len, size_t size)
+{
+	char *p = (char *)vp; // first element of array
+	char *pe = (char*)vp + (len-1) * size; // end of array
+
+	while(p < pe){
+		gswap(p,pe,size);
+		p += size;
+		pe -= size;
+	}
+}
+int main(void)
+{
+	int a[5] = {0, 2, 4, 5, 31};
+	print_array(a, asize(a));
+	g_get_reverse_array(a, asize(a), sizeof(int));
+	print_array(a, asize(a));
+}
+#endif
+
+
+#if 0
+/*memset() function*/
+int main(void)
+{
+	int x = 10;
+	printf("x = %d\n",x);
+	memset(&x,0,sizeof(x));
+	printf("x = %d\n",x);
+}
+
+#endif
+#if 0
+/*memset() function*/
+int main(void)
+{
+	int x = 10;
+	printf("x = %d\n",x);
+	int* p = (int*)memset(&x,0,sizeof(x));
+	printf("x = %d\n",x);
+
+	if(p == &x){
+		printf("dogru");
+	}
+	else{
+		printf("yanlis");
+	}
+}
+/*
+out:
+x = 10
+x = 0
+dogru
+*/
+#endif
+
+#if 1
+#define SIZE 20
+/*memset() function*/
+int main(void)
+{
+	int a[SIZE];
+	print_array(a,SIZE);
+	memset(a,0,sizeof(a[0]));
+	print_array(a,SIZE);
+}
+
+#endif
