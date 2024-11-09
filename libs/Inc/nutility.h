@@ -32,5 +32,5 @@ int *get_Array_Max(const int *p, size_t size);
 int *get_Array_Min(const int *p, size_t size);
 void selection_sort(int* p, size_t size);
 int *search_in_array(const int *p, size_t size, int key);
-
+void gswap(void* vp1, void* vp2, size_t size);
 #endif // NUTILITY_H

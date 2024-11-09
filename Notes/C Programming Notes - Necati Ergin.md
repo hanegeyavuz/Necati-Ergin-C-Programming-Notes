@@ -7135,4 +7135,763 @@ int main(void)
 
 ```
 
-1.17.37
+- Source code:
+```c
+void* mymemset(void* vp, int val, size_t sz){
+	char* p = vp;
+	while(sz--){
+	
+		*p++ = (char)val;
+	
+	}
+	return vp;
+}
+
+```
+
+#### Güzel Bir Mülakat Sorusu
+```c
+int main(void)
+{
+	int x;
+	memset(&x,255,sizeof x);
+	printf("x = %d\n",x);
+}
+```
+- yukarıdaki kodun çıktısı ne olur?
+Cevap: `-1` olur.
+- `memset()` fonksiyonu **her bir byte'ı** 255 yapar. Bu da tüm bitlerin 1 olması anlamına gelir.
+
+
+## `memcpy` Function
+
+- Generic bir kopyalama fonksiyonudur. çağrısı aşağıdaki gibidir.
+
+`void* memcopy(void* vpdest, const void* vpsource, size_t n) `
+
+
+```c
+  // memcpy function's implementation
+  void* memcpy_T( void* restrict vp_dest, const void* restrict vp_source, size_t block_size)
+  {
+    char* p_dest = vp_dest;
+    const char* p_source = vp_source;
+
+    while(block_size--)
+      *p_dest++ = *p_source++;
+
+    return vp_dest;
+  }
+
+```
+
+## `restrict` Keyword
+
+C99 standardında tanımlanan `restrict` anahtar kelimesi, C dilinde belirli bir pointer’ın (işaretçinin) başka bir pointer ile "overlap" etmeyeceğine (birbirine çakışmayacağına) dair bir garanti vermek için kullanılır. Bu garanti sayesinde derleyiciye, belirli optimizasyonları güvenle yapabilme fırsatı tanınır. 
+### Amaç ve Kullanım
+`restrict` anahtar kelimesi, bir pointer’a erişimi hızlandırmak için kullanılır. Eğer bir pointer `restrict` olarak tanımlanmışsa, bu pointer aracılığıyla erişilen belleğe başka bir pointer üzerinden erişilmeyeceği (ya da başka bir pointer ile bu bellek bölgesinin paylaşılmadığı) garantisi verilmiş olur. Örneğin:
+
+```c
+void add_arrays(int *restrict a, int *restrict b, int *restrict c, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        c[i] = a[i] + b[i];
+    }
+}
+```
+
+Yukarıdaki örnekte, `a`, `b` ve `c` işaretçileri `restrict` olarak tanımlanmıştır. Bu, `a`, `b` ve `c` işaretçileri tarafından gösterilen bellek bölgelerinin birbiriyle çakışmadığını ve dolayısıyla aynı bellek hücrelerine farklı yollarla erişilmediğini garanti eder. Bu garanti sayesinde derleyici, döngüyü daha iyi optimize edebilir ve işlemciye daha etkili bir kod sunabilir.
+
+### `restrict` Kullanımının Faydaları
+`restrict` kullanımı, bellek erişimlerini daha hızlı hale getirebilir çünkü derleyici, belleğe erişimlerin birbirinden bağımsız olduğunu bildiği için bazı ek yüklerden kaçınabilir. Örneğin:
+- Aynı belleğe farklı yollardan erişilmediğini bildiği için gereksiz bellek erişimlerini tekrar etmekten kaçınabilir.
+- Bellek erişimlerinin sırasını veya belleğe yüklenmesini optimize edebilir, çünkü verinin başka bir yerden değiştirilmediğini bilir.
+
+Bu optimizasyonlar özellikle büyük dizilerle veya yüksek performans gerektiren işlemlerde fark edilir bir hız artışı sağlayabilir.
+
+### Örnek ve `restrict` Olmadan Performans Kaybı
+
+Örneğin, `restrict` olmadan şu durumda derleyici her iki işaretçinin aynı bellek alanını işaret edip etmediğini kontrol etmek zorundadır:
+
+```c
+void copy(int *a, int *b, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        a[i] = b[i];
+    }
+}
+```
+
+Eğer `a` ve `b` aynı bellek alanını işaret ediyorsa (çakışma durumu), her bir atama işlemi sonrası `b[i]` değerinin tekrar okunması gerekebilir. Ancak, `restrict` ile şu şekilde tanımlarsak:
+
+```c
+void copy(int *restrict a, int *restrict b, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        a[i] = b[i];
+    }
+}
+```
+
+Bu durumda, `a` ve `b` aynı bellek alanını işaret edemeyeceği için derleyici daha rahat bir optimizasyon yapabilir.
+
+### Dikkat Edilmesi Gerekenler
+`restrict` anahtar kelimesi, yalnızca pointer’lara uygulanabilir ve doğru kullanılmazsa programın beklenmedik şekilde davranmasına neden olabilir. Yanlış `restrict` kullanımı, yani bir pointer’ın aslında çakıştığı durumda `restrict` olarak tanımlanması, **tanımsız davranış** (undefined behavior) ile sonuçlanabilir. Bu nedenle, `restrict` kullanımı hakkında emin olunmayan durumlarda kullanılmaması daha güvenlidir.
+
+### Özetle
+- `restrict`, bir pointer’ın gösterdiği belleğe başka bir pointer ile erişilmeyeceğini garanti eder.
+- Bu garanti sayesinde derleyiciler daha verimli optimizasyonlar yapabilir.
+- Özellikle yüksek performans gerektiren uygulamalarda büyük hız artışları sağlanabilir.
+- Ancak, yanlış kullanımda tanımsız davranışa yol açabileceği için dikkatli olunmalıdır.
+
+## `memmove` Function
+
+- `memcpy` fonksiyonu ile aynı işleve sahiptir fakat tek fark `memmove` fonksiyonu overlapped bloklar üzerinde kullanılabilmektedir.
+```c
+  // memmove function's implementation
+  void* my_memmove( void* restrict vp_dest, const void* restrict vp_source, size_t block_size)
+  {
+    char* p_dest = vp_dest;
+    const char* p_source = vp_source;
+
+    while(block_size--)
+      *p_dest++ = *p_source++;
+
+    return vp_dest;
+  }
+```
+
+- Overlapped fonksiyonlar üzerinde işlem yapılacağı zaman `memmove` fonksiyonu kullanılmalıdır.
+```c
+/*memmove functions*/
+int main(void)
+{
+
+	char str[100] = "gulsen";
+	// strcpy(str+3,str);// UNDEFINED BEHAVIOUR
+	// memcpy(str+3,str,strlen(str) + 1);// UNDEFINED BEHAVIOUR
+	memmove(str + 3, str, strlen(str) + 1); // LEGAL
+
+	puts(str);
+}
+
+```
+
+
+## `memchr` Function
+- Bir bellek bloğunda ikinci parametresine geçilen tam sayı değerini arayan fonksiyondur.
+- Bulursa bulduğu yerin adresini, bulamazsa NULL pointer döndürür.
+```c
+/*memchr function*/
+void *my_memchr(const void *vp, int key, size_t size)
+{
+	const char *c = vp;
+
+	while (size--)
+	{
+		if (*c == key)
+		{
+			return (char*)c;
+		}
+		c++;
+	}
+	return NULL;
+}
+
+int main(void)
+{
+	char str[] = "ankara'da kara gozlu kara kasli bir arkadasim var";
+
+	if (my_memchr(str, 'v', sizeof(str)))
+	{
+		printf("bulundu.");
+	}
+}
+```
+
+
+## `memcmp` Function
+
+- İki bellek bloğunu karşılaştıran fonksiyondur.
+- `memcmp` fonksiyonunun döndürdüğü değerin 0 dan küçük veya büyük olmasının değişkenlerin sahip oldukları değerlerin büyüklüğü ile hiçbir ilgisi yoktur.
+- 
+```c
+int my_memcmp(const void *vp1, const void *vp2,size_t size){
+
+	char* p1 = vp1;
+	char* p2 = vp2;
+
+	while(size--){
+		if(*p1++ != *p2++){
+			if(*p1 > *p2){
+				return 1;
+			}
+			else if (*p1 < *p2){
+				return -1
+			}
+		}
+	
+	}
+
+}
+
+```
+
+
+```c
+#define SIZE 10
+/*memcmp function*/
+int my_memcmp(const void *vp1, const void *vp2, size_t size)
+{
+
+	const unsigned char *p1 = (const unsigned char *)vp1;
+	const unsigned char *p2 = (const unsigned char *)vp2;
+
+	while (size--)
+	{
+		if (*p1 != *p2)
+		{
+			if (*p1 > *p2)
+			{
+				return 1;
+			}
+			else if (*p1 < *p2)
+			{
+				return -1;
+			}
+		}
+		++p1;
+		++p2;
+	}
+	return 0;
+}
+
+int main(void)
+{
+
+	char a[SIZE] = {1, 2, 3, 4, 5, 7, 8, 0};
+	char b[SIZE];
+	memcpy(b, a, sizeof(a));
+
+	if (!my_memcmp(a, b, sizeof(b)))
+	{
+		printf("esittir\n");
+	}
+	else
+	{
+		printf("esit degildir\n");
+	}
+
+	a[3]++;
+
+	if (!my_memcmp(a, b, sizeof(b)))
+	{
+		printf("esittir\n");
+	}
+	else
+	{
+		printf("esit degildir\n");
+	}
+}
+
+/*
+out:
+esittir
+esit degildir
+*/
+```
+
+- Nesnelerin değerleri ile memcmp fonksiyonunun büyük-küçük olarak döndürdüğü değer aynı anlamda değildir.
+```c
+int main(void){
+
+	int x = -856;
+	int y = 981;
+
+	if(y > x)
+		printf("evet dogru");
+	else
+		printf("dogru degil");
+
+}
+
+```
+
+  
+## Endianness
+
+
+- Bir 4 bytle'lık int değişkenin değeri 15 olsun.
+- binary olarak `00000000 00000000 00000000 00001111` bu şekilde görünür.
+- her bir byte'ın adresi sırasıyla 4800, 4801, 4802, 4803 olsun.
+- Bellekte görünüm iki şekilde olabilir
+### big-endian
+
+		x
+4800   00000000
+4801   00000000
+4802   00000000
+4803   00001111
+
+## little-endian
+
+		x
+4800   00001111
+4801   00000000
+4802   00000000
+4803   00000000
+
+```c
+
+/*
+  int main(void)
+  {
+    int x = 15;   // 0x00'00'00'0F
+    printf("%p\n", &x);  // output -> 00000050FC9FF90C
+
+    // in Big Endian Architecture, LSByte is at the highest address
+    // 00000050FC9FF90C     0x00    0b0000'0000 (Most Significant Byte) 
+    // 00000050FC9FF90D     0x00    0b0000'0000  
+    // 00000050FC9FF90E     0x00    0b0000'0000
+    // 00000050FC9FF90F     0x0F    0b0000'1111 (Least Significant Byte)
+
+    // in Little Endian Architecture, LSByte is at the lowest address
+    // 00000050FC9FF90C     0x0F    0b0000'1111 (Least Significant Byte)
+    // 00000050FC9FF90D     0x00    0b0000'0000
+    // 00000050FC9FF90E     0x00    0b0000'0000
+    // 00000050FC9FF90F     0x00    0b0000'0000 (Most Significant Byte)
+  }
+*/
+
+/*
+  - from big endian to little endian 2 byte swap operation needed
+  - from little endian to big endian 2 byte swap operation needed
+*/
+```
+
+---
+### Sık Sorulan Bir Mülakat Sorusu
+
+- Kod çalıştırılınca sistemin little-endian veya big-endian olduğunun anlaşıldığı bir kod yazınız.
+```c
+int main(void)
+{
+	int x = 1; /*00000000 00000000 00000000 00000001 */
+	if (*(char*)&x)
+	{
+		printf("little endian");
+	}
+	else
+	{
+		printf("big-endian");
+	}
+}
+```
+
+---
+
+### Bazı `void*` Hataları
+
+- Bir void* değişkene herhangi bir adresi atayabilirsiniz Fakat `void**` türünden bir değişkene yalnızca `void*` türünden bir değişkenin adresi atanabilir. `void**` generic bir tür değildir.
+- `void*` türünden elemanlara sahip diziler olabilir, legaldir.
+
+---
+# Lesson 40
+
+## Function Pointers
+
+- Fonksiyonlar fonksiyonlar tarafından birbirlerine aktarılan işlevlerdir.
+- `callback` mekanizmasının temelidir.
+- Her fonksiyonun bir adresi vardır.
+- Bir fonksiyonun adres türü fonksiyonun parametre türleri, geri dönüş değeri türü gibi etkenlere göre değişkenlik gösterir.
+```c
+int foo(int) /*Türü: int (*)(int)*/
+int bar(int,int) /*int (*)(int,int) */
+
+```
+
+```c
+/*
+  ------------------------------------------------------------------
+  | function                | int f1(int)                          |
+  | function type           | int(int)                             |
+  | function pointer type   | int(*)(int)                          |
+  |----------------------------------------------------------------|
+  | function                | double f2(double, double)            |
+  | function type           | double(double, double)               |  
+  | function pointer type   | double(*)(double, double)            |
+  |----------------------------------------------------------------|
+  | function                | size_t strlen(const char*)           |
+  | function type           | size_t(const char*)                  |
+  | function pointer type   | size_t(*)(const char*)               |
+  |----------------------------------------------------------------|
+  | function                | int strcmp(const char*, const char*) |
+  | function type           | int(const char*, const char*)        | 
+  | function pointer type   | int(*)(const char*, const char*)     | 
+  ------------------------------------------------------------------
+*/
+
+```
+
+
+- C dilinde bir fonksiyonun adresini elde etmenin 2 yolu vardır:
+	- `adress of `operatörü`(&)` ile
+	- Bir ifade içinde bir fonksiyon ismi kullanıldığında derleyici o fonksiyon ismini örtülü olarak söz konusu fonksiyonun adresine dönüştürür. **(function to pointer conversion)**
+```c
+int foo(int,int);
+
+
+int main(void){
+	//f; adress of func
+	//&f; adress of func
+}
+```
+
+- fonksiyon adres türünden değişken atamaları:
+```c
+int f1(int,int);
+int f2(int,int);
+
+int main(void){
+	int (*fptr)(int,int) = &f1; 
+	fptr = f2; /*function to pointer conversion*/
+}
+```
+
+```c
+int f1(int, int);
+int f2(int, int);
+void f3(int, int);
+
+int main(void)
+{
+	int (*fptr)(int, int) = &f1;
+	fptr = f2;			 /*function to pointer conversion*/
+	fptr = f3; /*error*/ /*assignment from incompatible pointer type [-Wincompatible-pointer-types]
+						  */
+}
+```
+
+>[!IMPORTANT] C dilinde bir türe eş isim verilebilir. `(typedef)` Bir fonksiyon adresi türüne de eş isim verilebilir.
+
+```c
+typedef int(*FPTR)(int,int);
+/*FPTR ==> int (*)(int,int)*/
+
+```
+
+- fonksiyon adres değişkenleri de statik ömürlü, otomatik ömürlü yerel değişkenler veya global değişkenler olabilir.
+```c
+
+  typedef int(*FPTR)(int, int);
+
+  int (*g_fp)(int, int);  
+  FPTR g_fp2;
+  // global pointer variable
+  // static storage duration object.
+
+  void func(void)
+  {
+    int (*fp)(int, int);
+    FPTR fp2;
+    // local pointer variable
+    // automatic storage duration object.
+
+    static int (*s_fp)(int, int);
+    static FPTR s_fp2;
+    // local pointer variable
+    // static storage duration object.
+  }
+
+  void foo(int(*fp_param)(int, int), FPTR fp_param2)
+  {
+    // fp_param is a function pointer parameter variable
+    // automatic storage duration object.
+  }
+```
+
+- Array şeklinde de tanımlama yapılabilir:
+```c
+int foo(int a, int b){return 1;}
+int bar(int a, int b){return 1;}
+int baz(int a, int b){return 1;}
+int bom(int a, int b){return 1;}
+typedef int (*FPTR)(int, int);
+int main(void)
+{
+
+	int (*fa1[4])(int,int) = {&foo,&bar,&baz,&bom};
+	int (*fa2[4])(int,int) = {foo,bar,baz,bom};
+	FPTR fa3[] = {foo,bar,baz,bom};
+}
+
+#endif
+
+```
+
+>[!NOTE] Fonksiyon çağrısı yapılırken bir fonksiyonun ismi(designator) ve sonrasında `function call` operatörü kullanılır. Bu operatör fonksiyon ismini `function to pointer conversion` ile fonksiyonun adresine dönüştürerek fonksiyonun çağrılması sağlanır.
+
+```c
+void foo(void){
+	printf("void func call");
+}
+
+int main(void)
+{
+/*SAME CALL TYPES*/
+	foo();
+	(&foo)(); 
+}
+
+```
+
+- function pointer ile fonksiyon çağrısı da gerçekleştirilebilir.
+```c
+#if 1
+/*Function call*/
+void foo(void){
+	printf("void func call\n");
+}
+
+int main(void)
+{
+
+	void (*fp)(void) = &foo;
+	fp(); /*FUNCTION CALL*/
+}
+
+#endif
+
+```
+
+- bir function pointer çağrısının hangi fonksiyonu çağırdığı runtime'da değişebileceğinden koda bakarak anlaşılmayabilir.
+```c
+/*Function call*/
+void foo(void){printf("void foo func call\n");}
+void bar(void){printf("void bar func call\n");}
+void baz(void){printf("void baz func call\n");}
+
+int main(void)
+{
+
+	void (*fptr)(void);
+
+	fptr = &foo;
+	fptr();
+	fptr = &bar;
+	fptr();
+	fptr = &baz;
+	fptr();
+}
+
+/*
+out:
+void foo func call
+void bar func call
+void baz func call
+*/
+```
+
+### Function Pointers De-referencing
+- Function pointer değişkenleri de-reference edip `function call` operatörü ile çağırarak da fonksiyon çağrısı yapılabilir.
+
+```c
+void foo(void){printf("void foo func call\n");}
+void bar(void){printf("void bar func call\n");}
+void baz(void){printf("void baz func call\n");}
+
+int main(void)
+{
+
+	void (*fptr)(void);
+
+	fptr = &foo;
+	(*fptr)(); /*Function Call*/
+}
+
+```
+
+- Kullanım amacı için bazı programcılar fonksiyon pointer değişken olduğunu belli etmek için bu notasyonu kullanırlar.
+```c
+f(1,2) /*Function*/
+(*f)(1,2) /*Function Pointer*/
+
+```
+
+>[!TIP] BU BIR KURAL DEGIL KONVENSIYONDUR!!
+
+
+- Aşağıdaki tüm çağrılar fonksiyonun çağrılmasını sağlar.
+```c
+int main(void){
+	void (*fp)(void) = &foo;
+
+
+	foo();
+	(&foo)();
+	(*foo)();
+	fp();
+	(*fp)();
+}
+
+```
+
+
+- Fonksiyonlara parametre olarak da geçilebilir.
+- `callback` mechanism:
+```c
+void foo(void) { printf("void foo func call\n"); }
+void bar(void) { printf("void bar func call\n"); }
+void baz(void) { printf("void baz func call\n"); }
+
+
+void func(void(*fp)(void)){
+	fp();
+
+}
+
+int main(void){
+
+	func(foo); // foo function call
+	func(&foo); // foo function call
+	func(&bar); // bar function call
+
+	
+
+}
+```
+
+- `ctype.h` kütüphanesinde bulunan karakter fonksiyonlarını parametre olarak alan bir fonksiyon yazalım. Fonksiyona istediğimiz fonksiyon adresini göndererek istenilen özellikteki tüm karakterleri yazdıralım.
+```c
+void print_chars(int (*fp)(int))
+{
+	for (int i = 0; i < 128; ++i)
+	{
+		if (fp(i))
+		{
+			putchar(i);
+		}
+	}
+	putchar('\n');
+}
+int main(void)
+{
+
+	print_chars(isupper);
+	print_chars(islower);
+	print_chars(isalpha);
+	print_chars(isalnum);
+	print_chars(isxdigit);
+}
+```
+
+>[!NOTE] `callback` yapısına ait pratikler proje içerisinde bulunan `main.c` dosyası içerisindedir.
+
+## `qsort()` Function
+
+- Türden bağımsız bir diziyi sıralayan fonksiyondur.
+```c
+void qsort(void *vpa,size_t size,size_t sz,int (*fp)(const void*,const void*))
+```
+
+
+- `qsort` fonksiyonunun son parametresi bir fonksiyon pointer parametredir. Bu parametreye türe bağımlı bir karşılaştırma fonksiyonu geçilerek qsort fonksiyonu çağırılır.
+```c
+/*story of qsort()*/
+#define SIZE 20
+int mycmp(const void* vp1,const void* vp2){
+	const int* p1 = (const int*)vp1; 
+	const int* p2 = (const int*)vp2;
+	if(*p1 == *p2)
+		return 0;
+	else if(*p1 > *p2){
+		return 1;
+	}
+	else{
+		return -1;
+	}
+
+}
+
+int main(void)
+{
+	int a[SIZE];
+	randomize();
+	set_array_random(a,SIZE);
+	print_array(a,SIZE);
+	qsort(a,SIZE,sizeof(int),&mycmp);
+	print_array(a,SIZE);
+	
+}
+
+
+```
+
+---
+### Kritik Mülakat Sorusu
+
+- Generic bir bubble sort fonksiyonu yazın. Türden bağımsız.
+- Tıpkı qsort işlevi gibi sıralayan
+
+```c
+void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)){
+	
+	char* p = (char*)vpa;
+
+	
+	for(int i = 0; i < size-1;++i){
+		for(int k = 0; k < size - i -1;++k){
+			if(fcmp((p+k*sz),(p+(k+1)*sz))){
+				gswap((p+k*sz),(p+(k+1)*sz),sz);
+			}
+		}
+	}
+
+}
+
+```
+
+- Test Code:
+
+```c
+#define SIZE 20
+/*bubble sort generic algortihm like qsort*/
+void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)){
+	
+	char* p = (char*)vpa;
+
+	
+	for(int i = 0; i < size-1;++i){
+		for(int k = 0; k < size - i -1;++k){
+			if(fcmp((p+k*sz),(p+(k+1)*sz))){
+				gswap((p+k*sz),(p+(k+1)*sz),sz);
+			}
+		}
+	}
+
+}
+
+int myicmp(const void* vp1,const void* vp2){
+	const int* p1 = (const int*)vp1; 
+	const int* p2 = (const int*)vp2;
+	if(*p1 == *p2)
+		return 0;
+	else if(*p1 > *p2){
+		return 1;
+	}
+	else{
+		return -1;
+	}
+
+}
+
+int main(void){
+	int a[SIZE];
+	randomize();
+	set_array_random(a,SIZE);
+	print_array(a,SIZE);
+	qsort(a,SIZE,sizeof(int),&myicmp);
+	print_array(a,SIZE);
+}
+```
+
+
+
+---

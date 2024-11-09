@@ -2991,7 +2991,6 @@ int main(void)
 }
 #endif
 
-
 #if 0
 /*memset() function*/
 int main(void)
@@ -3027,7 +3026,7 @@ dogru
 */
 #endif
 
-#if 1
+#if 0
 #define SIZE 20
 /*memset() function*/
 int main(void)
@@ -3039,3 +3038,635 @@ int main(void)
 }
 
 #endif
+
+#if 0
+#define SIZE 20
+/*memset() function*/
+int main(void)
+{
+	char str[100] = "Hande Kubilay";
+	puts(str);
+	memset(&str[6], '*', 7);
+	puts(str);
+}
+#endif
+
+#if 0
+#define SIZE 20
+/*arraydeki verilen indexten başlanarak kullanıcıdan alınan adet kadar elemanı 0 yapmak*/
+int main(void)
+{
+	int a[SIZE];
+	randomize();
+	set_array_random(a,SIZE);
+	print_array(a,SIZE);
+	int idx,n;
+	printf("index ve adet degeri giriniz: ");
+	scanf("%d%d",&idx,&n);
+
+	memset(a+idx,0,sizeof(int) * n);
+	print_array(a,SIZE);
+}
+
+#endif
+
+#if 0
+#define SIZE 20
+/*memcpy() function*/
+int main(void)
+{
+	int x, y;
+	printf("bir tam sayi giriniz: ");
+	scanf("%d",&x);
+	memcpy(&y,&x, sizeof x); // y = x;
+	printf("y = %d\n",y);
+}
+#endif
+
+#if 0
+#define SIZE 20
+/*copy array with memcpy() function*/
+int main(void)
+{
+	int x[SIZE] = {31,31,31,31,31,3,13,1};
+	int y[SIZE] =  {0};
+	randomize();
+	print_array(x,SIZE);
+	print_array(y,SIZE);
+	memcpy(&y,&x, sizeof x); 
+	print_array(y,SIZE);
+}
+#endif
+
+#if 0
+#define SIZE 20
+/*copy string with memcpy() function*/
+int main(void)
+{
+	system("cls");
+	puts("Evlendirme Dairesine Hosgeldiniz");
+	char s1[] = "Yavuz Hanege";
+	char s2[] = "Hande Kubilay";
+	printf("Ilk kisi: %s\n",s1);
+	printf("Ikinci kisi: %s\n",s2);
+	puts("Islem gerceklesiyor.........\n");	
+	printf("%s\n",s2);
+	puts("Lutfen Enter Tusuna Basiniz.\n");
+	(void)getchar();
+	memcpy(s2+6,s1+6,sizeof s2);
+	printf("%s\n",s2);
+	printf("Islem Basarili!!!");
+
+}
+#endif
+
+#if 0
+/*memmove functions*/
+int main(void)
+{
+
+	char str[100] = "gulsen";
+	// strcpy(str+3,str);// UNDEFINED BEHAVIOUR
+	// memcpy(str+3,str,strlen(str) + 1);// UNDEFINED BEHAVIOUR
+	memmove(str + 3, str, strlen(str) + 1); // LEGAL
+
+	puts(str);
+}
+
+#endif
+
+#if 0
+int main(void){
+
+	unsigned char buf[] = {1,2,3,4,5,6,7,8,9,0};
+
+	unsigned char* p = memchr(buf,0,sizeof(buf));
+	printf("%d indexli elemani",p-buf);
+
+}
+#endif
+
+#if 0
+int main(void)
+{
+
+	char str[] = "ankara'da kara gozlu kara kasli bir arkadasim var";
+
+	if (memchr(str, 'v', strlen(str)))
+	{
+		printf("bulundu.");
+	}
+	else
+	{
+		printf("bulunamadi.");
+	}
+}
+#endif
+
+#if 0
+/*memchr function*/
+void *my_memchr(const void *vp, int key, size_t size)
+{
+	const char *c = vp;
+
+	while (size--)
+	{
+		if (*c == key)
+		{
+			return (char*)c;
+		}
+		c++;
+	}
+	return NULL;
+}
+
+int main(void)
+{
+	char str[] = "ankara'da kara gozlu kara kasli bir arkadasim var";
+
+	if (my_memchr(str, 'v', sizeof(str)))
+	{
+		printf("bulundu.");
+	}
+}
+
+#endif
+
+#if 0
+#define SIZE 10
+/*memcmp function*/
+int my_memcmp(const void *vp1, const void *vp2, size_t size)
+{
+
+	const unsigned char *p1 = (const unsigned char *)vp1;
+	const unsigned char *p2 = (const unsigned char *)vp2;
+
+	while (size--)
+	{
+		if (*p1 != *p2)
+		{
+			if (*p1 > *p2)
+			{
+				return 1;
+			}
+			else if (*p1 < *p2)
+			{
+				return -1;
+			}
+		}
+		++p1;
+		++p2;
+	}
+	return 0;
+}
+
+int main(void)
+{
+
+	char a[SIZE] = {1, 2, 3, 4, 5, 7, 8, 0};
+	char b[SIZE];
+	memcpy(b, a, sizeof(a));
+
+	if (!my_memcmp(a, b, sizeof(b)))
+	{
+		printf("esittir\n");
+	}
+	else
+	{
+		printf("esit degildir\n");
+	}
+
+	a[3]++;
+
+	if (!my_memcmp(a, b, sizeof(b)))
+	{
+		printf("esittir\n");
+	}
+	else
+	{
+		printf("esit degildir\n");
+	}
+}
+
+#endif
+
+#if 0
+int main(void)
+{
+
+	int x = -856;
+	int y = 1;
+
+	if (y > x)
+		printf("evet dogru\n");
+
+	else
+		printf("dogru degil\n");
+
+	if (!memcmp(&y, &x, sizeof(x)))
+		printf("esittir\n");
+
+	else if (memcmp(&y, &x, sizeof(x)) > 0)
+		printf("buyuktur\n");
+
+	else
+	{
+		printf("kucuktur\n");
+	}
+}
+#endif
+
+#if 0
+/*endianness*/
+int main(void)
+{
+	int x = 1; /*00000000 00000000 00000000 00000001 */
+	if (*(char*)&x)
+	{
+		printf("little endian");
+	}
+	else
+	{
+		printf("big-endian");
+	}
+}
+#endif
+
+#if 0
+/*Generic strstr() function HOMEWORK*/
+const void *g_strstr(const void *vp1, size_t sizevp1, const void *vp2, size_t sizevp2)
+{
+	const unsigned char *haystack = (const unsigned char *)vp1;
+	const unsigned char *needle = (const unsigned char *)vp2;
+
+	if (sizevp2 == 0) 
+		return haystack;
+
+	while (sizevp1 >= sizevp2)
+	{
+		if (memcmp(haystack, needle, sizevp2) == 0)
+		{
+			return haystack; 
+		}
+		haystack++;
+		sizevp1--;
+	}
+
+	return NULL;
+}
+
+int main(void)
+{
+
+	char *str1 = "yavuzhanege";
+	char *str2 = "hanege";
+	if (g_strstr(str1, strlen(str1), str2, strlen(str2)))
+	{
+		printf("bulundu");
+	}
+	else
+	{
+		printf("bulunamadi.");
+	}
+}
+#endif
+
+#if 0
+/*function pointers*/
+int f1(int, int);
+int f2(int, int);
+void f3(int, int);
+
+int main(void)
+{
+	int (*fptr)(int, int) = &f1;
+	fptr = f2;			 /*function to pointer conversion*/
+	fptr = f3; /*error*/ /*assignment from incompatible pointer type [-Wincompatible-pointer-types]gcc
+						  */
+}
+
+#endif
+#if 0
+/*function pointers*/
+int f1(int, int);
+int f2(int, int);
+void f3(int, int);
+
+int main(void)
+{
+	int (*fptr)(int, int) = &f1;
+	fptr = f2;			 /*function to pointer conversion*/
+	fptr = f3; /*error*/ /*assignment from incompatible pointer type [-Wincompatible-pointer-types]gcc
+						  */
+}
+#endif
+
+#if 0
+
+typedef int(*FPTR)(int,int);
+
+int main(void)
+{
+	FPTR fp1; /*int(*fp1)(int,int)*/
+	FPTR fp2,fp3,fp4; 
+}
+#endif
+
+#if 0
+
+typedef int (*FPTR_t)(const char*, const char*);
+
+FPTR_t gf = &strcmp;
+
+void func(FPTR_t x)
+{
+	FPTR_t fp1 = &strcmp;
+	static FPTR_t fp2 = &strcmp;
+}
+int main(void)
+{
+
+	
+}
+
+#endif
+
+#if 0
+
+int foo(int,int);
+int main(void)
+{
+	int (*fp)(int,int) = &foo;
+
+}
+
+#endif
+
+#if 0
+
+int foo(int, int);
+int main(void)
+{
+	int (*fp)(int, int) = &foo;
+	int (**fptr)(int, int) = &fp; /*pointer to function pointer */
+}
+
+#endif
+#if 0
+
+int foo(int, int);
+typedef int (*FPTR)(int, int);
+int main(void)
+{
+	// int (*fp)(int, int) = &foo;
+	FPTR fp = &foo;
+	// int (**fptr)(int, int) = &fp; /*pointer to function pointer */
+	FPTR *fptr = &fp;
+}
+
+#endif
+#if 0
+
+int foo(int a, int b){return 1;}
+int bar(int a, int b){return 1;}
+int baz(int a, int b){return 1;}
+int bom(int a, int b){return 1;}
+typedef int (*FPTR)(int, int);
+int main(void)
+{
+
+	int (*fa1[4])(int,int) = {&foo,&bar,&baz,&bom};
+	int (*fa2[4])(int,int) = {foo,bar,baz,bom};
+	FPTR fa3[] = {foo,bar,baz,bom};
+}
+
+#endif
+
+#if 0
+/*Function call*/
+void foo(void){
+	printf("void func call\n");
+}
+
+int main(void)
+{
+/*SAME CALL TYPES*/
+	foo();
+	(&foo)(); 
+}
+
+#endif
+
+#if 0
+/*Function call*/
+void foo(void){
+	printf("void func call\n");
+}
+
+int main(void)
+{
+
+	void (*fp)(void) = &foo;
+	fp(); /*FUNCTION CALL*/
+}
+
+#endif
+
+#if 0
+/*Function call*/
+void foo(void){printf("void foo func call\n");}
+void bar(void){printf("void bar func call\n");}
+void baz(void){printf("void baz func call\n");}
+
+int main(void)
+{
+
+	void (*fptr)(void);
+
+	fptr = &foo;
+	fptr();
+	fptr = &bar;
+	fptr();
+	fptr = &baz;
+	fptr();
+}
+
+#endif
+
+#if 0
+/*Function Calls*/
+void foo(void) { printf("void foo func call\n"); }
+void bar(void) { printf("void bar func call\n"); }
+void baz(void) { printf("void baz func call\n"); }
+
+int main(void)
+{
+	void (*fp)(void) = &foo;
+
+	foo();
+	(&foo)();
+	(*foo)();
+	fp();
+	(*fp)();
+}
+
+#endif
+
+#if 0
+void foo(void) { printf("void foo func call\n"); }
+void bar(void) { printf("void bar func call\n"); }
+void baz(void) { printf("void baz func call\n"); }
+
+
+void func(void(*fp)(void)){
+	fp();
+
+}
+
+int main(void){
+
+	func(foo); // foo function call
+	func(&foo); // foo function call
+	func(&bar); // bar function call
+
+	
+
+}
+#endif
+
+#if 0
+/*Function callback Mechanism*/
+void print_chars(int (*fp)(int))
+{
+	for (int i = 0; i < 128; ++i)
+	{
+		if (fp(i))
+		{
+			putchar(i);
+		}
+	}
+	putchar('\n');
+}
+int main(void)
+{
+
+	print_chars(isupper);
+	print_chars(&islower);
+	print_chars(&isalpha);
+	print_chars(isalnum);
+	print_chars(isxdigit);
+}
+
+#endif
+
+
+#if 0
+void print_object(const void* vp,void(*fpr)(const void*)){
+	fpr(vp);
+}
+void my_iprint(const void* vp){
+
+	int val = *(const int*)vp;
+	printf("(%d)\n",val);
+
+}
+void my_dprint(const void* vp){
+
+	double dval = *(const double*)vp;
+	printf("(%f)\n",dval);
+
+}
+void my_cprint(const void* vp){
+
+	char cval = *(const char*)vp;
+	printf("(%c)\n",cval);
+
+}
+int main(void)
+{
+
+	int i = 5;
+	double d = 3.4;
+	char c = 'A';
+	print_object(&i,my_iprint);
+	print_object(&d,my_dprint);
+	print_object(&c,my_cprint);
+}
+
+#endif
+
+#if 0
+/*story of qsort()*/
+#define SIZE 20
+int mycmp(const void* vp1,const void* vp2){
+	const int* p1 = (const int*)vp1; 
+	const int* p2 = (const int*)vp2;
+	if(*p1 == *p2)
+		return 0;
+	else if(*p1 > *p2){
+		return 1;
+	}
+	else{
+		return -1;
+	}
+
+}
+
+int main(void)
+{
+	int a[SIZE];
+	randomize();
+	set_array_random(a,SIZE);
+	print_array(a,SIZE);
+	qsort(a,SIZE,sizeof(int),&mycmp);
+	print_array(a,SIZE);
+	
+}
+
+#endif
+
+#if 1
+#define SIZE 20
+/*bubble sort generic algortihm like qsort*/
+void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)){
+	
+	char* p = (char*)vpa;
+
+	
+	for(int i = 0; i < size-1;++i){
+		for(int k = 0; k < size - i -1;++k){
+			if(fcmp((p+k*sz),(p+(k+1)*sz))){
+				gswap((p+k*sz),(p+(k+1)*sz),sz);
+			}
+		}
+	}
+
+}
+
+int myicmp(const void* vp1,const void* vp2){
+	const int* p1 = (const int*)vp1; 
+	const int* p2 = (const int*)vp2;
+	if(*p1 == *p2)
+		return 0;
+	else if(*p1 > *p2){
+		return 1;
+	}
+	else{
+		return -1;
+	}
+
+}
+
+int main(void){
+	int a[SIZE];
+	randomize();
+	set_array_random(a,SIZE);
+	print_array(a,SIZE);
+	qsort(a,SIZE,sizeof(int),&myicmp);
+	print_array(a,SIZE);
+
+
+}
+
+#endif
+

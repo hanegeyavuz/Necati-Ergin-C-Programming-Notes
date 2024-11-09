@@ -405,3 +405,17 @@ int *search_in_array(const int *p, size_t size, int key)
 	}
 	return NULL;
 }
+
+
+void gswap(void* vp1, void* vp2, size_t size)
+{
+  char* p1 = vp1;
+  char* p2 = vp2;
+
+  while (size--)
+  {
+    char temp = *p1;
+    *p1++ = *p2;
+    *p2++ = temp;
+  }
+}
