@@ -419,3 +419,20 @@ void gswap(void* vp1, void* vp2, size_t size)
     *p2++ = temp;
   }
 }
+
+
+/*bubble sort generic algortihm like qsort*/
+void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)){
+	
+	char* p = (char*)vpa;
+
+	
+	for(int i = 0; i < size-1;++i){
+		for(int k = 0; k < size - i -1;++k){
+			if(fcmp((p+k*sz),(p+(k+1)*sz))){
+				gswap((p+k*sz),(p+(k+1)*sz),sz);
+			}
+		}
+	}
+
+}

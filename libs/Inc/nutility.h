@@ -33,4 +33,6 @@ int *get_Array_Min(const int *p, size_t size);
 void selection_sort(int* p, size_t size);
 int *search_in_array(const int *p, size_t size, int key);
 void gswap(void* vp1, void* vp2, size_t size);
+void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*));
+
 #endif // NUTILITY_H

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "nutility.h"
+#include <math.h>
 
 #if 0
 
@@ -3559,7 +3560,6 @@ int main(void)
 
 #endif
 
-
 #if 0
 void print_object(const void* vp,void(*fpr)(const void*)){
 	fpr(vp);
@@ -3625,7 +3625,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 #define SIZE 20
 /*bubble sort generic algortihm like qsort*/
 void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)){
@@ -3667,6 +3667,421 @@ int main(void){
 
 
 }
+#endif
+
+#if 0
+/*generic search function implementation*/
+#define SIZE 20
+void *gsearch(const void *vp, size_t size, size_t sz, const void *vpkey)
+{
+	const char *p = (const char *)vp;
+	while (size--)
+	{
+		if (!memcmp(p, vpkey, sz))
+			return (char *)p;
+
+		p += sz;
+	}
+	return NULL;
+}
+
+int main(void)
+{
+	int a[SIZE];
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	int key;
+
+	printf("arancak degeri giriniz: ");
+	scanf("%d", &key);
+	int *p = gsearch(a, SIZE, sizeof(a[0]), &key);
+
+	if (p)
+	{
+		printf("bulundu %d indexli elemani", p - a);
+	}
+	else
+	{
+		printf("bulunamadi.");
+	}
+}
 
 #endif
 
+#if 0
+#define SIZE 20
+
+int icmp(const void *vp1, const void *vp2)
+{
+	const int *p1 = (const int *)vp1;
+	const int *p2 = (const int *)vp2;
+	if (*(p1) > *(p2))
+	{
+		return 1;
+	}
+	else if (*(p1) < *(p2))
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int main(void)
+{
+
+	int a[SIZE];
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	qsort(a, SIZE, sizeof(a[0]), icmp);
+	print_array(a, SIZE);
+	int key;
+	printf("arancak degeri giriniz: ");
+	scanf("%d", &key);
+	int *p = bsearch(&key, a, SIZE, sizeof(a[0]), icmp);
+	if (p)
+	{
+		printf("bulundu, dizinin %d indexli adresi\n", p - a);
+	}
+	else
+	{
+		printf("bulunamadi.\n");
+	}
+}
+
+#endif
+
+#if 0
+/*HOMEWORK:Bir char pointer dizisindeki tüm elemanlari qsort fonksiyonu ile sıralayınız. */
+
+int g_c_cmp(const void *vp1, const void *vp2)
+{
+	const char *const*p1 = (const char *const*)vp1;
+	const char *const*p2 = (const char *const*)vp2;
+
+	return strcmp(*p1, *p2);
+}
+int main(void)
+{
+	const char *charPointerArray[] = {
+		"G", "B", "K", "D", "Y", "W", "L", "Q", "E", "A", "Z", "U", "T",
+		"R", "H", "P", "C", "S", "F", "X", "I", "V", "M", "N", "J", "O"};
+
+	for (size_t i = 0; i < asize(charPointerArray); ++i)
+	{
+		printf("%s ", charPointerArray[i]);
+	}
+	putchar('\n');
+	printf("-----------------------------------------");
+	putchar('\n');
+
+	qsort(charPointerArray, asize(charPointerArray), sizeof(charPointerArray[0]), g_c_cmp);
+
+	for (size_t i = 0; i < asize(charPointerArray); ++i)
+	{
+		printf("%s ", charPointerArray[i]);
+	}
+	putchar('\n');
+	printf("-----------------------------------------");
+	putchar('\n');
+}
+
+#endif
+
+#if 0
+/*function pointer return type functions */
+int foo(const char* c1,const char* c2){
+	printf("function foo call");
+	return 1;
+}
+
+int(*bar(void))(const char*,const char*){
+	return &foo;
+}
+int main(void){
+	const char ch1,ch2;
+	int(*fp)(const char*,const char*) = bar();
+	fp(&ch1,&ch2);
+
+}
+#endif
+
+#if 0
+typedef int (*FPTYPE)(const char*,const char*);
+
+/*function pointer return type functions */
+int foo(const char* c1,const char* c2){
+	printf("function foo call");
+	return 1;
+}
+
+// int(*bar(void))(const char*,const char*){
+// 	return &foo;
+// }
+
+FPTYPE bar(void){
+	return &foo;
+}
+
+int main(void){
+	const char ch1,ch2;
+	//int(*fp)(const char*,const char*) = bar();
+	FPTYPE fp = bar();
+	fp(&ch1,&ch2);
+
+}
+#endif
+
+#if 0
+/*Function pointer arrays*/
+int f1(int x, int y)
+{
+	printf("function f1 call\n");
+	return 1;
+}
+int f2(int x, int y)
+{
+	printf("function f2 call\n");
+	return 2;
+}
+int f3(int x, int y)
+{
+	printf("function f3 call\n");
+	return 3;
+}
+int f4(int x, int y)
+{
+	printf("function f4 call\n");
+	return 4;
+}
+
+int main(void)
+{
+	int a = 0, b = 0;
+	int (*fp[])(int, int) = {&f1, &f2, &f3, &f4};
+	for (int i = 0; i < 4; i++)
+	{
+		(fp[i])(a, b);
+	}
+}
+
+#endif
+
+#if 0
+/*Function pointer arrays*/
+int f1(int x, int y)
+{
+	printf("x = %d\ty = %d function f1 call\n",x,y);
+	return 1;
+}
+int f2(int x, int y)
+{
+	printf("x = %d\ty = %d function f2 call\n",x,y);
+	return 2;
+}
+int f3(int x, int y)
+{
+	printf("x = %d\ty = %d function f3 call\n",x,y);
+	return 3;
+}
+int f4(int x, int y)
+{
+	printf("x = %d\ty = %d function f4 call\n",x,y);
+	return 4;
+}
+
+int main(void)
+{
+	int (*fp[])(int, int) = {&f1, &f2, &f3, &f4};
+	for (int i = 0; i < 4; i++)
+	{
+		(fp[i])(i, i);
+	}
+}
+
+#endif
+
+#if 0
+/*Function Pointer Array Example*/
+void print_menu(void)
+{
+	printf(
+		"[1] isupper\n"
+		"[2] islower\n"
+		"[3] isalpha\n"
+		"[4] isdigit\n"
+		"[5] isalnum\n"
+		"[6] isxdigit\n"
+		"[7] ispunct\n");
+}
+
+int get_option(void)
+{
+	print_menu();
+	int option;
+	printf("seciminizi giriniz: ");
+	scanf("%d", &option);
+	return option;
+}
+
+int (*fa[])(int) = {isupper,
+					islower,
+					isalpha,
+					isdigit,
+					isalnum,
+					isxdigit,
+					ispunct};
+
+int main(void)
+{
+	printf("bir karakter girin: ");
+	int ch = getchar();
+	int op = get_option();
+	if (fa[op](ch))
+	{
+		printf("girilen karakter secilen fonksiyona uygun degildir.");
+	}
+	else
+	{
+		printf("girilen karakter secilen fonksiyona uygundur.");
+	}
+}
+
+#endif
+
+#if 0
+/*Function Pointer Array Interview Question*/
+void print_menu(void)
+{
+	printf(
+		"[1] isupper\n"
+		"[2] islower\n"
+		"[3] isalpha\n"
+		"[4] isdigit\n"
+		"[5] isalnum\n"
+		"[6] isxdigit\n"
+		"[7] ispunct\n");
+}
+
+char *get_option(void)
+{
+	print_menu();
+	static char str_option[45];
+	printf("seciminizi giriniz: ");
+	scanf("%s", str_option);
+	return str_option;
+}
+
+int (*const fa[])(int) = {isupper,
+					islower,
+					isalpha,
+					isdigit,
+					isalnum,
+					isxdigit,
+					ispunct};
+
+const char* const func_names[] = {
+	"isupper",
+	"islower",
+	"isalpha",
+	"isdigit",
+	"isalnum",
+	"isxdigit",
+	"ispunct"};
+
+int main(void)
+{
+	printf("bir karakter girin: ");
+	int ch = getchar();
+	char *op = get_option();
+	for (size_t i = 0; i < asize(func_names); ++i)
+	{
+		if (!strcmp(op, func_names[i]))
+		{
+			if (fa[i](ch))
+			{
+				printf("OK\n");
+			}
+			else
+			{
+				printf("NOK\n");
+			}
+		}
+	}
+}
+
+#endif
+
+#if 0
+/*function behaviour set in library function*/
+#include "fpointers.h"
+
+void yavuz(void) { printf("yavuz cagirildi\n"); }
+
+int main(void)
+{
+	foo();
+	ftype fpp = set_foo(yavuz);
+	foo();
+	set_foo(fpp);
+	foo();
+}
+
+#endif
+
+#if 0
+/*function register with function pointer arrays example*/
+#include "fpointers.h"
+void f1(void) { printf("f1 cagrildi\n"); }
+void f2(void) { printf("f2 cagrildi\n"); }
+void f3(void) { printf("f3 cagrildi\n"); }
+void f4(void) { printf("f4 cagrildi\n"); }
+void f5(void) { printf("f5 cagrildi\n"); }
+
+int main(void)
+{
+	reg_func(f1);
+	// reg_func(f2);
+	reg_func(f3);
+	// reg_func(f4);
+	reg_func(f5);
+
+	reg_foo();
+}
+
+#endif
+
+#if 0
+void f1(void) { printf("f1 cagrildi\n"); }
+void f2(void) { printf("f2 cagrildi\n"); }
+void f3(void) { printf("f3 cagrildi\n"); }
+void f4(void) { printf("f4 cagrildi\n"); }
+void f5(void) { printf("f5 cagrildi\n"); }
+
+int main(void)
+{
+	atexit(f1);
+	atexit(f2);
+	atexit(f3);
+	atexit(f4);
+	atexit(f5);
+	printf("main basladi.\n");
+	exit(1);
+	printf("main devam ediyor\n");
+}
+
+#endif
+
+#if 1
+
+int main(void)
+{
+	int a[10][20];
+	printf("a size = %zu", asize(a));
+}
+
+#endif

@@ -6383,7 +6383,7 @@ int main(void){
 
 	int* ar[] = {&x,&y,&z,&t};
 	*ar[0] = 999; /* x = 999;*/
-	*ar = 999; /* x = 999;*/
+	*ar = 999; /* warning: assignment to ‘int *’ from ‘int’ makes pointer from integer without a cast [-Wint-conversion] */
 
 }
 ```
@@ -7892,6 +7892,537 @@ int main(void){
 }
 ```
 
+---
+
+# Lesson 41
+
+## `bsearch` Function
+- Generic binary search algoritması fonksiyonudur. 
+- Son parametresi bir pointer function değişkendir.
+```c
+(const void *, const void *, size_t, size_t, int (*)(const void *, const void *));
+```
+- bsearch algoritması için öncesinde dizinin sıralanması gerekmektedir.
+- Dizi sıralandıktan sonra karşılaştırma fonksiyonu parametre olarak girilip search işlemi yapılır.
+
+```c
+#define SIZE 20
+int icmp(const void *vp1, const void *vp2)
+{
+	const int *p1 = (const int *)vp1;
+	const int *p2 = (const int *)vp2;
+	if (*(p1) > *(p2))
+	{
+		return 1;
+	}
+	else if (*(p1) < *(p2))
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+int main(void)
+{
+
+	int a[SIZE];
+	randomize();
+	set_array_random(a, SIZE);
+	print_array(a, SIZE);
+	qsort(a, SIZE, sizeof(a[0]), icmp);
+	print_array(a, SIZE);
+	int key;
+	printf("arancak degeri giriniz: ");
+	scanf("%d", &key);
+	int *p = bsearch(&key, a, SIZE, sizeof(a[0]), icmp);
+	if (p)
+	{
+		printf("bulundu, dizinin %d indexli adresi\n", p - a);
+	}
+	else
+	{
+		printf("bulunamadi.\n");
+	}
+}
+
+```
+
+---
+
+### Homework
+- bir `char pointer dizisini` `qsort` fonksiyonu ile sıralayınız.
+- Bunun için gerekli callback fonksiyonunu yazınız.
+
+```c
+#if 1
+/*HOMEWORK:Bir char pointer dizisindeki tüm elemanlari qsort fonksiyonu ile sıralayınız. */
+
+int g_c_cmp(const void *vp1, const void *vp2)
+{
+	const char *const*p1 = (const char *const*)vp1;
+	const char *const*p2 = (const char *const*)vp2;
+
+	return strcmp(*p1, *p2);
+}
+int main(void)
+{
+	const char *charPointerArray[] = {
+		"G", "B", "K", "D", "Y", "W", "L", "Q", "E", "A", "Z", "U", "T",
+		"R", "H", "P", "C", "S", "F", "X", "I", "V", "M", "N", "J", "O"};
+
+	for (size_t i = 0; i < asize(charPointerArray); ++i)
+	{
+		printf("%s ", charPointerArray[i]);
+	}
+	putchar('\n');
+	printf("-----------------------------------------");
+	putchar('\n');
+
+	qsort(charPointerArray, asize(charPointerArray), sizeof(charPointerArray[0]), g_c_cmp);
+
+	for (size_t i = 0; i < asize(charPointerArray); ++i)
+	{
+		printf("%s ", charPointerArray[i]);
+	}
+	putchar('\n');
+	printf("-----------------------------------------");
+	putchar('\n');
+}
+
+
+```
+
+---
+
+### Geri Dönüş Türü Function Pointer olan Fonksiyonlar
+- Bir fonksiyonun geri dönüş türü function pointer da olabilir.
+- Bu durumda syntax aşağıdaki gibi olmalıdır.
+
+```c
+int foo(int,int);
+
+int(*bar(void))(int,int){
+	return &foo;
+}
+```
+
+- Function call with fp
+```c
+/*function pointer return type functions */
+int foo(const char* c1,const char* c2){
+	printf("function foo call");
+	return 1;
+}
+
+int(*bar(void))(const char*,const char*){
+	return &foo;
+}
+int main(void){
+	const char ch1,ch2;
+	int(*fp)(const char*,const char*) = bar();
+	fp(&ch1,&ch2);
+
+}
+```
+
+- Typedef kullanılarak çok daha okunaklı bir şekilde yazılabilir.
+
+```c
+typedef int (*FPTYPE)(const char*,const char*);
+
+/*function pointer return type functions */
+int foo(const char* c1,const char* c2){
+	printf("function foo call");
+	return 1;
+}
+
+// int(*bar(void))(const char*,const char*){
+// 	return &foo;
+// }
+
+FPTYPE bar(void){
+	return &foo;
+}
+
+int main(void){
+	const char ch1,ch2;
+	//int(*fp)(const char*,const char*) = bar();
+	FPTYPE fp = bar();
+	fp(&ch1,&ch2);
+
+}
+```
+
+## Function Pointer Array
+
+- Elemanları `function pointer` olan dizilerdir.
+```c
+int(*fp[10])(int,int); /* elemanları int(*)(int,int) türündne olan 10 elemanlı fp dizisi*/
+```
+
+```c
+int f1(int,int);
+int f2(int,int);
+int f3(int,int);
+int f4(int,int);
+
+int(*fp[])(int,int) = {&f1,&f2,&f3,&f4}
+
+```
+
+
+```c
+/*Function pointer arrays*/
+int f1(int x, int y)
+{
+	printf("x = %d\ty = %d function f1 call\n",x,y);
+	return 1;
+}
+int f2(int x, int y)
+{
+	printf("x = %d\ty = %d function f2 call\n",x,y);
+	return 2;
+}
+int f3(int x, int y)
+{
+	printf("x = %d\ty = %d function f3 call\n",x,y);
+	return 3;
+}
+int f4(int x, int y)
+{
+	printf("x = %d\ty = %d function f4 call\n",x,y);
+	return 4;
+}
+
+int main(void)
+{
+	int (*fp[])(int, int) = {&f1, &f2, &f3, &f4};
+	for (int i = 0; i < 4; i++)
+	{
+		(fp[i])(i, i);
+	}
+}
+
+/*
+out:
+x = 0   y = 0 function f1 call
+x = 1   y = 1 function f2 call
+x = 2   y = 2 function f3 call
+x = 3   y = 3 function f4 call
+*/
+```
+
+
+### Jump Table Yapısı
+- `Function Pointer Arrays` başlığı altında en çok kullanılan yapılardan biri `jump table` yapısıdır. 
+- Bu yapıyla kullanıcının seçimine bağlı olarak belirli indexteki fonksiyon çağrılabilir.
+- Örneğin: Kullanıcı önce bir karakter girmeli daha sonrasında bu karaktere hangi sınamayı yapmak istediğini girmelidir.
+
+```c
+/*Function Pointer Array Example*/
+void print_menu(void)
+{
+	printf(
+		"[1] isupper\n"
+		"[2] islower\n"
+		"[3] isalpha\n"
+		"[4] isdigit\n"
+		"[5] isalnum\n"
+		"[6] isxdigit\n"
+		"[7] ispunct\n");
+}
+
+int get_option(void)
+{
+	print_menu();
+	int option;
+	printf("seciminizi giriniz: ");
+	scanf("%d", &option);
+	return option;
+}
+
+int (*fa[])(int) = {isupper,
+					islower,
+					isalpha,
+					isdigit,
+					isalnum,
+					isxdigit,
+					ispunct};
+
+int main(void)
+{
+	printf("bir karakter girin: ");
+	int ch = getchar();
+	int op = get_option();
+	if (fa[op](ch))
+	{
+		printf("girilen karakter secilen fonksiyona uygun degildir.");
+	}
+	else
+	{
+		printf("girilen karakter secilen fonksiyona uygundur.");
+	}
+}
+```
+
+---
+#### Jump Table Mülakat Sorusu
+- Kullanıcı standart inputa bir karakter girsin.
+- Girilen karakter sonrasında ekrandaki fonksiyonlardan birinin ismi standart inputtan kullanıcı tarafından girilsin.
+- Ismi girilen fonksiyon çağırılarak standart inputtan alınan karakter o fonksiyona parametre olarak geçilsin ve döndürdüğü değer standart output'a yazdırılsın.
+
+```c
+/*Function Pointer Array Interview Question*/
+void print_menu(void)
+{
+	printf(
+		"[1] isupper\n"
+		"[2] islower\n"
+		"[3] isalpha\n"
+		"[4] isdigit\n"
+		"[5] isalnum\n"
+		"[6] isxdigit\n"
+		"[7] ispunct\n");
+}
+
+char *get_option(void)
+{
+	print_menu();
+	static char str_option[45];
+	printf("seciminizi giriniz: ");
+	scanf("%s", str_option);
+	return str_option;
+}
+
+const int (*fa[])(int) = {isupper,
+					islower,
+					isalpha,
+					isdigit,
+					isalnum,
+					isxdigit,
+					ispunct};
+
+const char *func_names[] = {
+	"isupper",
+	"islower",
+	"isalpha",
+	"isdigit",
+	"isalnum",
+	"isxdigit",
+	"ispunct"};
+
+int main(void)
+{
+	printf("bir karakter girin: ");
+	int ch = getchar();
+	char *op = get_option();
+	for (size_t i = 0; i < asize(func_names); ++i)
+	{
+		if (!strcmp(op, func_names[i]))
+		{
+			if (fa[i](ch))
+			{
+				printf("OK\n");
+			}
+			else
+			{
+				printf("NOK\n");
+			}
+		}
+	}
+}
+
+```
 
 
 ---
+
+#### Hatırlatma:
+- C ile C++ dilleri arasında aşağıdaki kod parçacığında farklılıklar olduğunu belirmiştik
+```c
+void foo();
+void bar(void);
+```
+- C++ da bu iki fonksiyon bildirimi aynı anlama gelirken C de aynı anlama gelmemektedir.
+- C programlama dilinde fonksiyon parametresinin boş olması fonksiyonun parametreleri hakkında bilgi verilmemesi anlamına gelir.
+- **Function pointer için de aynı bildirim geçerlidir.**
+```c
+void f1(void);
+  void f2(int);
+  void f3(int, int);
+  void f4(int, int, int);
+  void f5(double);
+  void f6(double, double);
+
+  int main(void)
+  {
+    void(*fp_arr[])() = { f1, &f2, f3, &f4, f5, &f6 };
+  }
+```
+
+### function behaviour set in library function
+
+- Function pointer'lar bir fonksiyonu çağırmadan fonksiyonun işlevini bir kütüphane içerisinde değiştirilmesini sağlayabilirler.
+Örneğin:
+
+- .c file
+```c
+#include "fpointers.h"
+#include "stdio.h"
+
+/**
+ * @brief neco fonksiyonunun tanımı
+ *
+ * Bu fonksiyon ekrana "neco cagirildi." mesajını yazdırır.
+ */
+void neco(void)
+{
+    printf("neco cagirildi.\n");
+}
+
+/**
+ * @brief gfp işaretçisi, neco fonksiyonunu işaret eder.
+ */
+ftype gfp = &neco;
+
+/**
+ * @brief foo fonksiyonu
+ *
+ * Varsayılan olarak gfp işaretçisini kullanarak neco fonksiyonunu çağırır.
+ */
+void foo(void)
+{
+    gfp();
+}
+
+/**
+ * @brief foo'nun davranışını değiştiren fonksiyon
+ *
+ * @param fp Yeni fonksiyon işaretçisi.
+ * @return ftype Eski fonksiyon işaretçisini döndürür.
+ *
+ * Bu fonksiyon, hangi fonksiyon adresi verilirse, foo fonksiyonunun
+ * davranışını değiştirecek şekilde gfp işaretçisini günceller.
+ */
+ftype set_foo(ftype fp)
+{
+    ftype ret = gfp;
+
+    gfp = fp;
+
+    return ret;
+}
+```
+
+- main.c
+```c
+void yavuz(void) { printf("yavuz cagirildi\n"); }
+/*function behaviour set in library function*/
+#include "fpointers.h"
+int main(void)
+{
+	foo();
+	ftype fpp = set_foo(yavuz);
+	foo();
+	set_foo(fpp);
+	foo();
+}
+
+/*
+out:
+neco cagirildi.
+yavuz cagirildi
+neco cagirildi.
+*/
+```
+
+- Fonksiyonların kayıt edilerek uzaktan çağırılabildiği güzel bir örnek:
+
+```c
+/*function register with function pointer arrays example*/
+#include "fpointers.h"
+void f1(void) { printf("f1 cagrildi\n"); }
+void f2(void) { printf("f2 cagrildi\n"); }
+void f3(void) { printf("f3 cagrildi\n"); }
+void f4(void) { printf("f4 cagrildi\n"); }
+void f5(void) { printf("f5 cagrildi\n"); }
+
+int main(void)
+{
+	reg_func(f1);
+	// reg_func(f2);
+	reg_func(f3);
+	// reg_func(f4);
+	reg_func(f5);
+
+	reg_foo();
+}
+
+/*
+out:
+f1 cagrildi
+f3 cagrildi
+f5 cagrildi
+*/
+```
+
+>[!TIP] standart kütüphanede bulunan ve genellikle programı sonlandırma görevine sahip `exit()` fonksiyonu ile birlikte kullanılan `atexit()` fonksiyonu da bu şekilde implemente edilmiştir. Fakat `atexit()` fonksiyonu kayıt edilen fonksiyonları baştan sona değil sondan başa olarak çağırır.
+
+```c
+void f1(void) { printf("f1 cagrildi\n"); }
+void f2(void) { printf("f2 cagrildi\n"); }
+void f3(void) { printf("f3 cagrildi\n"); }
+void f4(void) { printf("f4 cagrildi\n"); }
+void f5(void) { printf("f5 cagrildi\n"); }
+
+int main(void)
+{
+	atexit(f1);
+	atexit(f2);
+	atexit(f3);
+	atexit(f4);
+	atexit(f5);
+	printf("main basladi.\n");
+	exit(1);
+	printf("main devam ediyor\n");
+}
+
+/*
+out:
+main basladi.
+f5 cagrildi
+f4 cagrildi
+f3 cagrildi
+f2 cagrildi
+f1 cagrildi
+*/
+```
+
+## Multi-dimensional Arrays
+
+```c
+int a[10][20]; /* türü: int[20] */
+```
+
+- Yukarıdaki gibi çok boyutlu array tanımlamalarında `[10]` değeri a dizisinin boyutudur.
+- İkinci köşeli parantez içine yazılan değer a'nın boyutu **DEĞİLDİR** a'nın elemanları olan dizinin boyutudur.
+```c
+int a[10][20];
+printf("a size = %zu",asize(a));
+
+/*
+out:
+a size = 10
+*/
+```
+
+
+>[!TIP] Lojik ilişki içerisindeki dizileri bir arada tutmanın en temel yollarından biri `multi-dimensional array` kullanmaktır.
+
+```c
+/* 20 kisilik 8 sinifa ait notlarin tutuldugu bir array */
+int grades[8][20]
+```
