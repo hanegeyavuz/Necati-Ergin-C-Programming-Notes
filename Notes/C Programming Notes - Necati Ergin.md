@@ -8405,6 +8405,7 @@ f1 cagrildi
 
 ```c
 int a[10][20]; /* türü: int[20] */
+int a[10][30]; /* türü: int[30] */
 ```
 
 - Yukarıdaki gibi çok boyutlu array tanımlamalarında `[10]` değeri a dizisinin boyutudur.
@@ -8426,3 +8427,359 @@ a size = 10
 /* 20 kisilik 8 sinifa ait notlarin tutuldugu bir array */
 int grades[8][20]
 ```
+
+
+---
+# Lesson 42
+
+- Çok boyutlu dizilerde tür eş ismi tanımlamaları ile okunurluk arttırılabilir.
+```c
+typedef int inta20[20];
+
+int main(void){
+	int a1[10][20];
+	inta20 a2[10];
+
+}
+
+```
+
+## Initializing Multi-Dimensional Arrays 
+
+```c
+int a[4][3] = {{1,1,1},{2,2,2},{3,3,3},{4,4,4}};
+
+```
+
+
+- Alt-süslü parantez kullanmadan da bu dizilere ilk değer verilebilir.
+
+```c
+/* Asagidaki iki dizi de ayni degerlere sahiptir */
+int ax[4][3] = {{1,1,1},{2,2,2},{3,3,3},{4,4,4}};
+int ay[4][3] = {1,1,1,2,2,2,3,3,3,4,4,4};
+
+
+```
+
+
+- Diziler for döngüsüyle taranabilir.
+```c
+int main(void)
+{
+	int a[4][3] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int k = 0; k < asize(a[1]); ++k)
+		{
+			printf("%d", a[i][k]);
+		}
+		putchar('\n');
+	}
+}
+
+```
+- **`designated Initializing`** işlemi de dizilerde olduğu gibi burada da geçerlidir.
+```c
+int ax[4][3] = {[2] = {1, 1, 1}, [3] = {3, 3, 3}};
+int ay[4][3] = {[2] = {1, 1, 1}, [3] = {[1] = 3, [2] = 31,[3] =  39}};
+
+```
+
+---
+### Mülakat Sorusu
+
+- Aşağıdaki tanımlamalardan hangileri sentaksa uygun değildir?
+```c
+int ax[][] = {1,1,1,2,2,2,3,3,3,4,4,4}; /*SYNTAX ERROR*/
+int ay[4][] = {1,1,1,2,2,2,3,3,3,4,4,4};/*SYNTAX ERROR*/
+int az[][3] = {1,1,1,2,2,2,3,3,3,4,4,4};/*LEGAL*/
+
+```
+
+- Dizinin boyutu belli olmayabilir fakat **türü** belli olmak zorundadır.
+
+---
+
+
+>[!NOTE] Çok boyutlu dizilerin elemanları bellekte ardışık olmak zorundadırlar.
+
+- Array decay kullanımı burda da gerçekleşmektedir.
+
+```c
+int main(void)
+{
+
+	int a[4][3] = {
+		{1, 1, 1},
+		{2, 2, 2},
+		{3, 3, 3},
+		{4, 4, 4}};
+
+	for (int i = 0; i < 4; ++i)
+	{
+		/* ARRAY DECAY */
+		print_array(a[i], 3);
+		// print_array(&a[i][0],3);
+		/* NO DIFFERENCE */
+	}
+}
+```
+
+>[!ERROR] `int* p = a;` ifadesi  a dizisinin ilk elemanı olan `int[4]` türüne sahip diziyi gösterir. bu dizinin ilk elemanını göstermez.
+
+```c
+int main(void)
+{
+
+	int a[4][3] = {
+		{1, 1, 1},
+		{2, 2, 2},
+		{3, 3, 3},
+		{4, 4, 4}};
+
+	int* p = a; /* warning: int* differs in levels of indirection from int(*)[4] */
+	int (*p)[3] = a;
+}
+```
+
+- Şayet bir `int*` pointerın **dizinin ilk elemanındaki dizinin ilk elemanını** göstermesi isteniyorsa burada 3 farklı yöntem bulunmaktadır.
+```c
+int* p1 = (int*)a; /*type-cast*/
+int* p2 = a[0]; /*Array to pointer conversion*/
+int* p3 = &a[0][0]; /*adress-of operator*/
+```
+
+
+## Çok Boyutlu Dizilerin Fonksiyonlarda Kullanımı
+
+- Çok boyutlu diziler fonksiyonlara geçilirken asıl önemli olan nokta 
+	- C programlama dilinde çok boyutlu dizilerin türleri `int[X]` şeklinde tanımlandığından dolayı bir fonksiyon tüm çok boyutlu dizilere hitap edemez.
+	- **Fonksiyona parametre olarak dizi türü ve uzunluğu geçilmelidir.**
+```c
+void foo(int(*p)[20],size); 
+```
+- Yukarıdkai fonksiyona yalnızca `int[size][20]` türüne sahip diziler parametre olarak verilebilir.
+
+>[!NOTE] Fonksiyonel makrolar kullanılarak bu sorun ortadan kaldırılabilir. Yazılacak fonksiyon bir fonksiyonel makroya geçilerek fonksiyonel makronun parametresi dizinin boyutu olursa dizi türlerine özgü fonksiyonlar ön-işlemci tarafından oluşturulur.
+
+```c
+#define set_mtrx(s)                           \
+	void set_matrix##s(int(*p)[s], int size) \
+	{                                         \
+		for (int i = 0; i < size; ++i)        \
+		{                                     \
+			for (int k = 0; k < s; ++k)      \
+			{                                 \
+				p[i][k] = rand() % 31;        \
+			}                                 \
+		}                                     \
+}
+```
+
+- yukarıdaki gibi bir fonksiyonel makro tanımlamasıyla artık makronun çağırıldığı s değerine göre o boyuta uygun fonksiyon tanımlanacaktır.
+```c
+/*Mult-Dim arrays with function makros*/
+
+#define set_mtrx(s)                          \
+	void set_matrix##s(int(*p)[s], int size) \
+	{                                        \
+		for (int i = 0; i < size; ++i)       \
+		{                                    \
+			for (int k = 0; k < s; ++k)      \
+			{                                \
+				p[i][k] = rand() % 31;       \
+			}                                \
+		}                                    \
+	}
+
+#define print_mtrx(s)                                            \
+	void print_matrix##s(const int(*p)[s], int size)                   \
+	{                                                            \
+		for (int i = 0; i < 4; ++i)                              \
+		{                                                        \
+			for (int k = 0; k < s; ++k)                          \
+			{                                                    \
+				printf("%d ", p[i][k]);                          \
+			}                                                    \
+			putchar('\n');                                       \
+		}                                                        \
+		printf("-------------------------------------------\n"); \
+	}
+
+/*
+void set_matrix20(int(*p)[20],int size){
+	for(int i = 0; i < size;++i){
+		for(int k = 0; k < 20;++k){
+			p[i][k] = rand() % 31;
+		}
+	}
+}
+*/
+
+/*void print_matrix20(const int(*p)[20],int size){
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int k = 0; k < 20; ++k)
+		{
+			printf("%d ",p[i][k]);
+		}
+		putchar('\n');
+	}
+	printf("-------------------------------------------\n");
+}*/
+
+set_mtrx(20);
+set_mtrx(5);
+print_mtrx(20);
+print_mtrx(5);
+int main(void)
+{
+	int b[12][5];
+	int a[4][20];
+	set_matrix20(a, 4);
+	set_matrix5(b, 12);
+	print_matrix20(a, 4);
+	print_matrix5(b, 12);
+}
+
+#endif
+
+```
+
+- Bir başka yol ise fonksiyona satır ve sütun değerlerini parametre olarak geçerek sanki `(row*column)` uzunluğuna sahip bir dizi ile işlem yapılıyormuş gibi fonksiyon yazılabilir.
+
+```c
+set_matrix(int* p, int row, int col){
+	for(int i = 0; i < row; ++i){
+		for(int k = 0; k < col; ++k){
+			p[i * row + k] = rand % 31;
+		
+		}
+	}
+}
+```
+
+>[!NOTE] Bu kullanımda fonksiyon çağrılırken matrisin direkt ismi `a` ile çağrılamaz.
+>Tür dönüşümü ile `(int*)a` veya `a[0]` veya `&a[0][0]` ile çağrılabilir.
+
+- çok boyutlu diziler char türünden tanımlanarak çeşitli yazıları tutmak için de kullanılabilirler.
+
+>[!IMPORTANT] char* pointer dizisi ile `char[][]` aynı şey değildir. Pointer dizisi adres tutarken çok boyutlu char dizisi yazının kendisini tutar!!
+
+```c
+char names[10][20] = {"ahmet","mehmet","ahmet","mehmet","ahmet","mehmet","ahmet","mehmet","ahmet","mehmet"};
+char* p[] = {"ahmet","mehmet","ahmet","mehmet","ahmet","mehmet","ahmet","mehmet","ahmet","mehmet"};
+
+```
+
+>[!WARNING] p dizisinin elemanlarına erişilip değişim yapılamaz çünkü `string literal`'ler değiştirilemez fakat char dizisinde bulunan string'ler değiştirilebilir.
+
+- Çok boyutlu dizileri sıralayan fonksiyon yazımı:
+```c
+#include <string.h> // strcpy, strcmp
+
+  #define   SIZE    10
+
+  void print_names(const char(*p)[20], size_t size)
+  {
+    while (size--)
+      printf("%s ", *p++);
+    printf("\n");
+  }
+
+  // max 19 character strings(NTBS)
+  void name_swap(char* p1, char* p2)  
+  {
+    char temp_name[20];
+    strcpy(temp_name, p1);
+    strcpy(p1, p2);
+    strcpy(p2, temp_name);
+  }
+
+  void sort_names(char(*p)[20], size_t size)
+  {
+    for (size_t i = 0; i < size - 1; ++i)
+      for (size_t k = 0; k < size - 1 - i; ++k)
+        if (strcmp(p[k], p[k + 1]) > 0)
+          name_swap(p[k], p[k + 1]);
+  }
+
+  int main(void)
+  {
+    char names[SIZE][20] = {
+      "Kemal", "Veli", "Hasan", "Huseyin", "Mehmet",
+      "Ayse", "Fatma", "Zeynep", "Ali" , "Necati",
+    };
+
+    print_names(names, SIZE);
+    // output ->
+    // Kemal Veli Hasan Huseyin Mehmet Ayse Fatma Zeynep Ali Necati
+
+    sort_names(names, SIZE);
+    print_names(names, SIZE);
+    // output ->
+    //  Ali Ayse Fatma Hasan Huseyin Kemal Mehmet Necati Veli Zeynep
+  }
+```
+
+- Yazıların karşılaştırılması ve swap edilmesinin `char*` dizisi ile yapılması:
+```c
+ #include "../nutility.h"
+  #include <stddef.h>   // size_t
+  #include <stdlib.h>   // qsort
+  #include <string.h>   // strcmp
+
+  int s_compare(const void* vp1, const void* vp2)
+  {
+    const char* p1 = *(const char**)vp1;
+    const char* p2 = *(const char**)vp2;
+
+    return strcmp(p1, p2);
+  }
+
+  int main(void)
+  {
+    char names[][20] = {
+      "ata", "emrecan", "adem", "burhan", "korhan", "demir", "bilal", 
+      "emrecan", "celik", "zahide", "dost", "lale", "baran", "saniye", 
+      "poyraz", "saadet", "aynur", "yeliz", "berivan", "mukerrem", 
+      "melih", "necati", "cezmi", "muslum", "azize", "atif", "rupen", 
+      "alev", "haldun", "hulusi", "yelda", "billur", "yasemin", "tarcan", 
+      "yasar", "tarkan", "refik", "berk", "kenan", "izzet", "adnan", };
+
+    char* p_names[asize(names)];
+
+    for (size_t i = 0; i < asize(names); ++i)
+      p_names[i] = names[i];
+
+    // swapping char arrays are expensive
+    // think about we will swap c_arr1('hello') and c_arr2('world')
+    // we need to create a temporary char[] and
+    // copying c_arr1 to temp array will copy 6 characters including '\0'
+    // copying c_arr2 to c_arr1 will copy 6 characters including '\0'
+    // copying temp array to c_arr2 will copy 6 characters including '\0'
+    // (18 copy operation)
+
+    // swapping char pointers are cheap
+    // we will reach strings by dereferencing the pointer 
+    // that points to the string
+    // after comparison operation 
+    // we will swap pointers (3 copy operation)
+
+    qsort(p_names, asize(p_names), sizeof(char*), s_compare);
+
+    for (size_t i = 0; i < asize(p_names); ++i)
+      printf("%s ", p_names[i]);
+    // output ->
+    // adem adnan alev ata atif aynur azize baran berivan 
+    // berk bilal billur burhan celik cezmi demir dost emrecan 
+    // emrecan haldun hulusi izzet kenan korhan lale melih mukerrem 
+    // muslum necati poyraz refik rupen saadet saniye tarcan tarkan 
+    // yasar yasemin yelda yeliz zahide
+  }
+
+```
+
+---
+# Lesson 43

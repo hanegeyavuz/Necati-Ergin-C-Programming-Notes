@@ -4076,12 +4076,195 @@ int main(void)
 
 #endif
 
-#if 1
-
+#if 0
+/*Multi-Dimensional Arrays*/
 int main(void)
 {
 	int a[10][20];
 	printf("a size = %zu", asize(a));
+}
+
+#endif
+
+#if 0
+/*Multi-Dimensional Arrays Init*/
+int main(void)
+{
+	int a[4][3] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+}
+
+#endif
+
+#if 0
+/*Multi-Dimensional Arrays */
+int main(void)
+{
+	int a[4][3] = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int k = 0; k < asize(a[1]); ++k)
+		{
+			printf("%d", a[i][k]);
+		}
+		putchar('\n');
+	}
+}
+
+#endif
+
+#if 0
+
+int main(void)
+{
+
+	int a[4][3] = {
+		{1, 1, 1},
+		{2, 2, 2},
+		{3, 3, 3},
+		{4, 4, 4}};
+
+	for (int i = 0; i < 4; ++i)
+	{
+		/* ARRAY DECAY */
+		print_array(a[i], 3);
+		// print_array(&a[i][0],3);
+		/* NO DIFFERENCE */
+	}
+}
+
+#endif
+
+#if 0
+int main(void)
+{
+
+	int a[4][3] = {
+		{1, 1, 1},
+		{2, 2, 2},
+		{3, 3, 3},
+		{4, 4, 4}};
+
+	int (*p)[3] = a;
+
+	size_t size = asize(a);
+	while(size--){
+		print_array(*p++,asize(a[1]));
+	}
+}
+
+#endif
+#if 0
+int main(void)
+{
+
+	int a[4][3] = {
+		{1, 1, 1},
+		{2, 2, 2},
+		{3, 3, 3},
+		{4, 4, 4}};
+
+	int (*p)[3] = a;
+
+	for(int i = 0; i < 4; ++i){
+		for(int k = 0; k < 3; ++k){
+			printf("%d, ",(*p)[k]);
+		}
+		putchar('\n');
+		++p;
+	}
+}
+
+#endif
+#if 0
+/*Mult-Dim arrays with functions*/
+void set_matrix20(int(*p)[20],int size){
+	for(int i = 0; i < size;++i){
+		for(int k = 0; k < 20;++k){
+			p[i][k] = rand() % 31;
+		}
+	}
+}
+
+int main(void)
+{
+
+	int a[4][20];
+	set_matrix20(a,4);
+	int (*p)[20] = a;
+
+	for(int i = 0; i < 4; ++i){
+		for(int k = 0; k < 20; ++k){
+			printf("%d ",(*p)[k]);
+		}
+		putchar('\n');
+		++p;
+	}
+}
+
+#endif
+#if 1
+/*Mult-Dim arrays with function makros*/
+
+#define set_mtrx(s)                          \
+	void set_matrix##s(int(*p)[s], int size) \
+	{                                        \
+		for (int i = 0; i < size; ++i)       \
+		{                                    \
+			for (int k = 0; k < s; ++k)      \
+			{                                \
+				p[i][k] = rand() % 31;       \
+			}                                \
+		}                                    \
+	}
+
+#define print_mtrx(s)                                            \
+	void print_matrix##s(int(*p)[s], int size)                   \
+	{                                                            \
+		for (int i = 0; i < 4; ++i)                              \
+		{                                                        \
+			for (int k = 0; k < s; ++k)                          \
+			{                                                    \
+				printf("%d ", p[i][k]);                          \
+			}                                                    \
+			putchar('\n');                                       \
+		}                                                        \
+		printf("-------------------------------------------\n"); \
+	}
+
+/*
+void set_matrix20(int(*p)[20],int size){
+	for(int i = 0; i < size;++i){
+		for(int k = 0; k < 20;++k){
+			p[i][k] = rand() % 31;
+		}
+	}
+}
+*/
+
+/*void print_matrix20(int(*p)[20],int size){
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int k = 0; k < 20; ++k)
+		{
+			printf("%d ",p[i][k]);
+		}
+		putchar('\n');
+	}
+	printf("-------------------------------------------\n");
+}*/
+
+set_mtrx(20);
+set_mtrx(5);
+print_mtrx(20);
+print_mtrx(5);
+int main(void)
+{
+	int b[12][5];
+	int a[4][20];
+	set_matrix20(a, 4);
+	set_matrix5(b, 12);
+	print_matrix20(a, 4);
+	print_matrix5(b, 12);
 }
 
 #endif
