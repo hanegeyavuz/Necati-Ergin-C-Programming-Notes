@@ -4202,7 +4202,7 @@ int main(void)
 }
 
 #endif
-#if 1
+#if 0
 /*Mult-Dim arrays with function makros*/
 
 #define set_mtrx(s)                          \
@@ -4267,4 +4267,160 @@ int main(void)
 	print_matrix5(b, 12);
 }
 
+#endif
+
+#if 0
+/*strncat() function*/
+#define SIZE 100
+int main(void)
+{
+	char dest[SIZE];
+	char source[SIZE] = "yavuz hanege";
+	strncpy(dest, source, 5);
+	puts(dest);
+}
+
+#endif
+
+#if 0
+#define SIZE 100
+int main(void)
+{
+	char dest[SIZE] = "hande kubilay";
+	char source[SIZE] = "yavuz hanege";
+	// strcpy(dest)
+	strncpy(dest + 6, source + 6, 6);
+	dest[strlen(dest) - 1] = 0;
+	puts(dest);
+}
+#endif
+
+#if 0
+/*strncmp() function*/
+#define SIZE 100
+int main(void)
+{
+	int n = 6;
+	char p1[SIZE] = "hande hanege";
+	char p2[SIZE] = "yavuz hanege";
+	// strcpy(dest)
+	if(!strncmp(p1+6,p2+6,n)){
+		printf("yazilarin son %d karakteri (%s) esitir",n,p1+6);
+	}
+	else{
+		printf("yazilarin son %d karakteri esit degildir",n);
+	}
+}
+#endif
+
+#if 0
+/*strspn() function*/
+int main(void){
+
+	char str1[] = "yavuz";
+	char str2[] = "vuay";
+	int indx_span = strspn(str1,str2);
+	printf("span = %d\n",indx_span);
+}
+#endif
+
+#if 0
+/*strcspn() function*/
+int main(void){
+
+	char str1[] = "yavuz";
+	char str2[] = "vu";
+	int c_indx_span = strcspn(str1,str2);
+	printf("c_span = %d\n",c_indx_span);
+}
+#endif
+
+#if 0
+/*strtok() function*/
+int main(void)
+{
+	char str1[100];
+	printf("bir yazi giriniz: ");
+	sgets(str1);
+	const char *p = strtok(str1, " \t.!");
+	while (p)
+	{
+		puts(p);
+		p = strtok(NULL, " \t.!");
+	}
+}
+#endif
+#if 0
+/*atoi() function*/
+int main(void)
+{
+	char str1[100];
+	printf("bir yazi giriniz: ");
+	sgets(str1);
+	int val = atoi(str1);
+	printf("val = %d\n",val);
+}
+#endif
+
+#if 0
+int main(void)
+{
+	char str1[100];
+	printf("bir yazi giriniz: ");
+	sgets(str1);
+	int day,mon,year;
+	const char *p = strtok(str1, "-/"); /*bosluk, tab, nokta ve unlem karakterleri seperator*/
+	int i = 0;
+	while (p)
+	{
+		puts(p);
+		switch (i)
+		{
+		case 0:
+			day = atoi(p);
+			break;
+		case 1:
+			mon = atoi(p);
+
+		case 2:
+			year = atoi(p);
+
+		default:
+			break;
+		}
+		p = strtok(NULL, "-/");
+		i++;
+	}
+	printf("day = %d\nmon = %d\nyear = %d\n",day,mon,year);
+}
+#endif
+
+#if 0
+/*strto functions*/
+int main(void)
+{
+	char str[] = "87542hande";
+	char *p = 0;
+	long x = strtol(str, &p, 10);
+	printf("(%s) yazisinin sayi kismi %ld ve bittigi yerdeki karakter (%c) ve adresi %p", str, x, *p, p);
+}
+
+#endif
+
+#if 1
+int main(void)
+{
+    int id = 36;
+    float fd = 121.45;
+    char cdizi[] = "C Programlama Dili";
+    char buffer[100];
+
+    sprintf(buffer, "%d %.2f %s", id, fd, cdizi);
+    printf("Olusturulan karakter dizisi: %s\n", buffer);
+
+    /* Sadece ilk 7 karakteri okur. */
+    sprintf(buffer, "%.*s\n", 7, cdizi);
+    printf("Olusturulan karakter dizisi: %s\n", buffer);
+	exit(31);
+}
 #endif

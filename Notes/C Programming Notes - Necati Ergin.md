@@ -8783,3 +8783,222 @@ char* p[] = {"ahmet","mehmet","ahmet","mehmet","ahmet","mehmet","ahmet","mehmet"
 
 ---
 # Lesson 43
+
+## Other `string.h` Library Functions
+
+### `strncpy()` Function
+- `char* strncpy(char* pdest, char* psource, size_t n)`
+	- `n` tane karakteri destination'a kopyalar.
+	- n'in içinde `NULL CHARACTER` de bulunması gerekir aksi taktirde `NULL TERMINATED BYTE STREAM` olmaz.
+	- Null Character koyulmamasının sebebi genelde bu fonksiyonun replace için kullanılmasıdır.
+```c
+#define SIZE 100
+int main(void)
+{
+	char dest[SIZE];
+	char source[SIZE] = "yavuz hanege";
+	strncpy(dest, source, 5);
+	puts(dest); /*puts fonksiyonu NULL karakteri arar. UB!!*/
+}
+
+/*
+out:
+yavuz|~v
+*/
+
+```
+### `strncmp()` Function
+- `char* strncat(char* pdest,const char* psource,size_t n)`
+	- Yazının sonuna n kadar karakter kopyalar
+- `strncmp(const char* p1, const char* p2,size_t n)`
+	- Yazıların ilk n karakteri karşılaştırılır.
+
+### `strspn()` Function
+- `size_t strspn(const char* str1,const char* str2)`
+	- 1. parametredeki yazının içinde ikinci parametredeki karakterlerden herhangi biri olmayan ilk indexi yani bir başka deyişler spnain uzunluğunu döndürür.
+```c
+int main(void){
+
+	char str1[] = "yavuz";
+	char str2[] = "vuay";
+	int indx_span = strspn(str1,str2);
+	printf("span = %d\n",indx_span);
+}
+#endif
+
+/*
+out:
+span = 4
+*/
+```
+### `strcspn()` Function
+- `size_t strcspn(const char* p1, const char* p2)`
+	- Birinci parametreye geçilen yazıdaki ikinci parametredeki yazıda olan karakterlerden oluşmayan span'i bulur.
+```c
+/*strcspn() function*/
+int main(void){
+
+	char str1[] = "yavuz";
+	char str2[] = "vu";
+	int c_indx_span = strcspn(str1,str2);
+	printf("c_span = %d\n",c_indx_span);
+}
+
+/*
+out:
+c_span = 2
+*/
+```
+
+### `strtok()` Function
+- `char* strtok(char* str,char* seperator)`
+- Bir yazıyı tokenizing etmek için kullanılır.
+	- tokenizin nedir örnek:
+		- `yavuz--hanege..ders! çalışıyor`
+		- Bu yazıdaki `yavuz`,`hanege`,`ders`,`çalışıyor` kelimelerini elde etmek için kullanılır.
+- Fonksiyon hangi karakterlerin **seperator** olarak kullanacağı bilgisini de almalıdır.
+- Fonksiyonun çalışma prensibi şu şekildedir:
+	- Diyelim ki seperatör boşluk karakteri olsun:
+	- Fonksiyon ilk defa çağırıldığında ilk token i alır ve sonuna `null character` ekler
+	- Daha sonra tekrar çağrıldığında ikinci token için aynı işlemi yapar ve bu devam eder.
+>[!WARNING] Bu fonksiyon yazıya null karakter eklemeleri yaptığından dolayı yazıyı değiştiren bir fonksiyondur.
+- İlk çağrıdan sonra fonksiyona null pointer geçilir.
+```c
+/*strtok() function*/
+int main(void)
+{
+	char str1[100];
+	printf("bir yazi giriniz: ");
+	sgets(str1);
+	const char *p = strtok(str1, " \t.!"); /*bosluk, tab, nokta ve unlem karakterleri seperator*/
+	while (p)
+	{
+		puts(p);
+		p = strtok(NULL, " \t.!");
+	}
+}
+
+/*
+bir yazi giriniz: yavuz!hanege!hande.kubilay
+yavuz
+hanege
+hande
+kubilay
+*/
+```
+
+### Yazılar ve Sayılar Arasındaki Dönüşümler
+
+ - Bu fonksiyonlar `stdlib.h` kütüphanesinde bulunur.
+
+#### `atoi()` Function
+- `int atoi(const char* p)`
+- Str parametresi ile gösterilen karakter dizisini int bir değere çevirir.
+- Fonksiyon, önce boşluk karakteri içermeyen ilk karakteri bulana kadar boşluk atlar. Daha sonra, bu karakterden başlayarak, int değer içeriğine benzeyen karakterleri sayısal değerlere çevirir. Karakter dizisindeki son geçerli karakterden sonraki karakterler dikkate alınmaz.
+>[!NOTE] Sayının int sınırları içerisinde olması lazım.
+
+```c
+/*atoi() function*/
+int main(void)
+{
+	char str1[100];
+	printf("bir yazi giriniz: ");
+	sgets(str1);
+	int val = atoi(str1);
+	printf("val = %d\n",val);
+}
+
+/*
+out:
+bir yazi giriniz: 3131yavuz
+val = 3131
+*/
+
+```
+
+### `atof()`, `atol`, `atoll` Functions
+- atof string to float
+- atol string to long
+- atoll string to long long
+
+### `strto` functions
+- strtod
+- strtof
+- strtol
+- strtoll
+- strtold...
+
+#### strtol Function
+- `long strtol(const char* p, char** psend,int base)`
+- base -> sayı sistemi(10'luk,16'lık...)
+- psend -> bitiş adresini döndüren pointer to pointer
+
+```c
+int main(void)
+{
+	char str[] = "87542hande";
+	char *p = 0;
+	long x = strtol(str, &p, 10);
+	printf("(%s) yazisinin sayi kismi %d ve bittigi yerdeki karakter (%c) ve adresi %p", str, x, *p, p);
+}
+
+/*
+out:
+(87542hande) yazisinin sayi kismi 87542 ve bittigi yerdeki karakter (h) ve adresi 0061ff16
+*/
+```
+
+
+## Other `stdio.h` Functions
+### `sprintf()` Function
+
+- `int sprintf (char buffer, const char *format, par1, par2, ...);`
+- Bir karakter dizisi içinde format tanımlayıcıları ile tanımlanan değerleri bir karakter dizisi içine yazar.
+
+- Format parametresi ile gösterilen karakter dizisi içinde yer alan karakterleri normal bir şekilde, % işareti ile başlayan format tanımlayıcılarını ise tanımlanan her bir format tanımlayıcı için, format parametresinden sonra yer alan parametrelerden sıra ile değer okuyarak format karakter dizisini buffer parametresi ile gösterilen karakter dizisine yazar.
+
+- Format parametresinde yer alan karakter dizisi buffer parametre dizi genişliğini aşarsa belirsiz sonuçlar yaratabilir.
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    int id = 36;
+    float fd = 121.45;
+    char cdizi[] = "C Programlama Dili";
+    char buffer[100];
+
+    sprintf(buffer, "%d %.2f %s", id, fd, cdizi);
+    printf("Oluşturulan karakter dizisi: %s\n", buffer);
+
+    /* Sadece ilk 7 karakteri okur. */
+    sprintf(buffer, "%.*s\n", 7, cdizi);
+    printf("Oluşturulan karakter dizisi: %s\n", buffer);
+}
+```
+
+### `sscanf()` Function
+- Bir karakter dizisinden verileri okuyarak değişkenlere atar.
+- `int sscanf (const char *buffer, FILE *stream, const char *format, par1, par2, ...);`
+- Buffer parametresi ile gösterilen karakter dizisinden okunan değerleri, format parametresi ile gösterilen karakter dizisindeki format tanımlayıcılarının sırasına ve veri yapısına uygun olarak, üç nokta (...) ile ifade edilen ve format parametresinden sonra aynı sırayla yer alan değişken parametrelere aktarır.
+
+- Fonksiyonun format parametresi " " karakterleri arasında tanımlanan bir karakter dizisidir. Kontrol dizisi olarak adlandırılan bu karakter dizisinin içinde hem normal karakterler hem de % işareti ile başlayan format tanımlayıcıları adı verilen ifadeler yer alabilir.
+
+- Format tanımlayıcıları, format parametresinden sonra yer alan parametreler tarafından adresleri gösterilen değişkenlere buffer karakter dizisinden okunan bilgilerin hangi yapıda atanacağını belirler. Fonksiyon bir format tanımlayıcısı ile karşılaştığında, buffer karakter dizisinden bir veri okuyacağını ve bu verinin format tanımlayıcısına karşılık gelen argümanda adresi gösterilen değişkene atanacağını anlar.
+
+## Programların Sonlandırılması
+- Program 2 şekilde sonlanabilir
+	- Normal Termination
+		- `exit()` function
+			- `atexit()`
+	- Abnormal Termination
+	- `abort()` function
+
+### `exit()` Function
+- `stdlib.h` library
+- void exit(int)
+- parametresi işletim sistemine iletilen `exit code`'dur
+	- main fonksiyonunda `return` statement kullanıldığı zaman return edilen ifadeyi derleyici `exit()` fonksiyonuna parametre olarak geçer.
+
+---
+# Lesson 44
