@@ -4407,7 +4407,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 int main(void)
 {
     int id = 36;
@@ -4421,6 +4421,141 @@ int main(void)
     /* Sadece ilk 7 karakteri okur. */
     sprintf(buffer, "%.*s\n", 7, cdizi);
     printf("Olusturulan karakter dizisi: %s\n", buffer);
-	exit(31);
+	exit(31); /*exit function*/
+}
+#endif
+
+#if 0
+/* atexit() Function */
+
+void fooo(void)
+{
+	printf("program sonlandirilmadan once fooo() calistirildi\n");
+}
+void bar(void)
+{
+	printf("program sonlandirilmadan once bar() calistirildi\n");
+}
+
+int main(void)
+{
+
+	atexit(&fooo);
+	atexit(&bar);
+	printf("main() basladi.\n");
+	exit(EXIT_SUCCESS);
+}
+
+#endif
+#if 0
+	/* abort() Function */
+
+	void fooo(void)
+	{
+		printf("program sonlandirilmadan once fooo() calistirildi\n");
+		abort();
+		
+	}
+	void bar(void)
+	{
+		printf("program sonlandirilmadan once bar() calistirildi\n");
+	}
+
+	int main(void)
+	{
+		printf("main() basladi.\n");
+		fooo();
+		exit(EXIT_FAILURE);
+	}
+
+#endif
+
+#if 0
+/*malloc() functions*/
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)malloc(n * sizeof(int));
+	if(!ptr){
+		fprintf(stderr,"malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	randomize();
+	set_array_random(ptr,n);
+	print_array(ptr,n);
+	free(ptr); /*for memory leak*/
+}
+
+#endif
+
+#if 0
+/*malloc() augmentation wrapper*/
+
+void *checked_malloc(size_t n)
+{
+	void *vp = malloc(n);
+	if (!vp)
+	{
+		fprintf(stderr, "malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	return vp;
+}
+
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)checked_malloc(n * sizeof(int));
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	free(ptr); /*for memory leak*/
+}
+#endif
+
+#if 0
+/*DANGLING POINTER (UNDEFINED BEHAVIOUR)*/
+void *checked_malloc(size_t n)
+{
+	void *vp = malloc(n);
+	if (!vp)
+	{
+		fprintf(stderr, "malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	return vp;
+}
+
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)checked_malloc(n * sizeof(int));
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	int* p2 = ptr;
+	free(ptr); /*for memory leak*/
+	print_array(p2,n); /*DANGLING POINTER*/
+}
+#endif
+
+#if 1
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)calloc(n, sizeof(int));
+	print_array(ptr, n);
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	free(ptr); /*for memory leak*/
 }
 #endif

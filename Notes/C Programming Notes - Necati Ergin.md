@@ -8986,6 +8986,9 @@ int main(void)
 
 - Format tanımlayıcıları, format parametresinden sonra yer alan parametreler tarafından adresleri gösterilen değişkenlere buffer karakter dizisinden okunan bilgilerin hangi yapıda atanacağını belirler. Fonksiyon bir format tanımlayıcısı ile karşılaştığında, buffer karakter dizisinden bir veri okuyacağını ve bu verinin format tanımlayıcısına karşılık gelen argümanda adresi gösterilen değişkene atanacağını anlar.
 
+---
+# Lesson 44
+
 ## Programların Sonlandırılması
 - Program 2 şekilde sonlanabilir
 	- Normal Termination
@@ -8996,9 +8999,231 @@ int main(void)
 
 ### `exit()` Function
 - `stdlib.h` library
-- void exit(int)
+- `void exit(int status)`
 - parametresi işletim sistemine iletilen `exit code`'dur
 	- main fonksiyonunda `return` statement kullanıldığı zaman return edilen ifadeyi derleyici `exit()` fonksiyonuna parametre olarak geçer.
+- Genelde `exit(0)` ile program sonlandırılmış ise **SUCCESS**; `exit(non-zero)` ile sonlandırılmış ise **FAILTURE** olarak kullanılır.
+- Bunlar için `EXIT_SUCCESS` ve `EXIT_FAILTURE` isimli iki adet makro bulunmaktadır.
+
+### `atexit()` Function
+- `int atexit(void(*p)(void));`
+
+```c
+/* atexit() Function */
+
+void fooo(void)
+{
+	printf("program sonlandirilmadan once fooo() calistirildi\n");
+}
+void bar(void)
+{
+	printf("program sonlandirilmadan once bar() calistirildi\n");
+}
+void baz(void)
+{
+	printf("program sonlandirilmadan once baz() calistirildi\n");
+}
+
+int main(void)
+{
+
+	atexit(&fooo);
+	atexit(&bar);
+	atexit(&baz);
+	printf("main() basladi.\n");
+	exit(EXIT_SUCCESS);
+}
+
+/*
+out:
+main() basladi.
+program sonlandirilmadan once baz() calistirildi
+program sonlandirilmadan once bar() calistirildi
+program sonlandirilmadan once fooo() calistirildi
+*/
+```
+
+>[!NOTE] Program çıktısında da görüldüğü üzere `atexit()` fonksiyonu en son kendisine parametre olarak geçilen fonksiyonu ilk olarak çağırır ve ilk `atexit()` çağrısına doğru gider.
+
+### `abort()` Function
+- `void abort(void)` 
+- Hiçbir önlem alınmadan program sonlandırılır.
+- Genelde debug için kullanılır.
+- programın abort fonksiyonu ile sonlandırıldığı anlaşılabilir.
+
+## Dinamik Bellek Yönetimi 
+
+### Dinamik Ömür (Dynamic Storage)
+- Bir nesnenin yerinin derleme zamanında derleyici tarafından değil de, çalışma zamanında çalışan bir kod ile elde edilmesidir.
+- **Otomatik ömürlü nesnelerin maliyeti dinamik ömürlü nesnelere göre çok çok daha fazladır.**
+- Dinamik ömürlü nesnelerin işleri tamamlandığında ömürlerinin sona erdirilmemesi **`memory leak`** sorununa yol açabilmektedir.
+- Dinamik bellek alanına genellikle **heap** denir.
+
+>[!IMPORTANT] Tipik bir sistemde Otomatik ömürlü nesneler **stack** denilen bellek alanında, statik ömürlü nesneler **data segment** denilen bellek alanında, dinamik ömürlü nesneler ise **heap** denilen bellek alanında tutulur.
+
+- 4 adet önemli fonksiyon bu başlık altında bulunmaktadır.
+	- malloc
+		- memory allocation
+		- Bellek tahsisi
+	- calloc
+		- clear memory allocation
+		- Sıfırlanmış (non garbage value) bellek tahsisi
+	- realloc
+		- Daha önce tahsis edilmiş bellek bloğunun büyütülmesi/küçültülmesi için kullanılır.
+	- free
+		- Edinilmiş bellek bloğunu geri verir.
+
+### `malloc()` Function
+
+- `void* malloc(size_t n)`
+	- n değeri -> kaç byte'lık alana ihtiyaç duyuluyorsa o değerdir.
+
+>[!ERROR] 
+>malloc() fonksiyonu başarısız olma ihtimali olan bir fonksiyondur.
+
+>[!ERROR] 
+>malloc fonksiyonu çağırılırken kesinlikle başarısı sınanmalıdır.
+
+#### Function Wrapper for `malloc()`
+- fonksiyonu çağıran başka bir fonksiyon yazılmasıdır
+- autmentation
+```c
+/*malloc() augmentation wrapper*/
+
+void *checked_malloc(size_t n)
+{
+	void *vp = malloc(n);
+	if (!vp)
+	{
+		fprintf(stderr, "malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	return vp;
+}
+
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)checked_malloc(n * sizeof(int));
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	free(ptr); /*for memory leak*/
+}
+```
+
+### `free()` Function
+- `void free(void* vp)`
+- Bellek bloğunu sisteme geri verir.
+
+#### `free()` fonksiyonu ile İlgili Sıkça Yapılan Hatalar
+1. dinamik olmayan bir bellek bloğunu `free` etme işlemi **(UNDEFINED BEHAVIOUR)**
+2. `free()` fonksiyonu ile allocate edilmiş bir bellek bloğunun **bir kısmını** vermeye çalışmak **(UNDEFINED BEHAVIOUR)**
+3. *Double Deletion*: `free()` işleminden sonra `dangling pointer` kullanımı **(UNDEFINED BEHAVIOUR)**
+```C
+void *checked_malloc(size_t n)
+{
+	void *vp = malloc(n);
+	if (!vp)
+	{
+		fprintf(stderr, "malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	return vp;
+}
+
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)checked_malloc(n * sizeof(int));
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	int* p2 = ptr;
+	free(ptr); /*for memory leak*/
+	p2 /*DANGLING POINTER*/
+}
+```
+
+4. `free()` fonksiyonu ile dinamik hafızayı geri vermemek. **(MEMORY LEAK)** 
+```c
+void *checked_malloc(size_t n)
+{
+	void *vp = malloc(n);
+	if (!vp)
+	{
+		fprintf(stderr, "malloc basarisiz oldu\n");
+		exit(EXIT_FAILURE);
+	}
+	return vp;
+}
+
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int a[100] = {0};
+	int *ptr = (int *)checked_malloc(n * sizeof(int));
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	ptr = a;
+	/*Artık malloc çağrısı ile allocate edilen belleği free() ile geri verme şansı kalmamıştır. MEMORY LEAK!!*/
+}
+```
+
+>[!NOTE] Bazı durumlarda `free()` kullanıldıktan sonra dangling pointer haline gelen pointer değişkene `NULL Pointer` atanarak dangling pointer'dan kurtulunabilir. Bu bir *must* değildir.
+
+
+>[!NOTE] `NULL` Pointer değerini free() fonksiyonuna geçmek tanımsız davranış DEĞİLDİR. Herhangi bir etkisi yoktur.
+
+### `calloc()` Function
+- `void* calloc(size_t n, size_t sz)`
+- **`malloc()` fonksiyonu ile aynı işleve sahiptir. Tek farkı calloc() ile bellek tahsisatında bellekteki değerler çöp değer değil, 0'dır.**
+- `sz` parametresi oluşturulacak elemanların `sizeof` değeridir.
+- `n` parametresi ise blok adet sayısıdır.
+
+```c
+int main(void)
+{
+	size_t n;
+	printf("kac tam sayi: ");
+	scanf("%d", &n);
+	int *ptr = (int *)calloc(n, sizeof(int));
+	print_array(ptr, n);
+	randomize();
+	set_array_random(ptr, n);
+	print_array(ptr, n);
+	free(ptr); /*for memory leak*/
+}
+/*
+out:
+kac tam sayi: 11
+  0   0   0   0   0   0   0   0   0   0   0
+---------------------------------------
+442 730 908   1 611 664 823 461 677 782 875 
+---------------------------------------
+*/
+```
+
+>[!IMPORTANT] `int* pd = malloc(n * sizeof(*pd))` ifadesi tamamen LEGAL'dir. Sebebi ise `sizeof()` operatörünün operandı olan ifade için işlem kodu üretilmemesidir.
 
 ---
-# Lesson 44
+#### Güzel bir Soru
+
+- Aşağıdaki kodda bir hata var mıdır? Var ise nedir?
+```c
+int g = 10;
+
+int main(void){
+	int g = g;
+}
+```
+- **HATA KESİNLİKLE VARDIR. NAME-LOOKUP YAPILIRKEN `g` DEĞİŞKENİ MAIN İÇERİSİNDEKİ SCOPE'DA ARANACAĞINDAN TANIMSIZ DAVRANIŞTIR.**
+---
+# Lesson 45
