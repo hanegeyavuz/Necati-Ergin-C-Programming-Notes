@@ -6,6 +6,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <math.h>
+#include <string.h>
 
 #define asize(x) (sizeof(x) / sizeof(x[0]))
 
@@ -34,5 +35,5 @@ void selection_sort(int* p, size_t size);
 int *search_in_array(const int *p, size_t size, int key);
 void gswap(void* vp1, void* vp2, size_t size);
 void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*));
-
+char *my_strdup(const char *str);
 #endif // NUTILITY_H

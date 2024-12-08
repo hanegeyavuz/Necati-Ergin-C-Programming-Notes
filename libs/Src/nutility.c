@@ -436,3 +436,14 @@ void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)
 	}
 
 }
+
+
+char *my_strdup(const char *str)
+{
+	char *p = malloc(strlen(str) + 1);
+	if (!p)
+	{
+		return 0;
+	}
+	return strcpy(p, str);
+}

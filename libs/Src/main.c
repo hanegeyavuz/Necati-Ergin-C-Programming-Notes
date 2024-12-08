@@ -4545,7 +4545,7 @@ int main(void)
 }
 #endif
 
-#if 1
+#if 0
 int main(void)
 {
 	size_t n;
@@ -4557,5 +4557,290 @@ int main(void)
 	set_array_random(ptr, n);
 	print_array(ptr, n);
 	free(ptr); /*for memory leak*/
+}
+#endif
+
+#if 0
+#define SIZE 20
+char *my_strdup(const char *str)
+{
+	char *p = malloc(strlen(str) + 1);
+	if (!p)
+	{
+		return NULL;
+	}
+	return strcpy(p, str);
+}
+
+int main(void)
+{
+	char str[SIZE];
+	printf("bir yazi giriniz:");
+	sgets(str);
+	char *pd = my_strdup(str);
+	printf("%s\n", str);
+	printf("%s\n", pd);
+	free(pd);
+}
+
+#endif
+
+#if 0
+char *strconcat(const char *c1, const char *c2)
+{
+	char *p1 = my_strdup(c1);
+	char *p2 = my_strdup(c2);
+	char *ret = malloc(strlen(p1) + strlen(p2) + 1);
+	if(ret == NULL){
+		return NULL;
+	}
+	ret = p1;
+	strcat(ret, p2);
+	return ret;
+}
+int main(void)
+{
+	char *yvz = "yavuz";
+	char *hng = "hanege";
+	char *pd = strconcat(yvz, hng);
+	printf("(%s) + (%s) = (%s)",yvz,hng, pd);
+	free(pd);
+}
+
+#endif
+
+#if 0
+
+#include <stddef.h> // size_t
+
+int fn_compare_int(const void *vp1, const void *vp2)
+{
+	return *(const int *)vp1 - *(const int *)vp2;
+}
+
+int *create_random_array(size_t size)
+{
+	int *pd_arr = (int *)malloc(size * sizeof(int));
+
+	if (!pd_arr)
+		return NULL;
+
+	return set_array_random_2(pd_arr, size);
+}
+
+int main(void)
+{
+	size_t N = 20;
+
+	int *p_arr = create_random_array(N);
+	print_array(p_arr, N);
+	// output ->
+	//   41 467 334 500 169 724 478 358 962 464
+	//  705 145 281 827 961 491 995 942 827 436
+
+	qsort(p_arr, N, sizeof(*p_arr), &fn_compare_int);
+
+	print_array(p_arr, N);
+	// output ->
+	//   41 145 169 281 334 358 436 464 467 478
+	//  491 500 705 724 827 827 942 961 962 995
+
+	free(p_arr);
+	p_arr = NULL;
+}
+
+#endif
+
+#if 0
+
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(char *p)
+{
+	char* ptemp = p;
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	while (len--)
+	{
+		*p++ = rand() % 26 + 'a';
+	}
+	*p = '\0';
+	return ptemp;
+}
+
+int main(void)
+{
+	char psw[SIZE];
+	randomize();
+	get_rand_psw(psw);
+	puts(psw);
+}
+
+#endif
+
+#if 0
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(void)
+{
+	static char psw[SIZE];
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	for(int i = 0; i < len; ++i){
+		psw[i] = rand() % 26 + 'a';
+
+	}
+	return psw;
+}
+
+int main(void)
+{
+	randomize();
+	char* psw = get_rand_psw();
+	puts(psw);
+}
+
+#endif
+
+#if 0
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(void)
+{
+	static char psw[SIZE];
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	for (int i = 0; i < len; ++i)
+	{
+		psw[i] = rand() % 26 + 'a';
+	}
+	psw[len] = '\0';
+	return my_strdup(psw);
+}
+
+int main(void)
+{
+	// randomize();
+	char *psw = get_rand_psw();
+	puts(psw);
+	free(psw);
+}
+
+#endif
+
+#if 0
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	int **pd = (int **)malloc(row * sizeof(int *));
+	if (!pd)
+	{
+		exit(1);
+	}
+	for (size_t i = 0; i < row; ++i)
+	{
+		pd[i] = (int *)malloc(col * sizeof(int));
+		if (!pd[i])
+		{
+			exit(1);
+		}
+	}
+
+	for (size_t i = 0; i < row; i++)
+	{
+		for (size_t j = 0; j < col; j++)
+		{
+			pd[i][j] = rand() % 10;
+			printf("%d ", pd[i][j]);
+		}
+		putchar('\n');
+	}
+
+	for (size_t i = 0; i < row; i++)
+	{
+		free(pd[i]);
+	}
+	free(pd);
+}
+
+#endif
+#if 0
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	int *pd = (int *)malloc(row * col * sizeof(int));
+	if (!pd)
+	{
+		exit(1);
+	}
+	for (size_t i = 0; i < row * col ; ++i)
+	{
+		pd[i] = rand() % 10;
+		printf("%d ",pd[i]);
+		if (i % row == 2){
+			putchar('\n');
+		}
+	}
+	free(pd);
+}
+
+#endif
+
+#if 1
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	int *pd = (int *)malloc(row * col * sizeof(int));
+
+	int **p = (int **)malloc(row * sizeof(int *));
+	if (!pd || !p)
+	{
+		exit(1);
+	}
+
+	for (size_t i = 0; i < row; ++i)
+	{
+
+		p[i] = pd + i * col;
+	}
+
+	for (size_t i = 0; i < row; ++i)
+	{
+		for (size_t j = 0; j < col; ++j)
+		{
+
+			p[i][j] = rand() % 10;
+		}
+	}
+	for (size_t i = 0; i < row; ++i)
+	{
+		for (size_t j = 0; j < col; ++j)
+		{
+
+			printf("%d ", p[i][j]);
+		}
+		printf("\n");
+	}
+
+	free(pd);
+	free(p);
 }
 #endif

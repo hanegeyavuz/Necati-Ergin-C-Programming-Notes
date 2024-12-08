@@ -9227,3 +9227,278 @@ int main(void){
 - **HATA KESİNLİKLE VARDIR. NAME-LOOKUP YAPILIRKEN `g` DEĞİŞKENİ MAIN İÇERİSİNDEKİ SCOPE'DA ARANACAĞINDAN TANIMSIZ DAVRANIŞTIR.**
 ---
 # Lesson 45
+
+## `realloc()` Function
+- Daha önceden edinilmiş bir bellek bloğunun arttırılması veya bir kısmının geri verilmesi için kullanılan fonksiyondur.
+
+- Örnekler verilecek.
+
+## Fonksiyon Kullanımında Farklı Bir Durum
+- Bazı fonksiyonların verdiği adres **`heap`** adı verilen dinamik ömürlü nesnelerin tutulduğu yerde depolanır. 
+	- Bu durum dolayısıyla fonksiyonların kullanımı sonrası o adres de-allocate edilmelidir.
+
+```c
+int main(void)
+{
+	char str[SIZE];
+	printf("bir yazi giriniz:");
+	sgets(str);
+	char* pd = strdup(str);
+	printf("%s\n",str);
+	printf("%s\n",pd)
+	free(pd);
+}
+```
+
+ We want to create a password generator
+
+  - (1) address can be passed by the caller and
+    we can generate the password in that address (out param)
+  constraints:
+    -> user needs to create a buffer (1)
+
+  - returning the address of the generated password
+    (no argument is passed)
+    - (2) password array will be a static local array
+    - (3) password array will be a dynamic array
+  constraints:
+    -> user does not need to create a buffer (2 and 3)
+    -> if static local array is used, every call will return 
+        the same address (2)
+    -> if dynamic array is used, user will get different addresses
+        but need to free the memory block every time (3)
+
+
+- 1
+```c
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(char *p)
+{
+	char* ptemp = p;
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	while (len--)
+	{
+		*p++ = rand() % 26 + 'a';
+	}
+	*p = '\0';
+	return ptemp;
+}
+
+int main(void)
+{
+	char psw[SIZE];
+	randomize();
+	get_rand_psw(psw);
+	puts(psw);
+}
+}
+
+```
+
+- 2. Durum
+```c
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(void)
+{
+	static char psw[SIZE];
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	for(int i = 0; i < len; ++i){
+		psw[i] = rand() % 26 + 'a';
+
+	}
+	return psw;
+}
+
+int main(void)
+{
+	randomize();
+	char* psw = get_rand_psw();
+	puts(psw);
+}
+```
+
+>[!ERROR] 
+>Statik değişken kullanılarak yazılan fonksiyonda çağıran fonksiyonu her çağırdığında aynı değeri alır!!!
+
+- 3. Durum
+
+```c
+#define SIZE 100
+#define MIN_LEN 8
+#define MAX_LEN 16
+
+char *get_rand_psw(void)
+{
+	static char psw[SIZE];
+	size_t len = rand() % (MAX_LEN - MIN_LEN + 1) + MIN_LEN;
+	for (int i = 0; i < len; ++i)
+	{
+		psw[i] = rand() % 26 + 'a';
+	}
+	psw[len] = '\0';
+	return my_strdup(psw);
+}
+
+int main(void)
+{
+	// randomize();
+	char *psw = get_rand_psw();
+	puts(psw);
+	free(psw); /*dynamic memory free for memory leak*/
+}
+
+```
+
+>[!IMPORTANT]
+> Bir fonksiyon parametresi pointer ise kesinlikle o fonksiyona `NULL Pointer` parametresi vermek tanımsız davranışa yol açıp açmadığı sorulmalıdır. Bu bilgi fonksiyonun dokümantasyonundan elde edilebilir
+
+>[!IMPORTANT]
+>Bir fonksiyon adres döndürüyorsa aşağıdaki üç durumdan hangisi olduğu yine dokümantasyon yoluyla öğrenilmelidir:
+> - Dinamik adres döndürmesi (free etme sorumluluğu kullanıcıya aittir!)
+> - Statik adres döndürmesi
+> - Parametre olarak aldığı adresi döndürmesi
+
+>[!INFO]
+>`malloc` ile bir pointer dizisi de allocate edilebilir.
+
+```c
+int** p = (int**)malloc(n * sizeof(int*));
+
+```
+
+
+- Dinamik bellek alanına sahip bir matrisin oluşturulması
+	- 1. Yol
+
+```c
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	
+	int **pd = (int **)malloc(row * sizeof(int *));
+	if (!pd)
+	{
+		exit(1);
+	}
+	for (size_t i = 0; i < row; ++i)
+	{
+		pd[i] = (int *)malloc(col * sizeof(int));
+		if (!pd[i])
+		{
+			exit(1);
+		}
+	}
+
+	for (size_t i = 0; i < row; i++)
+	{
+		for (size_t j = 0; j < col; j++)
+		{
+			pd[i][j] = rand() % 10;
+			printf("%d ", pd[i][j]);
+		}
+		putchar('\n');
+	}
+
+	for (size_t i = 0; i < row; i++)
+	{
+		free(pd[i]);
+	}
+	free(pd);
+}
+```
+
+- 2. Yol
+```c
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	int *pd = (int *)malloc(row * col * sizeof(int));
+	if (!pd)
+	{
+		exit(1);
+	}
+	for (size_t i = 0; i < row * col ; ++i)
+	{
+		pd[i] = rand() % 10;
+		printf("%d ",pd[i]);
+		if (i % row == 2){
+			putchar('\n');
+		}
+	}
+	free(pd);
+}
+```
+
+- 2. Yoldaki implementasyonda matrisin a satır, b sütündaki elemanına a ve b değerleriyle erişilemez.
+- 2. Yol, 1. yola göre çok daha az bellek alanı ayırır. Daha verimlidir(bellek açısından)
+- 2. Yoldaki matrisin elemanlarının adresleri bellekte sıralıyken 1. yoldaki adresler sıralı değildir. 
+
+
+- 3. Yol
+```c
+int main(void)
+{
+	randomize();
+	size_t row = 0, col = 0;
+	printf("row degeri giriniz: ");
+	scanf("%d", &row);
+	printf("col degeri giriniz: ");
+	scanf("%d", &col);
+	int *pd = (int *)malloc(row * col * sizeof(int));
+
+
+
+	int** p = (int**)malloc(row * sizeof(int*));
+	if (!pd || !p)
+	{
+		exit(1);
+	}
+
+	for(size_t i = 0; i < row; ++i){
+	
+		p[i] = pd[i * col];
+	}
+
+	for (size_t i = 0; i < row; ++i)
+	{
+		for(size_t j = 0; j < col; ++j){
+		
+			p[i][j] = rand() % 10;
+		}
+	}
+	for (size_t i = 0; i < row; ++i)
+	{
+		for(size_t j = 0; j < col; ++j){
+		
+			printf("%d ",p[i][j]);
+		}
+		printf("\n");
+	}
+	
+	free(pd);
+	free(p);
+}
+
+```
+
+- 3. Yöntem hybrid bir yöntemdir.
+- fragmantation ile dinamik memory allocation yapar.
+
+# Lesson 46
+
