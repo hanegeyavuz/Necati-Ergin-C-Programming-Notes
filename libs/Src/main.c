@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "nutility.h"
 #include <math.h>
+#include <conio.h>
 
 #if 0
 
@@ -4799,7 +4800,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 int main(void)
 {
 	randomize();
@@ -4843,4 +4844,184 @@ int main(void)
 	free(pd);
 	free(p);
 }
+#endif
+
+#if 0
+/*realloc() function*/
+int main()
+{
+	size_t n;
+	printf("kac tam sayi ");
+	// scanf'in dönüş değerini kontrol ediyoruz
+	if (scanf("%d", &n) != 1)
+	{
+		printf("Invalid input!\n");
+		// Eğer giriş geçersizse, giriş tamponunu temizlemek faydalı olur
+		while (getchar() != '\n')
+			; // Giriş tamponunu temizler
+	}
+	else
+	{
+		printf("Input Number: %d\n", n);
+	}
+	int *pd = malloc(n * sizeof(int));
+	if (!pd)
+	{
+		abort();
+	}
+	randomize();
+	set_array_random(pd, n);
+	print_array(pd, n);
+	size_t n_add;
+	printf("kac tam sayi daha eklensin ");
+
+	if (!scanf("%d", &n_add))
+	{
+		while (getchar() != '\n')
+			; // Giriş tamponunu temizler
+	}
+
+	pd = realloc(pd, (n + n_add) * sizeof(int));
+	if (!pd)
+	{
+		abort();
+	}
+	set_array_random(pd + n, n_add);
+	print_array(pd, n + n_add);
+	free(pd);
+}
+
+#endif
+
+#if 0
+/*reallocation with NULL pointer parameter example*/
+int main()
+{
+	int ch;
+	int val;
+	size_t size = 0;
+	int *pd = NULL;
+	for (;;)
+	{
+		printf("bir tam sayi girecek misiniz (e) (h)");
+		while ((ch = _getch()) != 'e' && ch != 'h')
+			; // null statement
+		printf("\nch = %c\n", ch);
+		if (ch == 'h')
+		{
+			break;
+		}
+		pd = (int *)realloc(pd, (size + 1) * sizeof(int));
+		if (!pd)
+		{
+			abort();
+		}
+		printf("tam sayi girin: ");
+		val = rand() % 1000;
+		printf("%d\n", val);
+		pd[size++] = val;
+	}
+	printf("size = %zu\n", size);
+	print_array(pd, size);
+	free(pd);
+	if (!size)
+	{
+		printf("hic giris yapmadiniz!\n");
+	}
+}
+
+#endif
+#if 1
+/*ODEV dynamic array structures*/
+int isDuplicated(const char **str1, size_t size, const char *str2)
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (strcmp(str1[i], str2) == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void printCharArray(char **arr, size_t size)
+{
+	if (!arr || size == 0)
+	{
+		printf("Hic isim girilmedi!\n");
+		return;
+	}
+	printf("Girilen isimler:\n");
+	for (size_t i = 0; i < size; i++)
+	{
+		printf("%s\n", arr[i]);
+	}
+}
+int ccmp(const void *c1, const void *c2)
+{
+	const char *str1 = *(const char **)c1;
+	const char *str2 = *(const char **)c2;
+	return strcmp(str1, str2);
+}
+
+int main()
+{
+	int ch;
+	char *isim = NULL;
+	size_t size = 0;
+	size_t isim_len = 0;
+	char **pd = NULL;
+	for (;;)
+	{
+		printf("bir isim girecek misiniz (e) (h)");
+		while ((ch = _getch()) != 'e' && ch != 'h')
+			; // null statement
+		printf("\nch = %c\n", ch);
+		if (ch == 'h')
+		{
+			break;
+		}
+		if (!isim)
+		{
+			isim = malloc(isim_len * sizeof(char));
+		}
+		else if (strlen(isim) + 1 >= isim_len)
+		{
+			isim_len *= 2;
+			isim = realloc(isim, isim_len * sizeof(char));
+		}
+		pd = (char **)realloc(pd, (size + 1) * sizeof(char *));
+		if (!pd || !isim)
+		{
+			printf("allocation failed\n");
+			abort();
+		}
+
+		printf("tam isim girin: ");
+		scanf("%s", isim);
+		printf("isim = %s\n", isim);
+		if (isDuplicated((const char **)pd, size, isim))
+		{
+			printf("bu isim daha onceden girildi\n");
+			free(isim);
+			continue;
+		}
+		pd[size++] = my_strdup(isim);
+	}
+	printf("donguden cikti\n");
+	printf("size = %zu\n", size);
+	qsort(pd, size, sizeof(char *), ccmp);
+	printCharArray(pd, size);
+	for (size_t i = 0; i < size; ++i)
+	{
+		free(pd[i]);
+	}
+	free(pd);
+	if (!size)
+	{
+		printf("hic giris yapmadiniz!\n");
+	}
+}
+
 #endif

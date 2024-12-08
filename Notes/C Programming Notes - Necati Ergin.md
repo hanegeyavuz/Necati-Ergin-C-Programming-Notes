@@ -9227,12 +9227,6 @@ int main(void){
 - **HATA KESİNLİKLE VARDIR. NAME-LOOKUP YAPILIRKEN `g` DEĞİŞKENİ MAIN İÇERİSİNDEKİ SCOPE'DA ARANACAĞINDAN TANIMSIZ DAVRANIŞTIR.**
 ---
 # Lesson 45
-
-## `realloc()` Function
-- Daha önceden edinilmiş bir bellek bloğunun arttırılması veya bir kısmının geri verilmesi için kullanılan fonksiyondur.
-
-- Örnekler verilecek.
-
 ## Fonksiyon Kullanımında Farklı Bir Durum
 - Bazı fonksiyonların verdiği adres **`heap`** adı verilen dinamik ömürlü nesnelerin tutulduğu yerde depolanır. 
 	- Bu durum dolayısıyla fonksiyonların kullanımı sonrası o adres de-allocate edilmelidir.
@@ -9502,3 +9496,296 @@ int main(void)
 
 # Lesson 46
 
+## `realloc()` Function
+- Daha önceden edinilmiş bir bellek bloğunun arttırılması veya bir kısmının geri verilmesi için kullanılan fonksiyondur.
+- `void* realloc(void* vp, size_t newsize)` 
+
+>[!INFO]
+> Fonksiyon verilen adresteki değerleri bulunduğu alanda da büyütebilir, başka bir adrese de taşıyabilir.
+
+```c
+/*realloc() function*/
+int main()
+{
+	size_t n;
+	printf("kac tam sayi ");
+	// scanf'in dönüş değerini kontrol ediyoruz
+	if (scanf("%d", &n) != 1)
+	{
+		printf("Invalid input!\n");
+		// Eğer giriş geçersizse, giriş tamponunu temizlemek faydalı olur
+		while (getchar() != '\n')
+			; // Giriş tamponunu temizler
+	}
+	else
+	{
+		printf("Input Number: %d\n", n);
+	}
+	int *pd = malloc(n * sizeof(int));
+	if (!pd)
+	{
+		abort();
+	}
+	randomize();
+	set_array_random(pd, n);
+	print_array(pd, n);
+	size_t n_add;
+	printf("kac tam sayi daha eklensin ");
+
+	if (!scanf("%d", &n_add))
+	{
+		while (getchar() != '\n')
+			; // Giriş tamponunu temizler
+	}
+
+	pd = realloc(pd, (n + n_add) * sizeof(int));
+	if (!pd)
+	{
+		abort();
+	}
+	set_array_random(pd + n, n_add);
+	print_array(pd, n + n_add);
+	free(pd);
+}
+
+```
+
+- `realloc()` fonksiyonu ekstra olarak verdiği bellek alanını **garbage value** olarak verir.
+- `reallocation` maliyeti yüksek bir işlemdir! 
+- `realloc()` ile reallocation işlemi sonucunda eski bellek bloğunu  gösteren pointerlar `dangling pointer` olur!! Asla kullanılmamalıdır. (UB!)
+
+>[!IMPORTANT]
+>- reallocation takes time!
+>- reallocation invalidates pointers!
+
+- `realloc()`'un ilk parametresine `NULL Pointer` geçilirse **tanımsız davranış olmaz.**
+	- null pointer geçildiğinde aşağıdaki gibi davranır:
+		- `malloc(size);`
+
+```c
+#include <conio.h>
+int main()
+{
+	int ch;
+	int val;
+	size_t size = 0;
+	int *pd = NULL;
+	for (;;)
+	{
+		printf("bir tam sayi girecek misiniz (e) (h)");
+		while ((ch = _getch()) != 'e' && ch != 'h')
+			; // null statement
+		printf("\nch = %c\n", ch);
+		if (ch == 'h')
+		{
+			break;
+		}
+		pd = (int *)realloc(pd, (size + 1) * sizeof(int));
+		if (!pd)
+		{
+			abort();
+		}
+		printf("tam sayi girin: ");
+		val = rand() % 1000;
+		printf("%d\n", val);
+		pd[size++] = val;
+	}
+	printf("size = %zu\n", size);
+	print_array(pd, size);
+	free(pd);
+	if (!size)
+	{
+		printf("hic giris yapmadiniz!\n");
+	}
+}
+```
+
+- Yukarıdaki kodda ilk `realloc()` çağrısına NULL Pointer geçildiği için `malloc()` gibi davranır.
+
+
+## Data Structures
+
+```mermaid
+graph TD
+    A[Data Structure] --> B[Linear Data Structure]
+    A --> C[Non-linear Data Structure]
+    
+    B --> D[Static Data Structure]
+    B --> E[Dynamic Data Structure]
+    
+    D --> F[Array]
+    E --> G[Queue]
+    E --> H[Stack]
+    E --> I[Linked List]
+    
+    C --> J[Tree]
+    C --> K[Graph]
+
+```
+
+
+- Veri yapıları, verilerin düzenlenmesi ve verimli bir şekilde işlenmesi için kullanılan yapılardır. Genel olarak iki ana kategoriye ayrılır:
+
+## 1. Lineer Veri Yapıları
+Bu veri yapıları, elemanların sıralı bir şekilde düzenlendiği ve genellikle tek bir düzlemde işlendiği yapılardır:
+- **Statik Veri Yapıları:** 
+  - Bellek boyutu önceden belirlenmiştir.
+  - Örnek: **Dizi (Array)**
+- **Dinamik Veri Yapıları:** 
+  - Bellek boyutu çalışma zamanında değiştirilebilir.
+  - Örnekler: **Kuyruk (Queue)**, **Yığın (Stack)**, **Bağlı Liste (Linked List)**
+
+## 2. Doğrusal Olmayan Veri Yapıları
+Bu veri yapıları, elemanlar arasındaki ilişkilerin karmaşık bir şekilde düzenlendiği yapılardır:
+- **Ağaç (Tree):** Hiyerarşik bir yapı sunar.
+- **Graf (Graph):** Düğümler ve kenarlar ile karmaşık ilişkileri modellemek için kullanılır.
+
+Her bir veri yapısı, belirli bir problem türü için optimize edilmiştir ve seçimi uygulamanın ihtiyaçlarına bağlıdır.
+
+## Dynamic Array Data Structure
+
+- Herhangi bir zamanda özel işlemler yapılabilen özel array yapılarıdır.
+	- Insert
+	- Erase
+	- Element Access
+	- Iterations
+
+>[!NOTE]
+>C Dilindeki diziler **Dynamic Array** DEĞİLDİR!
+
+ - Dinamik Veri Yapısı, veri yapısında tutulan elemanların bellekte tek bir blok üzerinde tutulan bir veri yapısıdır.
+ 
+>[!IMPORTANT]
+> Dinamik dizilerin insert işlemini continuous bir şekilde yapabilmesinin sebebi **kapasite** özelliğidir. Fazladan allocate edilmiş bellek blokları bulunduğundan bu bloklara erişim ve işlem yapılabilmektedir.
+
+- Dinamik dizi yapısında kapasite ile block size birbirine eşit olduğunda ve bir **insert** işlemi talebi geldiğince veri yapısı o bellek bloğunun boyutunu reallocation ile arttırır. Böylece continuous özelliği kaybolmamış olur. Bu durum için standart **amortised constant** terimini kullanır.
+
+---
+### Dinamik Veri Yapısı Ödev
+
+- İsim girecek misiniz? (e) (h) e
+	- ismi girin: ozan
+- İsim girecek misiniz? (e) (h) e
+	- ismi girin: yavuz
+- İsim girecek misiniz? (e) (h) e
+	- ismi girin: hande
+- İsim girecek misiniz? (e) (h) e
+	- ismi girin: yavuz
+	- !! Bu isim daha önce girilmişti !!
+	- ismi girin: ozan
+	- !! Bu isim daha önce girilmişti !!
+	- ismi girin: ayse
+- İsim girecek misiniz? (e) (h) h
+	- Toplam 123 isim girdiniz
+	- girdiğiniz isimler: (ALFABETİK SIRAYA GÖRE)
+
+- Çıkabilecek problemler:
+	- İsimlerin bir yerde tutulması gerekiyor fakat aynı zamanda erişim için adreslerinin de bir yerde tutulması gerekiyor.
+	- dinamik veri yapısı char* tutacak
+	- Elemanları char* olan dinamik dizi her seferinde büyütülecek
+- Olmaması gerekenler:
+	- Dangling Pointer
+	- Memory Leak
+	- Programın istendiği gibi çalışmaması
+
+
+### ODEV8 SOLUTION
+
+```c
+/*ODEV dynamic array structures*/
+int isDuplicated(const char **str1, size_t size, const char *str2)
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		if (strcmp(str1[i], str2) == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void printCharArray(char **arr, size_t size)
+{
+	if (!arr || size == 0)
+	{
+		printf("Hic isim girilmedi!\n");
+		return;
+	}
+	printf("Girilen isimler:\n");
+	for (size_t i = 0; i < size; i++)
+	{
+		printf("%s\n", arr[i]);
+	}
+}
+int ccmp(const void *c1, const void *c2)
+{
+	const char *str1 = *(const char **)c1;
+	const char *str2 = *(const char **)c2;
+	return strcmp(str1, str2);
+}
+
+int main()
+{
+	int ch;
+	char *isim = NULL;
+	size_t size = 0;
+	size_t isim_len = 0;
+	char **pd = NULL;
+	for (;;)
+	{
+		printf("bir isim girecek misiniz (e) (h)");
+		while ((ch = _getch()) != 'e' && ch != 'h')
+			; // null statement
+		printf("\nch = %c\n", ch);
+		if (ch == 'h')
+		{
+			break;
+		}
+		if (!isim)
+		{
+			isim = malloc(isim_len * sizeof(char));
+		}
+		else if (strlen(isim) + 1 >= isim_len)
+		{
+			isim_len *= 2;
+			isim = realloc(isim, isim_len * sizeof(char));
+		}
+		pd = (char **)realloc(pd, (size + 1) * sizeof(char *));
+		if (!pd || !isim)
+		{
+			printf("allocation failed\n");
+			abort();
+		}
+
+		printf("tam isim girin: ");
+		scanf("%s", isim);
+		printf("isim = %s\n", isim);
+		if (isDuplicated((const char **)pd, size, isim))
+		{
+			printf("bu isim daha onceden girildi\n");
+			free(isim);
+			continue;
+		}
+		pd[size++] = my_strdup(isim);
+	}
+	printf("donguden cikti\n");
+	printf("size = %zu\n", size);
+	qsort(pd, size, sizeof(char *), ccmp);
+	printCharArray(pd, size);
+	for (size_t i = 0; i < size; ++i)
+	{
+		free(pd[i]);
+	}
+	free(pd);
+	if (!size)
+	{
+		printf("hic giris yapmadiniz!\n");
+	}
+}
+```
+
+
+---
+
+# Lesson 47
