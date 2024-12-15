@@ -6545,9 +6545,13 @@ int main(void)
 ```c
 	char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilebilir (Undefined Behaviour)
 	
-	const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilemez.
+	const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanlarının içeriği değiştirilemez fakat elemanları değiştirilebilir.
+
+	const char* const p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilemez ve elemanlarının içeriği de değiştirilemez
 	
 	static const char* p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları değiştirilemez ve her defasında initialize edilmez.
+
+	static const char* const p[] = {"pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"}; // Elemanları ve elemanlarının içeriği değiştirilemez ve her defasında initialize edilmez.
 ```
 
 ### Pointer Dizileri ile İlgili Idiomatik Yapılar
@@ -9789,3 +9793,246 @@ int main()
 ---
 
 # Lesson 47
+
+## Storage Class Specifiers 
+
+### `auto` Keyword
+- C Programlamanın kullanımdan düşmüş bir anahtar sözcüğüdür.
+- C++ dilinde kullanımı 11 standardı ile birlikte çok daha farklı bir anlam taşır.
+- Bir yerel değişkenin ömrünü **otomatik ömür** yapmak için kullanılır.
+- C dilinin standartlaşma döneminden önce default değişken ömrü otomatik olmadığından böyle bir anahtar sözcüğe ihtiyaç duyulmuştur.
+- Parametre değişkenlerinin ve global değişkenlerin statik ömürlü olma ihtimali olmadığından auto keyword'ü ile birlikte kullanılması **legal değildir.**
+
+#### C++ Dilinde `auto` Keyword Kullanımı
+- C++ dilinde `type reduction` kullanımı vardır.
+	- Bir çeşit type holder olarak kullanılır.
+	- Tür yazılması gereken yerlerde bir tür yazımı yerine kullanılan bu anahtar sözcükler sayesinde derleyici bulunduğu noktada koda bakarak spesifik bir tür tanımlayıcısı olduğunu anlayabilir.
+```c
+int main(void){
+
+	auto x = 10; /*DERLEYICI BU TURU INT OLARAK ELE ALIR*/
+
+}	
+```
+
+### `register` Keyword
+- C Programlamanın kullanımdan düşmek üzere olan bir anahtar sözcüğüdür.
+- Kullanımı çok nadirdir.
+- Değişken bildirimlerinde kullanılır.
+- Değişkenin değerinin bellek yerine register'da saklanması isteğine dayanır.
+- **Modern derleyiciler hangi değişkenin register'da tutulması gerektiğini mükemmel bir şekilde yapabilmektedir.**
+- Statik ömürlü değişkenler register'da tutulamaz.
+- Register anahtar sözcüğü ile tanımlanan bir değişkenin adresine **adress of(&)** operatörü ile erişmek mümkün değildir.
+
+>[!INFO] 
+>C++ dili 17 standardı ile register anahtar sözcüğünün bu anlamını kaldırmış fakat başka bir anlam da yüklememiştir.
+
+### `static` Keyword
+#### `static` Anahtar Sözcüğü: İşlev ve Kullanım Durumları
+
+`static` anahtar sözcüğü C ve C++ programlama dillerinde, tanımlandığı bağlama göre iki farklı anlam taşır ve buna bağlı olarak farklı işlevlere sahiptir:
+
+##### 1. **Fonksiyon İçinde Kullanılması Durumu**
+
+`static` bir değişken fonksiyon içerisinde tanımlandığında, bu değişkenin **ömrü (lifetime)** programın çalışma süresi boyunca devam eder. Ancak bu değişkenin **görünürlüğü (scope)** sadece tanımlandığı fonksiyon ile sınırlıdır. Yani, ilgili değişkene diğer fonksiyonlardan erişilemez.
+
+Bu tür değişkenler, yalnızca bir kez başlatılır ve değeri, fonksiyon her çağrıldığında yeniden oluşturulmak yerine önceki değeri korur.
+
+###### Örnek:
+
+```c
+void func(void) {
+    static int first_call = 1; // Ömrü program süresince, görünürlüğü fonksiyon içinde.
+    if (first_call) {
+        printf("İlk çağrı\n");
+    }
+    first_call = 0; // Değer, sonraki çağrılarda korunur.
+}
+```
+
+**Özellikler:**
+
+- Değişkenin ömrü, programın sonlanmasına kadar devam eder.
+- Değişken yalnızca tanımlandığı fonksiyon içinde erişilebilir.
+- Fonksiyon her çağrıldığında değişkenin değeri önceki çağrılardan korunur.
+
+##### 2. **Fonksiyon Dışında Kullanılması Durumu**
+
+`static` anahtar sözcüğü, bir değişken veya fonksiyonun **bağlamını (linkage)** tanımlamak için de kullanılır. Bu kullanımda, bir değişken veya fonksiyon yalnızca tanımlandığı dosya içinde erişilebilir olur (yani **file scope** kazanır).
+
+Bu, global değişkenler ve fonksiyonlar için varsayılan olarak gelen **external linkage** yerine **internal linkage** sağlamak için kullanılır. Böylece, bir modüldeki değişken veya fonksiyonun, diğer modüllerden yanlışlıkla erişilmesi önlenir ve bilgi gizliliği (encapsulation) sağlanır.
+
+###### Örnek:
+
+**Dosya 1 (module1.c):**
+
+```c
+static int counter = 0; // Bu değişkene yalnızca module1.c içerisinden erişilebilir.
+
+static void helper_function(void) { 
+    // Bu fonksiyon sadece bu dosyada kullanılabilir.
+    counter++;
+}
+
+void public_function(void) { 
+    helper_function();
+    printf("Counter: %d\n", counter);
+}
+```
+
+**Dosya 2 (module2.c):**
+
+```c
+extern void public_function(void);
+
+int main() {
+    public_function(); // Geçerli
+    // helper_function(); // HATA: Bu fonksiyon module2.c'den çağrılamaz.
+    return 0;
+}
+```
+
+**Özellikler:**
+
+- `static` bir değişken veya fonksiyon, yalnızca tanımlandığı dosya içinde erişilebilir olur.
+- Modüler programlama ve bilgi gizliliği için kullanılır.
+- Programdaki isim çakışmalarını önlemek amacıyla özellikle global değişkenlerde kullanışlıdır.
+#### Özet:
+
+| **Kullanım Durumu**              | **Ömür**                 | **Görünürlük (Scope)**         | **Amaç**                                      |
+| -------------------------------- | ------------------------ | ------------------------------ | --------------------------------------------- |
+| **Fonksiyon İçinde (`static`)**  | Programın çalışma süresi | Fonksiyonun içinde sınırlıdır. | Değerin korunması ve fonksiyon içi gizlilik.  |
+| **Fonksiyon Dışında (`static`)** | Programın çalışma süresi | Dosya (file) ile sınırlıdır.   | Bilgi gizliliği ve isim çakışmalarını önleme. |
+
+Bu farklılıklar sayesinde, `static` anahtar sözcüğü hem performans hem de bilgi gizliliği açısından önemli bir araç olarak kullanılır.
+
+---
+#### **Linkage (Bağlantı) Nedir?**
+
+Linkage, bir değişkenin veya fonksiyonun **programın diğer bölümleri tarafından erişilebilirlik seviyesini** ifade eder. Bu kavram, bir isim (örneğin bir değişken veya fonksiyon) ile onun bellekteki karşılığı arasındaki ilişkiyi belirler. C ve C++'ta üç tür linkage bulunur:
+##### 1. **No Linkage (Bağlantısızlık):**
+
+- Bir isim sadece tanımlandığı **blok (block scope)** içinde geçerlidir.
+- Örneğin, otomatik (`auto`) ve yerel (`local`) değişkenler no linkage kapsamındadır.
+
+```c
+void func() {
+    int local_var = 5; // Sadece bu blokta geçerlidir.
+}
+```
+
+##### 2. **Internal Linkage (Dahili Bağlantı):**
+
+- Bir isim yalnızca tanımlandığı **kaynak dosya (translation unit)** içinde erişilebilir.
+- `static` anahtar sözcüğü, global değişkenler ve fonksiyonlar için internal linkage sağlar.
+
+```c
+static int counter = 0; // Sadece bu dosyada erişilebilir.
+```
+
+##### 3. **External Linkage (Harici Bağlantı):**
+
+- Bir isim, farklı kaynak dosyalar arasında paylaşılabilir.
+- Varsayılan olarak, global değişkenler ve fonksiyonlar external linkage'a sahiptir.
+- `extern` anahtar sözcüğü, bir isim için external linkage olduğunu belirtir.
+
+```c
+// Dosya 1 (module1.c)
+int global_var = 10; // Varsayılan olarak external linkage.
+
+
+// Dosya 2 (module2.c)
+extern int global_var; // Farklı dosyadan erişim için tanımlama.
+```
+
+#### **Kısa Özet**
+
+| **Linkage Türü**     | **Erişim Alanı**                             | **Anahtar Sözcük**       |
+| -------------------- | -------------------------------------------- | ------------------------ |
+| **No Linkage**       | Sadece tanımlandığı blok içinde(Local Names) | (Anahtar sözcük yok)     |
+| **Internal Linkage** | Sadece tanımlandığı dosya içinde             | `static`                 |
+| **External Linkage** | Farklı dosyalar arasında paylaşılabilir      | Varsayılan veya `extern` |
+
+Linkage, programın karmaşık yapılarında değişken ve fonksiyonların erişim kontrolünü ve modülerliği sağlamak için temel bir kavramdır.
+
+>[!IMPORTANT] 
+>Global değişkenlerin ve fonksiyonların `default` linkage kavramı **External Linkage**'dır.
+
+### **`extern`** Keyword
+
+`extern` anahtar sözcüğü, bir değişkenin veya fonksiyonun başka bir dosyada tanımlandığını ve bu dosyada yalnızca bildiriminin (declaration) yapıldığını belirtmek için kullanılır. Bu sayede farklı modüller arasında global değişkenler ve fonksiyonlar paylaşılabilir.
+#### **Özellikler:**
+
+1. **Global Değişken ve Fonksiyon Erişimi:**
+    
+    - `extern` bir değişkenin veya fonksiyonun başka bir dosyada tanımlı olduğunu belirtir.
+    - Fonksiyonlar için `extern` kullanımı zorunlu değildir, çünkü C dilinde fonksiyonlar varsayılan olarak **external linkage** ile tanımlanır.
+    - Değişkenler için `extern` kullanımı zorunludur, aksi takdirde derleyici o değişkeni yerel olarak tanımlar.
+2. **Bellek Yönetimi:**
+    
+    - `extern` anahtar sözcüğü ile bildirim yapılan değişken için **ekstra bellek ayrılmaz**. Bellek yalnızca tanımın yapıldığı dosyada ayrılır.
+3. **Kütüphane ve Modüler Programlama:**
+    
+    - Genellikle global değişkenler bir **source file'a** yazılır.
+    - Bu değişkenler, erişim kolaylığı sağlamak amacıyla ilgili **header file** içinde `extern` ile bildirilir. Header file'ı include eden tüm dosyalar bu değişkene erişebilir.
+#### **Kullanım Örneği:**
+
+**Kaynak Dosya (`nutility.c`):**
+
+```c
+const int primes[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29}; // Global dizi tanımı
+```
+
+**Başlık Dosyası (`nutility.h`):**
+
+```c
+extern const int primes[]; // Dizinin bildirimi (boyut belirtmek zorunlu değil)
+```
+
+**Kullanım Dosyası (`main.c`):**
+
+```c
+#include "nutility.h"
+#include <stdio.h>
+
+int main() {
+    for (int i = 0; i < 10; ++i) {
+        printf("%d ", primes[i]); // `primes` değişkenine erişim
+    }
+    return 0;
+}
+```
+
+#### **Notlar:**
+
+1. **Dizilerde `extern` Bildirimi:**
+    
+    - Dizi bildirimi yapılırken **boyut belirtmek zorunlu değildir**.
+    - Bu durum, farklı dosyalardan erişimi kolaylaştırır.
+    
+    **Örnek:**
+    
+    ```c
+    extern int numbers[]; // Boyut belirtilmez.
+    ```
+    
+2. **Global Değişkenlerin Yönetimi:**
+    
+    - Global değişkenlerin bir modülde tanımlanması ve diğer modüllerde `extern` ile bildirilmesi, programın derlenebilirliğini ve modülerliğini artırır.
+3. **Fonksiyonlar:**
+    
+    - Varsayılan olarak external linkage'a sahip olduklarından, `extern` kullanımı genellikle gereksizdir. Ancak okunabilirliği artırmak için kullanılabilir.
+
+#### **`extern` ve Bellek Yönetimi**
+
+- Bir dosyada `extern` anahtar sözcüğü ile bildirilen değişken için **tanımlama yapılmadıkça** bellek ayrılmaz.
+- Bellek, yalnızca değişkenin **tanımının (definition)** bulunduğu dosyada ayrılır.
+
+### **Özet:**
+
+|**Özellik**|**Açıklama**|
+|---|---|
+|**Kullanım Amacı**|Başka bir dosyada tanımlı olan değişken veya fonksiyona erişim sağlar.|
+|**Zorunluluk**|Değişkenler için zorunludur, fonksiyonlar için genelde gerekmez.|
+|**Bellek Yönetimi**|Sadece tanım yapılan dosyada bellek ayrılır.|
+|**Modüler Programlama**|Kütüphane geliştirme ve global değişkenlerin paylaşımı için kullanılır.|

@@ -7,9 +7,14 @@
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
-
+/*------------------------------------------------------------------*/
+/*VARIABLES*/
+extern const int primes[]; /*extern bildiriminde dizilerin boyutunu yazma mecburiyeti yoktur*/
+/*------------------------------------------------------------------*/
+/*MAKROS*/
 #define asize(x) (sizeof(x) / sizeof(x[0]))
-
+/*------------------------------------------------------------------*/
+/*FUNCTIONS*/
 void randomize(void);
 void set_array_random(int *pArr, size_t size);
 void print_array(const int *pArr, size_t size);
@@ -36,4 +41,5 @@ int *search_in_array(const int *p, size_t size, int key);
 void gswap(void* vp1, void* vp2, size_t size);
 void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*));
 char *my_strdup(const char *str);
+/*------------------------------------------------------------------*/
 #endif // NUTILITY_H

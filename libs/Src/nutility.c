@@ -1,6 +1,8 @@
 #include "nutility.h"
 
 
+const int primes[10] = {2,3,5,7,11,13,17,19,23,29};
+
 /**
  * @brief Seeds the random number generator using the current time.
  */

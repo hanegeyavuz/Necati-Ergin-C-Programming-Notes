@@ -4931,7 +4931,7 @@ int main()
 }
 
 #endif
-#if 1
+#if 0
 /*ODEV dynamic array structures*/
 int isDuplicated(const char **str1, size_t size, const char *str2)
 {
@@ -5023,5 +5023,12 @@ int main()
 		printf("hic giris yapmadiniz!\n");
 	}
 }
+#endif
 
+#if 1
+#define INDEX 8
+/*extern keyword*/
+int main(void){
+	printf("index %d of primes array is = %d\n", INDEX, primes[INDEX]);
+}
 #endif
