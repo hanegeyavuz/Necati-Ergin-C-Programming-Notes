@@ -449,3 +449,25 @@ char *my_strdup(const char *str)
 	}
 	return strcpy(p, str);
 }
+
+int isprime(int n){
+    if(n < 2){
+        return 0;
+    }
+    if(n % 2 == 0){
+        return n == 2;
+    }
+    if(n % 3 == 0){
+        return n == 3;
+    }
+    if(n % 5 == 0){
+        return n == 5;
+    }
+    for(int i = 7; i*i <= (n); i += 2){
+        if(!(n % i)){
+           return 0; 
+        }
+    }
+    return 1;
+
+}

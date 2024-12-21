@@ -10036,3 +10036,170 @@ int main() {
 |**Zorunluluk**|Değişkenler için zorunludur, fonksiyonlar için genelde gerekmez.|
 |**Bellek Yönetimi**|Sadece tanım yapılan dosyada bellek ayrılır.|
 |**Modüler Programlama**|Kütüphane geliştirme ve global değişkenlerin paylaşımı için kullanılır.|
+
+---
+# Lesson 48
+
+## `const` Keyword *Remind*
+- Dilin en önemli anahtar sözcüklerden biridir.
+- Değeri değiştirilmemesi gereken değişkenler için kullanılır.
+
+```c
+int x = 10;
+int* const cp = &x;
+// const pointer to int
+// top level const
+// left const
+
+const int* p = &x;
+// pointer to const int
+// low level const
+// right const
+
+const int* const ptr = &x; /*const pointer to const int*/
+```
+
+>[!ERROR]
+>`const T*` -> `T*` dönüşümü kesinlikle sentaks hatasıdır.
+
+- string literallerin tanımlanmasında `const` kullanımı hem c++ uyumluluğu hem de değer değişiminin UB olması dolayısıyla önerilmektedir.
+- fonksiyon parametrelerinde fonksiyon parametresi pointer değişken ise in-parameter çeşidi parametrelerin `const` anahtar sözcüğüyle tanımlanması gerekmektedir.
+
+## USER-DEFINED TYPES
+
+- 3 farklı user-defined type oluşturabilecek yapı vardır.
+	- `structures`
+	- `unions`
+	- `enumarations`
+
+### `Structures`
+
+- Syntax
+```c
+struct Nec{
+	int x;
+	float y;
+};
+```
+- Yukarıdaki örnekte `Nec` bir **`structure tag`** olarak isimlendirilir.
+- C programlama user defined type'lar kullanılırken değişken tanımlamasında tip bilgisi de olmak zorundadır.
+	- Not: C++ da tip bilgisi olmadan da değişken tanımlaması yapılabilmektedir.
+```c
+struct Nec n1;
+void foo(struct Nec n1);
+```
+
+- Yapı nesneleri de diziler gibi bellekte tek bir blokta bulunur. (continuous)
+- Bellekte yapı nesnesinin başında ilk eleman olmak zorundadır.
+- Yapı nesnesinin `adress of` operatörünün operandı yapılması durumunda yapı nesnesinin ilk elemanının adresi ile aynı adrese sahip değer elde edilir.
+- Yapının elemanları:
+	- int, float gibi değişkenler olabilir
+	- diziler olabilir
+	- pointer olabilir.
+	- function pointer olabilir.
+
+>[!NOTE]
+>C Programlamada kullanılan `structure` yapılarında **en az bir değişken olmak zorundadır.**
+
+ >[!INFO]
+ >Hizalama durumu hariç tutulursa bir yapı türünün bellek ihtiyacı elemanlarının bellekte kapladığı alanın toplam miktarı kadardır.
+
+- Çok büyük çoğunlukla kullanılan modülün başlık dosyasında (`header file`) tanımlanır.
+- Bir struct türünden nesne 
+	- const olabilir.
+	- Bir linkage'a sahiptir.
+	- Ömür kavramı diğer değişkenler gibidir.
+	- Fonksiyonlara parametre olarak geçilebilir.
+- Atanacak pointer değişkenlerin türü `struct T*` olmalıdır.
+```c
+struct data {
+	int x,y;
+	double d;
+	char str[12];
+};
+
+int main(void){
+	struct data dx;
+	struct data* s_ptr = &dx; 
+}
+```
+
+- Elemanları struct olan bir dizi oluşturulabilir.
+```c
+struct data arr[10];
+```
+
+#### Member Selection Operators
+-  *dot operator* `(.)` ve *arrow operator* `->` operatörleridir.
+- Bir structure'ın elemanlarına erişim sağlarlar.
+- Nokta operatörü ile oluşturulan bir ifadede operatörün sol tarafındaki ifadenin bir yapı türünden nesne olması gerekir.
+	- Sağ tarafındaki ifadenin ise yapı türüne ait bir member olması gerekmektedir.
+```c
+struct data {
+	int x,y;
+	double d;
+	char str[12];
+};
+int main(void){
+	struct data mydata;
+	mydata.x = 31; /*mydata nesnesinin x üyesine 31 değeri atandı.*/
+}
+```
+
+- *arrow* `->` operatörü ise bir struct'ın adresini tutan pointer değişkeni kullanarak elemanlarına erişim sağlayabilmesini sağlayan operatördür.
+```c
+struct data {
+	int x,y;
+	double d;
+	char str[12];
+};
+int main(void){
+	struct data* mydata;
+	mydata->x = 31; /*mydata nesnesinin x üyesine 31 değeri atandı.*/
+}
+```
+>[!NOTE]
+> Bir adres kullanılarak member erişimi `(*p).x` şeklinde de kullanılabilir fakat gereksiz operatör kullanımından kaçınılması adına *arrow* `->` kullanımı dil standardında tanımlanmıştır.
+
+```c
+struct data
+{
+	int x, y;
+	double d;
+	char str[12];
+};
+int main(void)
+{
+	struct data mydata;
+
+	struct data *p = &mydata;
+	p->x = 31; /*mydata nesnesinin x üyesine 31 değeri atandı.*/
+	printf("member x of mydata struct = %d\n", p->x);
+	++p->x; /*mydata nesnesinin x üyesinin değeri 1 arttırıldı*/
+	printf("member x of mydata struct = %d\n", p->x);
+}
+```
+
+- structure tanımlamasının süslü parantez kapama işaretinden sonraki kısma nesne tanımlaması yapılabilir.
+```c
+struct data
+{
+	int x, y;
+	double d;
+	char str[12];
+}g,d,b;
+struct data g,d,b;
+```
+- Yukarıdaki iki tanımlama da aynı anlama gelmektedir.
+
+>[!ERROR]
+>Yapıların bildirimi içinde fonksiyon olamaz!!
+
+- Yapı türünden nesneler sadece 4 operatörün operandı olabilir
+	- sizeof() operator
+	- nokta operatörü (.)
+	- adress of operator (&)
+	- assignment operator (=)
+- Güzel bir hatırlatma:
+	- sizeof() operatörünün sonucu bir sabit ifade oluşturur!!!
+	- 

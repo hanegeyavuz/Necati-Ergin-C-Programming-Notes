@@ -41,5 +41,6 @@ int *search_in_array(const int *p, size_t size, int key);
 void gswap(void* vp1, void* vp2, size_t size);
 void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*));
 char *my_strdup(const char *str);
+int isprime(int n);
 /*------------------------------------------------------------------*/
 #endif // NUTILITY_H

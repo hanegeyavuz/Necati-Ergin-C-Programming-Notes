@@ -5025,10 +5025,69 @@ int main()
 }
 #endif
 
-#if 1
+#if 0
 #define INDEX 8
 /*extern keyword*/
 int main(void){
 	printf("index %d of primes array is = %d\n", INDEX, primes[INDEX]);
 }
 #endif
+
+#if 0
+int main(void)
+{
+	int x = 2;
+	int prime_count = 0;
+	while (prime_count < 100)
+	{
+		if (isprime(x))
+		{
+			if (!prime_count || prime_count % 20 == 0)
+			{
+				putchar('\n');
+			}
+			printf("%3d,", x);
+			prime_count++;
+		}
+		++x;
+	}
+}
+#endif
+
+#if 0
+/*USER-DEFINED TYPES*/
+/* dot operator */
+struct data {
+	int x,y;
+	double d;
+	char str[12];
+};
+int main(void){
+	struct data mydata;
+	mydata.x = 31; /*mydata nesnesinin x üyesine 31 değeri atandı.*/
+	printf("member x of mydata struct = %d\n",mydata.x);
+	++mydata.x; /*mydata nesnesinin x üyesinin değeri 1 arttırıldı*/
+	printf("member x of mydata struct = %d\n",mydata.x);
+
+}
+#endif
+#if 1
+/*arrow operator*/
+struct data
+{
+	int x, y;
+	double d;
+	char str[12];
+};
+int main(void)
+{
+	struct data mydata;
+
+	struct data *p = &mydata;
+	p->x = 31; /*mydata nesnesinin x üyesine 31 değeri atandı.*/
+	printf("member x of mydata struct = %d\n", p->x);
+	++p->x; /*mydata nesnesinin x üyesinin değeri 1 arttırıldı*/
+	printf("member x of mydata struct = %d\n", p->x);
+}
+#endif
+
