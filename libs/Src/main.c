@@ -5071,7 +5071,8 @@ int main(void){
 
 }
 #endif
-#if 1
+
+#if 0
 /*arrow operator*/
 struct data
 {
@@ -5091,3 +5092,130 @@ int main(void)
 }
 #endif
 
+#if 0
+/* Structure Initialization */
+struct Employee{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+};
+
+int main(void){
+	struct Employee e = {.name = "hande", .surname = "kubilay",.wage = 3131.31};
+	
+	printf("id = %d\n",e.id);
+	printf("name = %s\n",e.name);
+	printf("surname = %s\n",e.surname);
+	printf("wage = %f\n",e.wage);
+}
+#endif
+
+#if 0
+/* Arrow Operator */
+struct point
+{
+	int x, y, z;
+};
+int main(void)
+{
+	struct point p = {
+		.x = 31,
+		.y = 69,
+		.z = 23};
+	struct point *ptr = &p;
+
+	printf("dot operator: point x = %d\n", p.x);
+	printf("pointer dereferencing operator: point x = %d\n", (*ptr).x);
+	printf("arrow operator: point x = %d\n", ptr->x);
+}
+#endif
+
+#if 0
+/*structures typedef declarations*/
+typedef struct data{
+	int x,y,z;
+
+}data_t,*dataptr_t;
+
+int main(void){
+	data_t data = {1,2,3};
+	printf("data.x = %d\n",data.x);
+	dataptr_t ptr_data = &data;
+	printf("ptr_data->x = %d\n",ptr_data->x);
+
+}
+#endif
+
+#if 0
+/* Structures and Functions */
+typedef struct
+{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+} employee_t;
+
+void print_employee(employee_t e)
+{
+	printf("id = %d\n", e.id);
+	printf("name = %s\n", e.name);
+	printf("surname = %s\n", e.surname);
+	printf("wage = %f\n", e.wage);
+}
+
+int main(void)
+{
+	employee_t employee_hande = {
+		.id = 31,
+		.name = "Hande",
+		.surname = "Kubilay",
+		.wage = 3131.3131,
+	};
+	print_employee(employee_hande);
+}
+#endif
+
+#if 1
+/* Structures and Functions with call by reference  */
+typedef struct
+{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+} employee_t;
+
+void print_employee(const employee_t* e)
+{
+	printf("id = %d\n", e->id);
+	printf("name = %s\n", e->name);
+	printf("surname = %s\n", e->surname);
+	printf("wage = %f\n", e->wage);
+}
+
+int main(void)
+{
+	printf("sizeof(employee_t) = %zu\n",sizeof(employee_t));
+	printf("sizeof(employee_t*) = %zu\n",sizeof(employee_t*));
+
+	employee_t employee_hande = {
+		.id = 31,
+		.name = "Hande",
+		.surname = "Kubilay",
+		.wage = 3131.3131,
+	};
+	print_employee(&employee_hande);
+}
+/*
+out:
+sizeof(employee_t) = 56
+sizeof(employee_t*) = 4
+id = 31
+name = Hande
+surname = Kubilay
+wage = 3131.313100
+*/
+
+#endif

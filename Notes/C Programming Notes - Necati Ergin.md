@@ -10195,11 +10195,358 @@ struct data g,d,b;
 >[!ERROR]
 >Yapıların bildirimi içinde fonksiyon olamaz!!
 
+---
+# Lesson 49
+
 - Yapı türünden nesneler sadece 4 operatörün operandı olabilir
 	- sizeof() operator
 	- nokta operatörü (.)
 	- adress of operator (&)
+		- Nesnenin adresini gösterir. 
+		- Pointer değişkende saklanabilir.
+			- `struct T*` türünden bir değişken olmalıdır. *(T herhangi bir türü ifade eder.)*
 	- assignment operator (=)
-- Güzel bir hatırlatma:
-	- sizeof() operatörünün sonucu bir sabit ifade oluşturur!!!
-	- 
+		- Atama operatörü yalnızca aynı struct türüne ait iki nesne arasında gerçekleşebilir.
+```c
+struct data
+{
+	int x, y;
+	double d;
+	char str[12];
+};
+
+struct yvz
+{
+	int x, y;
+	double d;
+	char str[12];
+};
+
+int main(void){
+	struct data dx {1,2,1.2};
+	struct data dy {1,3,2.2};
+	struct yvz yvz_x {1,7,8.2};
+
+	dx = dy; /* LEGAL */
+	dy = yvz_x; /* SYNTAX ERROR */
+}
+```
+
+
+### Structure Initialization
+
+- Dizilere ilk değer verme işlemi gibi yapılara da ilk değer verilebilmektedir.
+>[!ERROR] 
+>- Bu şekilde ilk değer verme işleminde küme parantezinin içini boş bırakmak **syntax error** oluşturur.
+>- Yapının eleman sayısından daha fazla değer kullanılamaz
+>- Daha az değer verilirse, değer verilmeyen elemanlar 0 değeri ile hayatına başlar.
+>- En sonda fazladan bir virgül olması hataya sebep olmaz. (*trailing comma*)
+
+```c
+struct Data{
+	double d1,d2;
+	int i1,i2;
+	int ar[4];
+	double dval
+
+};
+
+int main(void){
+	struct Data data = {2.3,5.8,45,22{4,5,6,7},9.99};
+}
+```
+- Arrayler için süslü parantez açılmazsa derleyici sırasıyla array'in elemanlarına değerleri verir. 
+```c
+struct Data data = {2.3,5.8,45,22,4,5,6,9.99};
+```
+- Bir önceki örnek yukarıdaki gibi olsaydı derleyici 9.99 değerini `dval` değişkenine değil, arr dizisinin son elemanına verecekti.
+
+- Dilin 99 standardı ile birlikte diziler gibi yapılara da *designated Initialize* özelliği eklenmiştir.
+```c
+struct Employee{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+};
+
+int main(void){
+	struct Employee e = {.name = "hande", .surname = "kubilay",.wage = 313131};
+	
+	printf("id = %d",e.id)
+}
+
+```
+
+- Anonim structure oluşturulması da bazen karşılaşılan bir durumdur.
+```c
+struct {
+	int x,y,z;
+}a;
+
+int main(void){
+	a.x = 35;
+}
+
+```
+
+>[!ERROR] 
+>Birden fazla anonim yapıların nesneleri birbirine assign edilemez.
+
+```c
+struct {
+	int x,y,z;
+}a;
+
+struct {
+	int x,y,z;
+}b;
+
+int main(void){
+	a = b; /* SYNTAX ERROR */
+}
+```
+
+### Arrow Operator Detailed
+- Bir yapı nesnesinin elemanına adresi yoluyla ulaşılmasını sağlayan operatördür.
+```c
+struct point
+{
+	int x, y, z;
+};
+int main(void)
+{
+	struct point p = {
+		.x = 31,
+		.y = 69,
+		.z = 23};
+	struct point *ptr = &p;
+
+	printf("dot operator: point x = %d\n", p.x);
+	printf("pointer dereferencing operator: point x = %d\n", (*ptr).x);
+	printf("arrow operator: point x = %d\n", ptr->x);
+}
+
+/*
+out:
+dot operator: point x = 31
+pointer dereferencing operator: point x = 31
+arrow operator: point x = 31
+*/
+```
+
+- `(*ptr).x` ifadesi ile `ptr->x` ifadesi aynı anlama da gelse yaygın kullanım her zaman arrow operator olmuştur.
+
+- array decay geçerlidir.
+```c
+struct point
+{
+	int x, y, z;
+};
+int main(void)
+{
+	struct point a[] = {
+		{1,1,1},
+		{2,2,2},
+		{3,3,3}
+	};
+	a->y = 5; /*array decay*/
+	a[0].y = 5; /* Same */
+}
+```
+
+---
+#### Güzel Bir Kullanım
+- C programlama dilinde aşağıdaki gibi array assign işlemi yapılamaz. Sebebi ise derleyicinin dizi ismini yalın halde gördüğünde *array decay* olarak algılamasıdır.
+```c
+int main(void){
+	int a[100];
+	int b[100];
+	
+	/*some codes....*/
+	
+	a = b; /*SYNTAX ERROR*/
+}
+```
+
+- Bunu yapabilmek için structure türünden faydalanılabilir.
+```c
+struct arr{
+	int a[100];
+};
+
+int main(void){
+	struct arr x = { 0 };
+	struct arr y = { 0 };
+	/*some codes..*/
+
+	x = y; /* LEGAL */
+
+}
+```
+
+---
+
+### Structures and Typedef Declarations
+
+- C dilinde structure kullanımında bildirim yapılırken *struct* anahtar sözcüğünü her seferinde kullanmamak için typedef yapısından faydalanılır.
+```c
+struct Data{
+	int x,y,z;
+};
+
+typedef struct Data Data;
+typedef struct Data* DataPtr;
+
+
+int main(void){
+	Data x;
+	DataPtr p = &x;
+
+}
+```
+- Bir önceki bildirimden dolayı pointer typedef bildiriminde `struct Data*` yerine sadece `Data*` yazılabilir.
+- Struct tanımlaması içerisinde de typedef bildirimi yapılabilir ve genellikle kullanım bu şekildedir.
+```c
+typedef struct data{
+	int x,y,z;
+
+}data_t;
+
+int main(void){
+	data_t data = {1,2,3};
+	printf("data.x = %d\n",data.x);
+
+}
+
+```
+
+- Anonim yapılar için de aynı sentaks geçerlidir.
+
+```c
+typedef struct {
+	int x,y,z;
+
+}data_t;
+
+int main(void){
+	data_t dt = {1,2,3};
+}
+
+```
+- Anonim türden bir yapıda pointer bir nesne tanımlamasında türe ait isim olmadığından herhangi bir statik veya otomatik ömürlü bir değişken tanımlaması yapılamaz. **Fakat dinamik ömürlü değişken tanımlaması mümkündür.**
+```c
+typedef struct data{
+	int x,y,z;
+
+}*dataPtr_t;
+
+int main(void){
+	dataPtr_t p = malloc(sizeof(*p));
+}
+```
+
+---
+#### C Dilinde Olan ve Olmayan Özellikler
+- C++ dilinde yapı içerisinde fonksiyon bildirimi ve tanımı mümkünken C dilinde mümkün değildir.(*member function*)
+- *access control* özelliği (public,private,protected) C++ dilinde bulunurken, C dilinde bulunmamaktadır. Yani C dilinde yapının tüm elemanları *public*'tir.
+- C dilinde (C++ dilinde olan) memberlar için kullanılan default member init yoktur.
+- C dilinde (C++ dilinde olan) inheritance yoktur.
+- C dilinde (C++ dilinde olan) function overloading yoktur.
+- C dilinde (C++ dilinde olan) operator overloading yoktur.
+
+---
+### Structures and Functions
+ - Bir amaca hizmet eden çoğu kütüphane yapıları kullanan fonksiyonlar üzerine kuruludur. 
+	 - Bunun başlıca sebebi kütüphaneye özgü birçok elemanı içerisinde barındıran bir tür ihtiyacı ve bu türle işlem yapan fonksiyon yazımıdır.
+
+```c
+/* Structures and Functions */
+typedef struct
+{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+} employee_t;
+
+void print_employee(employee_t e)
+{
+	printf("id = %d\n", e.id);
+	printf("name = %s\n", e.name);
+	printf("surname = %s\n", e.surname);
+	printf("wage = %f\n", e.wage);
+}
+
+int main(void)
+{
+	employee_t employee_hande = {
+		.id = 31,
+		.name = "Hande",
+		.surname = "Kubilay",
+		.wage = 3131.3131,
+	};
+	print_employee(employee_hande);
+}
+```
+
+- Yukarıdaki print_employee fonksiyonu her çağırıldığında `sizeof(employee_t)` kadar kopyalama yapar. Bu da büyük yapılar için çok fazla işlem yükü demektir.
+- Bu sorunla karşılaşmamak için kullanılan en iyi yöntem **call by reference** ile fonksiyona structure nesnesinin adresini parametre olarak girmektir.
+
+```c
+/* Structures and Functions with call by reference  */
+typedef struct
+{
+	int id;
+	char name[20];
+	char surname[20];
+	double wage;
+} employee_t;
+
+void print_employee(employee_t* e)
+{
+	printf("id = %d\n", e->id);
+	printf("name = %s\n", e->name);
+	printf("surname = %s\n", e->surname);
+	printf("wage = %f\n", e->wage);
+}
+
+int main(void)
+{
+	printf("sizeof(employee_t) = %zu\n",sizeof(employee_t));
+	printf("sizeof(employee_t*) = %zu\n",sizeof(employee_t*));
+
+	employee_t employee_hande = {
+		.id = 31,
+		.name = "Hande",
+		.surname = "Kubilay",
+		.wage = 3131.3131,
+	};
+	print_employee(&employee_hande);
+}
+/*
+out:
+sizeof(employee_t) = 56
+sizeof(employee_t*) = 4
+id = 31
+name = Hande
+surname = Kubilay
+wage = 3131.313100
+*/
+```
+- Yukarıdaki çıktıda da görüldüğü üzere 56 byte'lık kopyalama yerine yalnızca 4 byte kullanıldı.
+
+- Bir fonksiyonun geri dönüş değeri türü
+	- bir yapı türünden olabilir.
+	- bir yapı adresi türünden olabilir.
+	- bir const yapı türünden adres olabilir.
+```c
+employee_t* create_random_employee_id(void){
+	employee_t* ptr = {
+		->id = rand()%100;
+	};
+}
+```
+
+---
+# Lesson 50
