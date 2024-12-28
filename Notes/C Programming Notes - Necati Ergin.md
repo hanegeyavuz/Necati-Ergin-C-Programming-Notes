@@ -10550,3 +10550,548 @@ employee_t* create_random_employee_id(void){
 
 ---
 # Lesson 50
+
+- Yapılar ile fonksiyonların kullanımında aşağıdaki fonksiyon çeşitleri kullanılmaktadır.
+```c
+void f1(struct Employee x);
+void f2(struct Employee* p);
+void f3(const struct Employee* p);
+struct Employee f4(void);
+struct Employee* f5(void);
+const struct Employee* f6(void);
+```
+
+>[!NOTE]
+>Kopyalama maliyetlerinden dolayı daha çok f2,f3,f5 ve f6 tipinde fonksiyonlar daha fazla kullanılır.
+
+- C dilinde genelde kütüphane oluşumunda iki tarz kütüphane bulunmaktadır. Bunlar konvansiyon değildir, Necati Ergin'in tanımlamalarıdır.
+	- C Type Library
+	- OOP Type Library
+
+
+## `<time.h>` Library
+
+>[!INFO] 
+>Bir Kütüphaneyi öğrenirken:
+>- Önce kütüphanedeki **türlere** bakılmalıdır
+>	- structure types
+>	- typedef alias
+>	- functions
+
+- `time.h` kütüphanesinde aşağıdaki türler bulunmaktadır
+	- time_t
+	- clock_t
+	- struct tm
+
+### time point
+- Tarih zaman doğrultusundaki anlık noktaya denir.
+- Bir orijin noktasına göre (örneğin 01.01.1900 saat 00.00) referans alınır. Bu orijin noktasına **epoch** denir.
+- Belirli bir epoch'tan geçen saniye satısına **calender time** denir.
+
+
+```c
+struct tm {
+	int tm_year; /* tm_year + 1900 = now */	/*year since 1900*/
+	int tm_mon;	 /* 0 = January */	
+	int tm_mday;		
+	int tm_wd;   /* 0 Sunday */		
+	int tm_yday; /* starts with 0 */		
+	int tm_hour; /* 0-24 scale */
+	int tm_min;	 /* 0-60 scale */	
+	int tm_sec;	 /* 0-60 scale */	
+	int tm_isdst; /* is daylight saving time (less than 0 = no information, greather than 0 = saving time mode active, equal 0 = saving time mode deactive) */
+};
+```
+
+#### Kullanımı
+
+- `time()` fonksiyonu ile time_t türünden değişken set edilir. 
+```
+// #include <time.h>
+/* time.h library */
+int main(void)
+{
+	for (;;)
+	{
+		time_t sec;
+		time(&sec);
+		printf("%lld\r", sec);
+	}
+}
+
+```
+
+- Programın ekran çıktısı 1970 yılından sonra geçen saniyeyi verir.
+
+- `time()` fonksiyonuna `NULL Pointer` parametre olarak geçilirse fonksiyonun dönüş değeri de yine 1970 yılından sonra geçen saniyeyi verir.
+
+### `localtime()` ve `gmtime()` Fonksiyonları
+
+#### `localtime()` Fonksiyonu
+
+`localtime()` fonksiyonu, bir `calendar time` türündeki zamanı (`time_t`), yerel saat dilimine göre `broken-down time` türüne (`struct tm`) dönüştürür.
+
+```c
+struct tm* localtime(const time_t *time);
+```
+
+- **Dönen Adres**: Fonksiyon bir statik adres döndürür, bu nedenle dikkatli kullanılmalıdır. Çoklu çağrılarda önceki değerlerin üzerine yazılabilir. _(Statik adres döndüren fonksiyonlarda bu durum her zaman kontrol edilmelidir.)_
+
+**Örnek Kullanım:**
+
+```c
+#include <stdio.h>
+#include <time.h>
+
+int main(void) {
+    time_t sec;
+    time(&sec);
+    struct tm* tm_test = localtime(&sec);
+    printf("Tarih = %d/%d/%d\n", 
+        tm_test->tm_year + 1900, 
+        tm_test->tm_mon + 1, 
+        tm_test->tm_mday
+    );
+    return 0;
+}
+```
+
+**Çıktı Örneği:**
+
+```
+Tarih = 2024/12/28
+```
+
+#### `gmtime()` Fonksiyonu
+
+`gmtime()` fonksiyonu, bir `calendar time` türündeki zamanı (`time_t`), UTC'ye göre `broken-down time` türüne (`struct tm`) dönüştürür.
+
+```c
+struct tm* gmtime(const time_t *time);
+```
+
+- **Dönen Adres**: `localtime()` gibi bu fonksiyon da statik bir adres döndürür. Çoklu çağrılarda önceki veriler üzerine yazılabilir.
+
+**Örnek Kullanım:**
+
+```c
+#include <stdio.h>
+#include <time.h>
+
+int main(void) {
+    const char* const pmons[] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    time_t sec1, sec2;
+    time(&sec1);
+    time(&sec2);
+
+    struct tm* ptr_lcl_tm = localtime(&sec1);  // Yerel saat
+    struct tm* ptr_gm_tm = gmtime(&sec2);      // UTC saat
+
+    printf("Yerel Saat: %d %s %d %02d:%02d:%02d\n",
+        ptr_lcl_tm->tm_mday,
+        pmons[ptr_lcl_tm->tm_mon],
+        ptr_lcl_tm->tm_year + 1900,
+        ptr_lcl_tm->tm_hour,
+        ptr_lcl_tm->tm_min,
+        ptr_lcl_tm->tm_sec
+    );
+
+    printf("UTC Saat: %d %s %d %02d:%02d:%02d\n",
+        ptr_gm_tm->tm_mday,
+        pmons[ptr_gm_tm->tm_mon],
+        ptr_gm_tm->tm_year + 1900,
+        ptr_gm_tm->tm_hour,
+        ptr_gm_tm->tm_min,
+        ptr_gm_tm->tm_sec
+    );
+
+    return 0;
+}
+```
+
+**Çıktı Örneği:**
+
+```
+Yerel Saat: 28 Dec 2024 14:09:22
+UTC Saat: 28 Dec 2024 12:09:22
+```
+
+### Detaylı Açıklamalar
+
+1. **`struct tm` Yapısı**:
+    
+    - `tm_year`: Yıl bilgisi, 1900'e eklenmelidir. Örneğin, 2024 yılı için `tm_year = 124` döner.
+    - `tm_mon`: Ay bilgisi, 0-11 arasında döner. Ocak ayı için `tm_mon = 0`.
+    - `tm_mday`: Ayın gün bilgisini içerir (1-31).
+    - `tm_hour`, `tm_min`, `tm_sec`: Saat, dakika ve saniye bilgilerini içerir.
+2. **Yerel Saat ve UTC Farkı**:
+    
+    - `localtime()` fonksiyonu, saat dilimi farkını ve yaz saati uygulamalarını dikkate alır.
+    - `gmtime()` fonksiyonu ise doğrudan UTC (Coordinated Universal Time) saatine göre işlem yapar.
+3. **Statik Adres Kullanımı**:
+    
+    - Her iki fonksiyon da aynı statik bellek adresine yazdığı için, eğer dönen `struct tm` verisi birden fazla yerde kullanılacaksa, kopyalanması önerilir.
+
+### ctime() ve asctime() Functions
+
+- Gün, ay, yıl ve saati string formatında veren fonksiyonlardır.
+
+```c
+char* ctime(const time_t*);
+char* asctime(const struct tm*);
+```
+- Statik adres döndürür. 26 karakterlik bir yazı adresi döndürür.
+- Aralarındaki tek fark parametre değişkenidir. İşlevleri aynıdır.
+- Döndürdükleri yazının son karakteri new line `(\n)` karakteridir.
+
+```c
+/* ctime() and asctime() */
+int main(void){
+	time_t sec;
+	time(&sec);
+	char* p1 = ctime(&sec);
+	const struct tm* tm_ptr = localtime(&sec);
+	char* p2 = asctime(tm_ptr);
+	printf("date with ctime = %s",p1);
+	printf("date with asctime = %s",p2);
+}
+
+/*
+out:
+date with ctime = Sat Dec 28 17:23:33 2024
+date with asctime = Sat Dec 28 17:23:33 2024
+*/
+
+```
+
+---
+#### Önemli bir Not
+- Saat yazımı, ondalıklı sayı ayıracı, tam sayı basamak ayıracı gibi ülkelere göre değişiklik gösteren konularda `locale` isimli bir bağlılık vardır.
+- locale-depended fonksiyonlar bu **locale**'e göre işlem gerçekleştirir.
+	- printf, scanf gibi fonksiyonlar örnek olarak verilebilir.
+- `locale`'i değiştirmek içn `<locale.h>` kütüphanesi kullanılarak `set_locale()` fonksiyonu kullanılır.
+
+```c
+/*locale*/
+#include <locale.h>
+int main(void)
+{
+	double dval = 3131.6969;
+	printf("dval before the change locale to turkish = %f\n", dval);
+
+	char *p = setlocale(LC_ALL, "turkish");
+	if (!p)
+	{
+		printf("locale degistirilemedi\n");
+		exit(0);
+	}
+	else
+	{
+		printf("locale degistirildi\n");
+	}
+
+	printf("dval after the change locale to turkish = %f\n", dval);
+}
+
+/*
+out:
+dval before the change locale to turkish = 3131.696900
+locale degistirildi
+dval after the change locale to turkish = 3131,696900
+*/
+```
+
+- Yukarıdaki örnekte görüldüğü üzere ondalıklı sayılar virgül ile ayrılarak standart output'a yazdırıldı.
+
+>[!NOTE] 
+>`NULL Pointer` parametresi geçilirse default C locale'i set eidlmiş olur.
+
+---
+### `strftime()` Fonksiyonu
+
+`strftime()` fonksiyonu, bir `struct tm` yapısındaki zamanı belirli bir biçimde biçimlendirilmiş bir karakter dizisi olarak döndürür. Bu, tarihi ve saati daha okunabilir bir formatta elde etmenizi sağlar.
+
+```c
+size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *timeptr);
+```
+#### Parametreler:
+
+1. **`str`**: Çıkış için biçimlendirilmiş karakter dizisini alacak tampon (buffer).
+2. **`maxsize`**: Tamponun maksimum boyutu.
+3. **`format`**: Biçimlendirme dizgisi (örneğin: `%Y`, `%d`, `%B`).
+4. **`timeptr`**: `struct tm` türünde bir gösterici.
+
+#### Dönen Değer:
+
+- Biçimlendirilmiş çıktı dizisinin karakter sayısını döner (sondaki `null` karakteri hariç). Eğer tampon yeterli değilse `0` döner.
+
+#### Örnek Kullanım:
+
+```c
+#include <stdio.h>
+#include <time.h>
+
+int main(void) {
+    time_t sec;
+    time(&sec);
+    char buf[100]; // Biçimlendirilmiş zamanı tutmak için buffer
+    size_t n = strftime(buf, sizeof(buf), "%d %B / %A / %Y", localtime(&sec));
+
+    printf("n = %zu\n", n);  // Biçimlendirilmiş dizenin uzunluğu
+    printf("Tarih: %s\n", buf);  // Biçimlendirilmiş çıktı
+
+    return 0;
+}
+```
+
+#### Çıktı Örneği:
+
+```
+n = 25
+Tarih: 28 December / Saturday / 2024
+```
+
+---
+
+### Detaylı Açıklamalar
+
+1. **Format Dize Öğeleri:**
+    
+    - `%d`: Ayın günü (01-31).
+    - `%B`: Ay adı (tam yazılış, örneğin "December").
+    - `%A`: Gün adı (tam yazılış, örneğin "Saturday").
+    - `%Y`: Yıl (tam sayı olarak, örneğin "2024").
+    - `%H`, `%M`, `%S`: Saat, dakika ve saniye bilgileri için kullanılabilir.
+2. **Tampon (Buffer) Kullanımı:**
+    
+    - `sizeof(buf)` ile tampon boyutu belirtmek, taşma hatalarını önler.
+    - Eğer tampon yetersiz kalırsa, `strftime()` `0` döner.
+3. **Yerel Saat Kullanımı:**
+    
+    - `localtime(&sec)` ile yerel saat `struct tm` yapısına dönüştürülür.
+    - Eğer UTC saati kullanmak istiyorsanız, `gmtime()` fonksiyonu tercih edilebilir.
+4. **Kod Güvenliği:**
+    
+    - Tampon boyutunun (`buf`) her zaman yeterli olduğundan emin olun.
+    - `n` değerini kontrol ederek biçimlendirme işleminin başarılı olup olmadığını anlayabilirsiniz.
+
+---
+
+### Öneri
+
+Eğer farklı formatlar denemek isterseniz, aşağıdaki gibi biçimlendirme dizgilerini değiştirebilirsiniz:
+
+|Format|Açıklama|Çıktı Örneği|
+|---|---|---|
+|`%d/%m/%Y`|Gün/Ay/Yıl|`28/12/2024`|
+|`%H:%M:%S`|Saat:Dakika:Saniye|`14:09:22`|
+|`%I:%M %p`|12 saatlik saat ve AM/PM|`02:09 PM`|
+|`%a, %b %d`|Kısaltılmış gün ve ay|`Sat, Dec 28`|
+
+>[!IMPORTANT]
+>`strftime()` fonksiyonu locele-depended bir fonksiyondur.
+
+```c
+#include <locale.h>
+int main(void) {
+    time_t sec;
+    time(&sec);
+    char buf1[100]; 
+    char buf2[100]; 
+    size_t n1 = strftime(buf1, sizeof(buf1), "%d %B / %A / %Y / %H:%M:%S", localtime(&sec));
+
+    printf("n = %zu\n", n1);  
+    printf("Tarih: %s\n", buf1);
+	/* change locale to turkish */
+	setlocale(LC_ALL,"turkish");
+
+	size_t n2 = strftime(buf2, sizeof(buf2), "%d %B / %A / %Y / %H:%M:%S", localtime(&sec));
+    printf("n = %zu\n", n2);  
+    printf("Tarih: %s\n", buf2);
+
+}
+/*
+out:
+n = 40
+Tarih: 28 December / Saturday / 2024 / 19:19:17
+n = 39
+Tarih: 28 Aralık / Cumartesi / 2024 / 19:19:17
+*/
+```
+
+### Programın Çalıştığı Süre Ölçümü
+
+#### `clock()` Function
+
+```c
+clock_t  clock (void);
+```
+
+- main fonksiyonunun çağrıldığı andan `clock()` fonksiyonun çağrıldığı ana kadar geçen süreyi veren fonksiyondur.
+- Saniye biriminde değil, *tick* biriminde verir.
+	- `CLOCKS_PER_SEC` MAKROSU ILE SANIYEYE CEVIRILEBILIR.
+```c
+/*clock() function*/
+int icmp(const void* p1,const void* p2){
+	return *(int*)p1 - *(int*)p2;
+}
+
+int main(void){
+	int n;
+	printf("kac tam sayi:");
+	scanf("%d",&n);
+
+	int* p = malloc(n*sizeof(int));
+	if(!p){
+		printf("bellek yetersiz\n");
+	}
+	set_array_random(p,n);
+
+	//print_array(p,n);
+	clock_t clk_start = clock();
+	qsort(p,n,sizeof(int),icmp);
+	clock_t clk_end = clock();
+	printf("clock of qsort = %f\n",(double)(clk_end-clk_start)/CLOCKS_PER_SEC);
+	system("pause");
+	print_array(p,n);
+	free(p);
+}	
+/*
+out:
+kac tam sayi:1000000
+clock of qsort = 0.076000
+*/
+```
+
+
+### Tamamlanmış ve Tamamlanmamış Türler
+
+#### Tamamlanmamış Tür (Incomplete Type)
+
+**Tamamlanmamış tür**, derleyicinin bir türün varlığından haberdar olduğu ancak bu tür hakkında tam bilgiye sahip olmadığı durumu ifade eder. Tamamlanmamış türler, özellikle türlerin tam tanımına gerek olmayan veya çevrimsel bağımlılıkları önlemek için kullanışlıdır.
+
+**Örnekler:**
+
+```c
+struct Employee;  
+// "struct Employee" derleyici için bir tamamlanmamış türdür.
+```
+
+Tamamlanmamış türler şu durumlarda kullanılabilir:
+
+- `typedef` bildirimlerinde
+- Fonksiyon bildirimlerinde
+- `extern` değişken bildirimlerinde
+- İşaretçi (pointer) değişken tanımlarında
+- Yapıların işaretçi üye değişkenlerinde
+
+#### Tamamlanmış Tür (Complete Type)
+
+**Tamamlanmış tür**, derleyicinin bir türle ilgili tüm bilgilere sahip olduğu durumdur. Bu tür, bellekte ne kadar yer kaplayacağını belirleyebildiği için daha geniş bir kullanıma sahiptir.
+
+**Örnekler:**
+
+```c
+struct Data {
+  int m_x, m_y, m_z;
+};
+// "struct Data" derleyici için tamamlanmış bir türdür.
+```
+
+Tamamlanmış türler şu durumlarda kullanılabilir:
+
+- Değişken tanımlamalarında
+- `sizeof` operatörünün operandı olarak
+- İşaretçi çözümlemede (dereferencing)
+
+---
+
+#### Tamamlanmamış ve Tamamlanmış Türlerin Kullanımı
+
+##### Örnek 1: Tamamlanmamış Türden Tamamlanmış Türe Geçiş
+
+```c
+// some.h
+struct Data;
+// "struct Data" burada tamamlanmamış bir türdür.
+
+struct Data {
+  int m_x, m_y, m_z;
+};
+// "struct Data" artık tamamlanmış bir türdür.
+```
+
+##### Örnek 2: `typedef` ile Tamamlanmamış Tür Kullanımı
+
+```c
+struct Data;  // Tamamlanmamış tür
+
+typedef struct Data Data_t; 
+typedef struct Data* p_Data_t;
+typedef Data_t* p_Data_t2;
+```
+
+##### Örnek 3: Fonksiyon Bildirimlerinde Tamamlanmamış Tür Kullanımı
+
+```c
+struct Data;  // Tamamlanmamış tür
+
+struct Data foo(struct Data);
+// foo fonksiyonu tamamlanmamış türle bildirilmiştir.
+
+struct Data* bar(struct Data*);
+// bar fonksiyonu tamamlanmamış tür işaretçisiyle bildirilmiştir.
+```
+
+##### Örnek 4: `extern` Kullanımı
+
+```c
+struct Data;  // Tamamlanmamış tür
+
+extern struct Data g_data;
+// g_data başka bir modülde tanımlanmış bir `struct Data` türünden değişkendir.
+
+extern struct Data g_data_array[];
+// g_data_array başka bir modülde tanımlanmış bir `struct Data` dizisidir.
+```
+
+##### Örnek 5: Bellek Boyutu ve İşaretçi Kullanımı
+
+```c
+struct Data;  // Tamamlanmamış tür
+
+int main(void) {
+  struct Data* p_data = NULL;
+  // İşaretçi türünün bellekte kapladığı boyut bilindiği için bir işaretçi tanımlanabilir.
+
+  // Ancak:
+  // struct Data d1;  // Söz dizimi hatası: Türün bellek boyutu bilinmiyor.
+
+  // size_t N = sizeof(struct Data);  // Söz dizimi hatası: `sizeof` operatörü tamamlanmamış türle kullanılamaz.
+}
+```
+
+---
+
+#### Tamamlanmamış Türlerin Kullanım Amaçları
+
+1. **Bağımlılıkların Azaltılması**: Başlık dosyalarının birbirlerini içermesi, derleme zamanını artırabilir. Tamamlanmamış türler kullanılarak bağımlılıklar azaltılabilir.
+2. **Bellek Yönetimi**: Türün tam tanımına gerek duyulmayan durumlarda bellek yönetimini sadeleştirmek için işaretçiler kullanılabilir.
+3. **Çevrimsel Bağımlılıklardan Kaçınma**: Birbirini içeren başlık dosyaları çevrimsel bağımlılığa neden olabilir. Tamamlanmamış türlerle bu durum önlenebilir.
+
+**Not**: Tamamlanmamış türler, sadece sınırlı bir kullanım alanına sahiptir. Tamamlanmamış türle bir nesne tanımlanamaz, `sizeof` operatörü ile kullanılamaz ve işaretçi çözümlemesi yapılamaz.
+
+>[!WARNING] Başlık dosyalarında incomplete type ile yapılabilecek işlemleri boşu boşuna complete type ile yapmamak gerekir. incomplete type durumlarında bir başlık dosyasına başka bir başlık dosyasının `#include` edilmesi zorunluluğu yoktur.
+
+```c
+//neco.h /*Unnecessary for function decleration*/
+struct nec foo(void); 
+
+```
+
+---
+
+# Lesson 51

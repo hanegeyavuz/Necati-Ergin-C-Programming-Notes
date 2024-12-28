@@ -6,7 +6,7 @@
 #include "nutility.h"
 #include <math.h>
 #include <conio.h>
-
+#include <time.h>
 #if 0
 
 #define NGAMES 10000000
@@ -5177,7 +5177,7 @@ int main(void)
 }
 #endif
 
-#if 1
+#if 0
 /* Structures and Functions with call by reference  */
 typedef struct
 {
@@ -5218,4 +5218,147 @@ surname = Kubilay
 wage = 3131.313100
 */
 
+#endif
+
+#if 0
+// #include <time.h>
+/* time.h library */
+int main(void)
+{
+	for (;;)
+	{
+		time_t sec;
+		time(&sec);
+		printf("%lld\r", sec);
+		
+	}
+}
+#endif
+
+#if 0
+/* localtime() function */
+int main(void){
+	time_t sec;
+	time(&sec);
+	struct tm* tm_test = localtime(&sec);
+	printf("date = %d/%d/%d\n",tm_test->tm_year + 1900,tm_test->tm_mon + 1,tm_test->tm_mday);
+}
+#endif
+
+#if 0
+/* gmtime() function */
+int main(void){
+	const char* const pmons[] = {"Jan","Feb","Mar","April","May","June","July","Agust","September","October","November","December"};
+	time_t sec1,sec2;
+	time(&sec1);
+	time(&sec2);
+	struct tm* ptr_lcl_tm = localtime(&sec1);
+	struct tm* ptr_gm_tm = gmtime(&sec2);
+	printf("%d %s %d\t%02d:%02d:%02d\n",ptr_lcl_tm->tm_mday,pmons[ptr_lcl_tm->tm_mon],ptr_lcl_tm->tm_year + 1900,ptr_lcl_tm->tm_hour,ptr_lcl_tm->tm_min, ptr_lcl_tm->tm_sec);
+	printf("%d %s %d\t%02d:%02d:%02d\n",ptr_gm_tm->tm_mday,pmons[ptr_gm_tm->tm_mon],ptr_gm_tm->tm_year + 1900,ptr_gm_tm->tm_hour,ptr_gm_tm->tm_min, ptr_gm_tm->tm_sec);
+}
+#endif
+
+#if 0
+/* ctime() and asctime() */
+int main(void){
+	time_t sec;
+	time(&sec);
+	char* p1 = ctime(&sec);
+	const struct tm* tm_ptr = localtime(&sec);
+	char* p2 = asctime(tm_ptr);
+	printf("date with ctime = %s",p1);
+	printf("date with asctime = %s",p2);
+}
+#endif
+
+#if 0
+/*locale*/
+#include <locale.h>
+int main(void)
+{
+	double dval = 3131.6969;
+	printf("dval before the change locale to turkish = %f\n", dval);
+
+	char *p = setlocale(LC_ALL, "turkish");
+	if (!p)
+	{
+		printf("locale degistirilemedi\n");
+		exit(0);
+	}
+	else
+	{
+		printf("locale degistirildi\n");
+	}
+
+	printf("dval after the change locale to turkish = %f\n", dval);
+}
+#endif
+
+
+#if 0
+/* strftime() function */
+int main(void){
+	time_t sec;
+	time(&sec);
+	char buf[100];
+	size_t n = strftime(buf,asize(buf),"%d %B / %A / %Y",localtime(&sec));
+	printf("n = %zu\n",n);
+	printf("%s",buf);
+}
+#endif
+
+#if 0
+#include <locale.h>
+int main(void) {
+    time_t sec;
+    time(&sec);
+    char buf1[100]; 
+    char buf2[100]; 
+    size_t n1 = strftime(buf1, sizeof(buf1), "%d %B / %A / %Y / %H:%M:%S", localtime(&sec));
+
+    printf("n = %zu\n", n1);  
+    printf("Tarih: %s\n", buf1);
+	/* change locale to turkish */
+	setlocale(LC_ALL,"turkish");
+
+	size_t n2 = strftime(buf2, sizeof(buf2), "%d %B / %A / %Y / %H:%M:%S", localtime(&sec));
+    printf("n = %zu\n", n2);  
+    printf("Tarih: %s\n", buf2);
+}
+#endif
+
+#if 0
+/*clock() function*/
+int icmp(const void* p1,const void* p2){
+	return *(int*)p1 - *(int*)p2;
+}
+
+int main(void){
+	int n;
+	printf("kac tam sayi:");
+	scanf("%d",&n);
+
+	int* p = malloc(n*sizeof(int));
+	if(!p){
+		printf("bellek yetersiz\n");
+	}
+	set_array_random(p,n);
+
+	//print_array(p,n);
+	clock_t clk_start = clock();
+	qsort(p,n,sizeof(int),icmp);
+	clock_t clk_end = clock();
+	printf("clock of qsort = %f\n",(double)(clk_end-clk_start)/CLOCKS_PER_SEC);
+	system("pause");
+	print_array(p,n);
+	free(p);
+}	
+
+#endif
+
+#if 1
+int main(void){
+	
+}
 #endif
