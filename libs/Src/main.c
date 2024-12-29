@@ -5357,8 +5357,248 @@ int main(void){
 
 #endif
 
-#if 1
+
+#if 0
 int main(void){
+	FILE* f = fopen("ali.txt","w");
+	fprintf(f,"....");
+	fclose(f);
+}
+#endif
+
+#if 0
+/* oop type library test code-1 */
+#include "date.h"
+int main(void){
+	Date dt;
+	int d = 27;
+	int m = 1;
+	int y = 2001;
+
+	if(!set_date_by_str(&dt,"10-10-2021")){
+		printf("gecersiz tarih");
+		return 1;
+	}
+	print_date(&dt);
+
+	if(!set_date(&dt,d,m,y)){
+		printf("gecersiz tarih");
+		return 1;
+	}
+	print_date(&dt);
+
+	if(!set_date(&dt,5,11,2031)){
+		printf("gecersiz tarih");
+		return 1;
+	}
+	print_date(&dt);
 	
+}
+#endif
+
+
+#if 0
+#include "date.h"
+
+/* oop type library test code-2 */
+void set_date_array(Date* p, size_t size){
+	while(size--){
+		set_random_date(p++);
+	}
+}
+void print_date_array(Date* p, size_t size){
+	while(size--){
+		print_date(p++);
+	}
+}
+#define SIZE 100
+int main(void){
+	Date ar[SIZE];
+	randomize();
+	set_date_array(ar,SIZE);
+}
+#endif
+
+
+#if 0
+#include "date.h"
+
+/* oop type library test code-3 */
+int maim(void){
+	Date dt;
+	printf("bir tarih giriniz:");
+	scan_date(&dt);
+	print_date(&dt);
+
+	printf("%d yiinin %d ayinin %d gunu\n",get_year(&dt),get_month(&dt),get_month_day(&dt));
+}
+#endif
+
+
+#if 0
+/* memory allocation remind */
+
+int main(void) {
+    int start_size = 31;        
+    int current_size = start_size;
+    char* std_date = malloc(current_size * sizeof(char)); 
+    if (std_date == NULL) {
+        printf("Bellek ayrilamadi");
+        return 1;
+    }
+
+    printf("Lutfen gecerli bir tarih giriniz: ");
+
+    int c, index = 0;
+    while ((c = getchar()) != '\n' && c != EOF) { 
+        if (index >= current_size - 1) { 
+            current_size *= 2; 
+            char* new_date = realloc(std_date, current_size * sizeof(char));
+            if (new_date == NULL) {
+                printf("Bellek yeniden ayrilamadi");
+                free(std_date);
+                return 1;
+            }
+            std_date = new_date;
+        }
+        std_date[index++] = c; 
+    }
+    std_date[index] = '\0'; 
+
+    printf("Tarih = %s\n", std_date);
+
+    free(std_date); 
+    return 0;
+}
+
+#endif
+
+#if 0
+/* oop type library test code-4 */
+
+#include "date.h"
+void set_date_array(Date* p, size_t size){
+	while(size--){
+		set_random_date(p++);
+	}
+}
+void print_date_array(Date* p, size_t size){
+	while(size--){
+		print_date(p++);
+	}
+}
+
+int callback_date_cmp(const void* p1,const void* p2){
+	return cmp_date((const Date*)p1,(const Date*)p2);
+}
+
+
+int main(void){
+	size_t n;
+	printf("kac tarih: ");
+	scanf("%d",&n);
+	Date* dt  = (Date*)malloc(n * sizeof(Date));
+	if(!dt){
+		printf("bellek yetersiz");
+		free(dt);
+		return 1;
+	}
+	set_date_array(dt,n);
+	printf("siralama basladi\n");
+	clock_t clk_start = clock();
+	qsort(dt,n,sizeof(*dt),callback_date_cmp);
+	clock_t clk_end = clock();
+	printf("siralama bitti\n");
+	printf("siralama suresi = %f",(double)(clk_end-clk_start) / CLOCKS_PER_SEC);
+	free(dt);
+}
+#endif
+
+#if 0
+#include "date.h"
+/* oop type library test code-5 */
+int main(void){
+	Date birth_date;
+	printf("dagum tarihinizi giriniz: ");
+	scan_date(&birth_date);
+	printf("dogum tarihiniz: ");
+	print_date(&birth_date);
+	Date today;
+	set_date_today(&today);
+	printf("bugunun tarihi: ");
+	print_date(&today);
+	printf("date diff = %d\n",date_diff(&birth_date,&today));
+}
+
+#endif
+
+#if 0
+#include "date.h"
+/* oop type library test code-6 */
+int main(void){
+	Date today;
+	set_date_today(&today);
+	printf("bugunun tarihi: ");
+	print_date(&today);
+	int n;
+
+	printf("kac gun sonrasi: ");
+	Date future_date;
+	scan_date(&future_date);
+	n_days_after(&future_date,&today);
+	print_date(&future_date);
+}
+
+#endif
+
+#if 0
+#include "date.h"
+int main(void){
+	Date dt;
+	/*set_date(&dt,27,01,2001);
+	printf("week day = %d\n",get_week_day(&dt));
+	print_date(&dt);*/
+	printf("lutfen dogum gununuzu giriniz: ");
+	scan_date(&dt);
+	printf("dogum gununuz: ");
+	print_date(&dt);
+}
+#endif
+
+#if 0
+#include "date.h"
+
+int main(void){
+	Date dt1;
+	Date dt2;
+	set_date(&dt1,22,02,2000);
+	set_date(&dt2,27,01,2001);
+	printf("hande ile yavuz arasindaki gun farki: %d\n",date_diff(&dt1,&dt2));
+
+}
+#endif
+
+
+#if 1
+/* test code for n_days_after and before */
+#include "date.h"
+int main(void){
+	Date today;
+	printf("bugun: ");
+	set_date_today(&today);
+	print_date(&today);
+	int n;
+
+	printf("\nkac gun sonrasi ve oncesi: ");
+	scanf("%d",&n);
+	Date future_date;
+	n_days_after(&future_date,&today,n);
+	printf("\nn gun sonrasi: ");
+	print_date(&future_date);
+
+	Date before_date;
+	n_days_before(&before_date,&today,n);
+	printf("\nn gun oncesi: ");
+	print_date(&before_date);
 }
 #endif

@@ -11091,7 +11091,24 @@ int main(void) {
 struct nec foo(void); 
 
 ```
-
 ---
-
 # Lesson 51
+
+### OOP Type Library 
+- Bu tarz kütüphaneler `handle` yapısı kullanır. Kullanıcı kütüphaneye ait bir nesneyi direkt oluşturamaz. Create veya start fonksiyonları sayesinde oluşturur. 
+- Oluşturulan nesne ile kütüphanedeki diğer fonksiyonlar işlem yapar.
+- İşlemler tamamlandığında destroy veya close fonksiyonları ile **memory leak**'den kaçınılır.
+- Örnek olarak dosya işlemleri veirlebilir.
+```c
+int main(void){
+	FILE* f = fopen("ali.txt","w");
+	fprintf(f,"....");
+	fclose(f);
+}
+```
+
+- Bu tarz kütüphaneler oop tarzı kütüphaneler olarak benzetilebilir.
+- Yapı elemanlarına tam erişim sağlanamaz.
+- Genellikle bir fonksiyon yoluyla oluşturulan yapının içerisindeki yalnızca `void*` türündeki pointer'ı görebiliriz. 
+
+
