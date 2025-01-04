@@ -11112,3 +11112,308 @@ int main(void){
 - Genellikle bir fonksiyon yoluyla oluşturulan yapının içerisindeki yalnızca `void*` türündeki pointer'ı görebiliriz. 
 
 
+- Kütüphane implementasyon örnekleri `date.c` dosyasında bulunmaktadır.
+# Lesson 52
+
+## Composition (Bir Yapının Elemanının Bir Yapı Türünden Olması)
+
+- Bir yapının elemanı bir yapı türünden olabilir.
+
+```c
+/* Composition */
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec nec;
+};
+
+int main(int argc, char const *argv[])
+{
+	printf("sizeof double = %zu\n",sizeof(double));
+	printf("sizeof(struct Nec) = %zu\n",sizeof(struct Nec));
+	printf("sizeof(struct Erg) = %zu\n",sizeof(struct Erg));
+
+}
+
+/*
+out:
+sizeof double = 8
+sizeof(struct Nec) = 12
+sizeof(struct Erg) = 32
+*/
+```
+- İlerleyen zamanlarda işlenecek **alignment** dolayısıyla `Erg` yapısının bellekte kapladığı alan 12+16 = 28 olması yerine 32'dir.
+- Birden fazla nokta operatörü kullanımı bu sistemlerde doğaldır.
+```c
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec nec;
+};
+
+int main(int argc, char const *argv[])
+{
+	struct Erg erg = {1.2,2.3,{31,69,32}};
+	printf("%d\n",erg.nec.a);
+
+}
+
+/*
+out:
+31
+*/
+```
+
+- **designated initialize** ile de ilk değer verilebilir.
+```c
+int main(int argc, char const *argv[])
+{
+	//struct Erg erg = {1.2,2.3,{31,69,32}};
+
+	struct Erg erg = { .nec.a = 66};
+	printf("%d\n",erg.nec.a);
+}
+/*
+out:
+66
+*/
+```
+
+- pointer türünden bir yapı elemanı da bir yapının elemanı olabilir
+```c
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec* necptr;
+};
+
+int main(int argc, char const *argv[])
+{
+	struct Erg erg = {};
+	struct Erg* erg_ptr = &erg;
+
+	//
+	struct Nec nec_str = {1,2,3};
+	erg.necptr = &nec_str;
+	printf("(erg.necptr->a) = %d\n",erg.necptr->a);
+	printf("(erg_ptr->necptr->b) = %d\n",erg_ptr->necptr->b);
+}
+
+
+/*
+out:
+(erg.necptr->a) = 1
+(erg_ptr->necptr->b) = 2
+*/
+
+```
+
+>[!ERROR]
+>- Bir yapının elemanı incomplete type türünden olamaz
+>- Yapının elemanı kendi türünden bir yapı elemanı olamaz.
+>- Yapının elemanı kendi türünden bir yapının pointer elemanı olabilir.
+
+- Self-referential structures olarak isimlendirilen yapılar aşağıdaki gibidir.
+```c
+struct Nec{
+	int x,y,z;
+	struct Nec* ptr;
+};
+
+```
+
+- Yapı içinde başka bir yapı bildirimi yapılabilir ve eleman gösterilebilir.
+```c
+struct Data{ /* enclosure struct */
+	int a,b;
+	struct Nec{ /* nested-structure */
+		int x,y;
+	}nec;
+};
+```
+- Nested yapıların kullanım kuralları C ve C++ dillerinde farklılık göstermektedir.
+- C dilinde içerideki structure a ait bir nesne, dışarıdaki enclosure struct'ın kullanılabileceği her yerde kullanılabilir.
+```c
+struct Data{ /* enclosure struct */
+	int a,b;
+	struct Nec{ /* nested-structure */
+		int x,y;
+	}nec;
+};
+int main(void){
+	struct Nec mynec; /* LEGAL for C programming */
+}
+
+```
+
+- C dilinin C11 standardı ile birlikte iç içe structures yapısına ** anonimous structures ** legalitesi de eklenmiştir.
+```c
+struct Data{ /* enclosure struct */
+	int a,b;
+	struct { /* anonimous-structure */
+		int x,y;
+	};
+};
+int main(void){
+	struct Nec mynec; /* LEGAL for C11 programming */
+	printf("%d\n",Data.x);
+}
+```
+- Derleyici anonim yapının elemanlarına enclosure struct sayesinde erişimi mümkün kılar.
+
+- Çoğu yapıların kullanımında yapı elemanı başka bir yapının türünden olabilir.
+```c
+#include "date.h"
+struct Employee{
+	int id;
+	char name[20];
+	char adress[40];
+	Date birth_date;	
+};
+
+int main(void){
+	struct Employee hande;
+	Date* hande_ptr = set_date(&(hande.birth_date),22,02,2000);
+	print_date(hande_ptr);
+}
+
+/*
+out:
+22 Subat 2000 Sali
+*/
+```
+
+
+- `person.c` dosyasında iç içe yapıları barındıran kütüphane implementasyonu bulunmaktadır.
+- Test kodu:
+```c
+/* dynamic test code for person.h*/
+void print_person_array(Person* p_arr,size_t size){
+	while(size--){
+		print_person(p_arr++);
+	}
+}
+void set_person_array(Person* p_arr,size_t size){
+	while(size--){
+		set_random_person(p_arr++);
+	}
+}
+int cmp_person_callback(const void* vp1, const void* vp2){
+	const Person* person_1 = (const Person*)vp1;
+	const Person* person_2 = (const Person*)vp2;
+
+	return cmp_person(person_1,person_2);
+}
+
+
+
+int main(void){
+	size_t n;
+	printf("kac kisi ");
+	scanf("%d",&n);
+
+	Person* p_arr = (Person*)malloc(n * sizeof(Person));
+	if(!p_arr){
+		printf("bellek yetersiz\n");
+	}
+	set_person_array(p_arr,n);
+	print_person_array(p_arr,n);
+	printf("\nsorting starts now\n");
+	qsort(p_arr,n,sizeof(Person),cmp_person_callback);
+	printf("\nsorting ended.\n");
+	printf("sorted array:\n");
+	print_person_array(p_arr,n);
+
+	free(p_arr);
+}
+```
+
+
+## Linked List
+
+- Dinamik diziler kadar olmasa da sık kullanılan bir veri yapısıdır.
+- Dinamik dizilerde sondan ekleme hariç diğer ekleme işlemleri linear complexity kompleksine sahiptir.
+- linked list **node** denilen birimlerden oluşur.
+- **Her düğüm data ve bir başka düğümü işaret eden bir pointer barındırır.**
+
+
+```mermaid
+graph LR
+    subgraph Array
+        A0["Index: 0 | Value: 24 | Address: 0x100"]
+        A1["Index: 1 | Value: 42 | Address: 0x104"]
+        A2["Index: 2 | Value: 12 | Address: 0x108"]
+        A3["Index: 3 | Value: 80 | Address: 0x112"]
+        A4["Index: 4 | Value: 95 | Address: 0x116"]
+        A5["Index: 5 | Value: 75 | Address: 0x120"]
+    end
+
+    subgraph LinkedList
+        Head["Head: 24 | Pointer: 0x104"]
+        Node2["Value: 42 | Pointer: 0x108"]
+        Node3["Value: 12 | Pointer: 0x112"]
+        Node4["Value: 80 | Pointer: 0x116"]
+        Node5["Value: 95 | Pointer: 0x120"]
+        Tail["Value: 75 | Pointer: NULL"]
+    end
+
+    %% Array connections
+    A0 --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 --> A4
+    A4 --> A5
+
+    %% Linked List connections
+    Head --> Node2
+    Node2 --> Node3
+    Node3 --> Node4
+    Node4 --> Node5
+    Node5 --> Tail
+
+```
+
+- Bir elemanı kullanarak yalnızca o elemandan sonraki elemanlara erişilebiliyorsa buna **singly linked-list** denir.
+- Hem önceki hem sonraki düğüme erişilebiliyorsa buna da **doubly linked list** denir.
+>[!INFO]
+>Tekli bağlı listede düğüm içerisinde yalnızca 1 adet sonraki düğümün adresini tutan pointer olmasına karşın, çiftli bağlı listede 2 adet pointer bulunur. Biri önceki düğümün adresini tutarken diğeri de sonraki düğümün adresini tutar.
+
+| **Kriter**              | **Dinamik Dizi (Dynamic Array)**                                                 | **Bağlı Liste (Linked List)**                                                                              |
+| ----------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Index ile Erişim**    | Daha avantajlı                                                                   | Dezavantajlı                                                                                               |
+| **Değer ile Erişim**    | Bağlı liste ile eşit                                                             | Dinamik dizi ile eşit                                                                                      |
+| **Öğe Ekleme ve Silme** | Dezavantajlı                                                                     | Çok daha avantajlı                                                                                         |
+| **Bellek Kullanımı**    | Daha avantajlı                                                                   | Dezavantajlı<br>- Her düğüm için ekstra pointer tutulur.<br>- Her düğüm için allocation işlemleri yapılır. |
+| **Cache Uyumluluğu**    | Avantajlı (öğelerin ardışık olması nedeniyle)                                    | Dezavantajlı                                                                                               |
+| **Fragmentation**       | Dezavantajlı (öğe sayısının çok fazla olduğu durumlarda)                         | Bazen avantajlı                                                                                            |
+| **Swap İşlemleri**      | Dezavantajlı (swap işlemleri için daha karmaşık süreç)                           | Avantajlı (sadece pointerların değiştirilmesi yeterlidir)                                                  |
+| **Vektörizasyon**       | Avantajlı (işlemcinin vektörizasyon komutlarının avantajlarından faydalanabilir) | Dezavantajlı (vektörizasyon avantajından faydalanamaz)                                                     |
+>[!TIP]
+>Linked-list i dolaşırken son düğümü anlamanın en kolay yolu son düğümde `NULL Pointer` kullanmaktır.
+
+- Linked-list yapısının kullanım sonrası kesinlikle **free** edilmesi gerekmektedir.
+
+## Handle Sistemi
+
+- Bir önceki örnekte oluşturulan `person.c` ye aşağıdaki özellikleri sağlayan yeni bir modül eklenmek istenmektedir
+	- listeye baştan ekleme yapmak (constant time)
+	- listedeki ilk öğeye her zaman erişilebilsin (constant time)
+	- listedeki öğe sayısı (constant time)
+	- Traverse / traversal (linked-list raversal)
+
+- Aşağıda bu veri yapısının handle sistemi kullanılmadan yapılan implementasyonu verilmiştir
+```c
+
+```

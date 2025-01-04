@@ -7,6 +7,8 @@
 #include <math.h>
 #include <conio.h>
 #include <time.h>
+#include "date.h"
+#include "person.h"
 #if 0
 
 #define NGAMES 10000000
@@ -5295,7 +5297,6 @@ int main(void)
 }
 #endif
 
-
 #if 0
 /* strftime() function */
 int main(void){
@@ -5353,10 +5354,9 @@ int main(void){
 	system("pause");
 	print_array(p,n);
 	free(p);
-}	
+}
 
 #endif
-
 
 #if 0
 int main(void){
@@ -5396,7 +5396,6 @@ int main(void){
 }
 #endif
 
-
 #if 0
 #include "date.h"
 
@@ -5419,7 +5418,6 @@ int main(void){
 }
 #endif
 
-
 #if 0
 #include "date.h"
 
@@ -5433,7 +5431,6 @@ int maim(void){
 	printf("%d yiinin %d ayinin %d gunu\n",get_year(&dt),get_month(&dt),get_month_day(&dt));
 }
 #endif
-
 
 #if 0
 /* memory allocation remind */
@@ -5578,8 +5575,7 @@ int main(void){
 }
 #endif
 
-
-#if 1
+#if 0
 /* test code for n_days_after and before */
 #include "date.h"
 int main(void){
@@ -5600,5 +5596,221 @@ int main(void){
 	n_days_before(&before_date,&today,n);
 	printf("\nn gun oncesi: ");
 	print_date(&before_date);
+}
+#endif
+
+#if 0
+/* Composition */
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec nec;
+};
+
+int main(int argc, char const *argv[])
+{
+	printf("sizeof double = %zu\n",sizeof(double));
+	printf("sizeof(struct Nec) = %zu\n",sizeof(struct Nec));
+	printf("sizeof(struct Erg) = %zu\n",sizeof(struct Erg));
+
+}
+#endif
+
+#if 0
+/* Composition */
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec nec;
+};
+
+int main(int argc, char const *argv[])
+{
+	//struct Erg erg = {1.2,2.3,{31,69,32}};
+
+	struct Erg erg = { .nec.a = 66};
+	printf("%d\n",erg.nec.a);
+}
+
+#endif
+#if 0
+/* Composition */
+struct Nec
+{
+	int a,b,c;
+};
+
+struct Erg{
+	double d1,d2;
+	struct Nec* necptr;
+};
+
+int main(int argc, char const *argv[])
+{
+	struct Erg erg = {};
+	struct Erg* erg_ptr = &erg;
+
+	//
+	struct Nec nec_str = {1,2,3};
+	erg.necptr = &nec_str;
+	printf("(erg.necptr->a) = %d\n",erg.necptr->a);
+	printf("(erg_ptr->necptr->b) = %d\n",erg_ptr->necptr->b);
+}
+
+#endif
+
+#if 0
+#include "date.h"
+struct Employee{
+	int id;
+	char name[20];
+	char adress[40];
+	Date birth_date;	
+};
+
+int main(void){
+	struct Employee hande;
+	Date* hande_ptr = set_date(&(hande.birth_date),22,02,2000);
+	print_date(hande_ptr);
+}
+
+#endif
+
+#if 0
+/*test code for person.h functions*/
+int main(void){
+	randomize();
+	Person rand_person_1;
+	Person rand_person_2;
+	Person* ptr_1 = set_random_person(&rand_person_1);
+	Person* ptr_2 = set_random_person(&rand_person_2);
+	print_person(&rand_person_1);
+	print_person(&rand_person_2);
+	int cmp_result = cmp_person(ptr_1,ptr_2);
+	if(cmp_result > 0){
+		printf("person 1 is greather than person 2\n");
+	}
+	else if(cmp_result < 0){
+		printf("person 2 is greather than person 1\n");
+
+	}
+	else{
+		printf("persons are equal\n");
+	}
+}
+#endif
+
+#if 0
+/* dynamic test code for person.h*/
+void print_person_array(Person *p_arr, size_t size)
+{
+	while (size--)
+	{
+		print_person(p_arr++);
+	}
+}
+void set_person_array(Person *p_arr, size_t size)
+{
+	while (size--)
+	{
+		set_random_person(p_arr++);
+	}
+}
+int cmp_person_callback(const void *vp1, const void *vp2)
+{
+	const Person *person_1 = (const Person *)vp1;
+	const Person *person_2 = (const Person *)vp2;
+
+	return cmp_person(person_1, person_2);
+}
+
+int main(void)
+{
+	size_t n;
+	clock_t clk_start;
+	clock_t clk_end;
+	printf("kac kisi ");
+	scanf("%d", &n);
+
+	Person *p_arr = (Person *)malloc(n * sizeof(Person));
+	if (!p_arr)
+	{
+		printf("bellek yetersiz\n");
+	}
+	set_person_array(p_arr, n);
+	// print_person_array(p_arr,n);
+	printf("\nsorting starts now\n");
+	clk_start = clock();
+	qsort(p_arr, n, sizeof(Person), cmp_person_callback);
+	clk_end = clock();
+	printf("\nsorting ended.sorting time = %f\n", (double)(clk_end - clk_start) / CLOCKS_PER_SEC);
+	printf("sorted array:\n");
+
+	print_person_array(p_arr, n);
+
+	free(p_arr);
+}
+
+#endif
+
+#if 0
+/* 1-test code for personlist.h  */
+#include "personlist.h"
+int main(void){
+	Person p;
+	randomize();
+	for(int i = 0; i < 10; ++i){
+		set_random_person(&p);
+		print_person(&p);
+		push_front(&p);
+	}
+
+	printf("listede %d kisi var\n",get_size());
+	print_list();
+	make_empty();
+	//...
+}
+#endif
+#if 0
+/* 2-test code for personlist.h  */
+#include "personlist.h"
+int main(void){
+	Person p;
+	randomize();
+	for(int i = 0; i < 100000; ++i){
+		set_random_person(&p);
+		push_front(&p);
+	}
+
+	printf("listede %d kisi var\n",get_size());
+	print_list();
+	make_empty();
+	//...
+}
+#endif
+#if 1
+/* 3-test code for personlist.h  */
+#include "personlist.h"
+int main(void){
+	Person p;
+	randomize();
+	for(int i = 0; i < 10; ++i){
+		set_random_person(&p);
+		push_front(&p);
+	}
+	while(!is_empty()){
+		printf("listede %d kisi var\n",get_size());
+		print_list();
+		pop_front(&p);
+	}
+
 }
 #endif
