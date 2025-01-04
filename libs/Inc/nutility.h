@@ -12,7 +12,8 @@
 extern const int primes[]; /*extern bildiriminde dizilerin boyutunu yazma mecburiyeti yoktur*/
 /*------------------------------------------------------------------*/
 /*MAKROS*/
-#define asize(x) (sizeof(x) / sizeof(x[0]))
+#define asize(x)    (sizeof(x) / sizeof(x[0]))
+#define r_elem(x)   (x[rand() % asize(x)]) 
 /*------------------------------------------------------------------*/
 /*FUNCTIONS*/
 void randomize(void);
@@ -42,5 +43,6 @@ void gswap(void* vp1, void* vp2, size_t size);
 void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*));
 char *my_strdup(const char *str);
 int isprime(int n);
+const char* get_random_name(void);
 /*------------------------------------------------------------------*/
 #endif // NUTILITY_H
