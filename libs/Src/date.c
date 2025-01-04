@@ -1,3 +1,5 @@
+/*------------------------------------------------------*/
+/* INCLUDES */
 #include "date.h"
 #include <string.h>
 #include <stdio.h>
@@ -216,7 +218,7 @@ PUBLIC Date *set_year(Date *p, int y)
 /*------------------------------------------------------*/
 /* utility functions */
 /*------------------------------------------------------*/
-int cmp_date(const Date *p1, const Date *p2)
+PUBLIC int cmp_date(const Date *p1, const Date *p2)
 {
     int y1 = get_year(p1);
     int m1 = get_month(p1);
@@ -250,7 +252,7 @@ Date *n_days_before(Date *pdest, const Date *psource, int n){
 /*------------------------------------------------------*/
 /* formatted input-output functions */
 /*------------------------------------------------------*/
-void print_date(const Date *p)
+PUBLIC void print_date(const Date *p)
 {
     PRIVATE const char *pmonths[] = {"", "Ocak", "Subat", "Mart", "Nisan", "Mayis", "Haziran", "Temmuz", "Agustos", "Eylul", "Ekim", "Kasim", "Aralik"};
     PRIVATE const char *pdays[] = {"Pazar", "Pazartesi", "Sali", "Carsamba", "Persembe", "Cuma", "Cumatesi"};
