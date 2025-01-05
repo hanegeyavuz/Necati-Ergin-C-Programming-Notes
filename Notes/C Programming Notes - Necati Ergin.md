@@ -11405,15 +11405,509 @@ graph LR
 
 - Linked-list yapısının kullanım sonrası kesinlikle **free** edilmesi gerekmektedir.
 
+# Lesson 53
+
 ## Handle Sistemi
 
 - Bir önceki örnekte oluşturulan `person.c` ye aşağıdaki özellikleri sağlayan yeni bir modül eklenmek istenmektedir
 	- listeye baştan ekleme yapmak (constant time)
 	- listedeki ilk öğeye her zaman erişilebilsin (constant time)
 	- listedeki öğe sayısı (constant time)
-	- Traverse / traversal (linked-list raversal)
+	- Traverse / traversal print (linked-list raversal)
 
 - Aşağıda bu veri yapısının handle sistemi kullanılmadan yapılan implementasyonu verilmiştir
 ```c
+#include "personlist.h"
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Node
+{
+    Person per;
+    struct Node *pnext;
+} Node;
 
+static Node *gpfirst = NULL;
+static int gcount = 0;
+
+static Node *create_node(void)
+{
+    Node *p = malloc(sizeof(Node));
+    if (!p)
+    {
+        printf("bellek yetersiz");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+void push_front(const Person *p) {
+    Node* pnewnode = create_node();
+    pnewnode->per = *p;
+    pnewnode->pnext = gpfirst;
+    gpfirst = pnewnode;
+    gcount++;
+}
+void pop_front(void) {
+    if(is_empty()){
+        printf("bos liste hatasi!");
+        exit(EXIT_FAILURE);
+    }
+    Node* ptemp = gpfirst;
+    gpfirst = gpfirst->pnext;
+    free(ptemp);
+    --gcount;
+}
+void get_first(Person *p) {
+    if(is_empty()){
+        printf("bos liste hatasi!");
+        exit(EXIT_FAILURE);
+    }
+    *p = gpfirst->per;
+}
+int get_size(void)
+{
+    return gcount;
+}
+void print_list(void) {
+    for(Node* p = gpfirst; p != NULL; p = p->pnext){
+        print_person(&p->per);
+    }
+    printf("\n-------------------------------\n");
+}
+void make_empty(void) {
+    while(!is_empty()){
+        pop_front();
+    }
+}
+int is_empty(void)
+{
+    return gcount == 0;
+}
 ```
+
+#### Problem nedir?
+
+- Bu veri yapısında tüm fonksiyonların aynı listeyi kullanması gerekiyor.
+- Birden fazla liste ile işlem yapılamıyor.
+- Kullanılabilirliği çok azdır.
+- Problem çözümü için **handle sistemi** kullanılmaktadır.
+	- Handle sisteminde ortak kullanılan data'lar bir struct içerisinde toplanır. 
+	- Create list ve destroy list gibi fonksiyonlar ile başlangıç bitiş yapılır.
+	- Tüm fonksiyonlar handle adı verilen struct nesnesinin adresini parametre olarak alır ve işlem yapar.
+	- Böylelikle birden fazla liste ile çalışma sağlanabilir.
+- Örnek implementasyon
+```c
+#include "personlist.h"
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct Node
+{
+    Person per;
+    struct Node *pnext;
+} Node;
+
+struct List
+{
+    Node *mpfirst;
+    int mcount;
+};
+
+ListHandle create_list(void)
+{
+    ListHandle lh = malloc(sizeof(struct List));
+    if (!lh)
+    {
+        return NULL;
+    }
+    lh->mpfirst = NULL;
+    lh->mcount = 0;
+    return lh;
+}
+void destroy_list(ListHandle lh)
+{
+    make_empty(lh);
+    free(lh);
+}
+
+static Node *create_node(void)
+{
+    Node *p = malloc(sizeof(Node));
+    if (!p)
+    {
+        printf("bellek yetersiz");
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
+void push_front(ListHandle lh, const Person *p)
+{
+    Node *pnewnode = create_node();
+    pnewnode->per = *p;
+    pnewnode->pnext = lh->mpfirst;
+    lh->mpfirst = pnewnode;
+    lh->mcount++;
+}
+void pop_front(ListHandle lh)
+{
+    if (is_empty(lh))
+    {
+        printf("bos liste hatasi!");
+        exit(EXIT_FAILURE);
+    }
+    Node *ptemp = lh->mpfirst;
+    lh->mpfirst = lh->mpfirst->pnext;
+    free(ptemp);
+    --lh->mcount;
+}
+void get_first(ListHandle lh, Person *p)
+{
+    if (is_empty(lh))
+    {
+        printf("bos liste hatasi!");
+        exit(EXIT_FAILURE);
+    }
+    *p = lh->mpfirst->per;
+}
+int get_size(ListHandle lh)
+{
+    return lh->mcount;
+}
+void print_list(ListHandle lh)
+{
+    for (Node *p = lh->mpfirst; p != NULL; p = p->pnext)
+    {
+        print_person(&p->per);
+    }
+    printf("\n-------------------------------\n");
+}
+void make_empty(ListHandle lh)
+{
+    while (!is_empty(lh))
+    {
+        pop_front(lh);
+    }
+}
+int is_empty(ListHandle lh)
+{
+    return lh->mcount == 0;
+}
+```
+
+- test code:
+```c
+#include "personlist.h"
+/*test code for handle system*/
+int main(void){
+	randomize();
+	Person p;
+
+	ListHandle h1 = create_list();
+	for(int i = 0; i < 10; ++i){
+		set_random_person(&p);
+		push_front(h1,&p);
+	}
+	ListHandle h2 = create_list();
+	for(int i = 0; i < 20; ++i){
+		set_random_person(&p);
+		push_front(h2,&p);
+	}
+	ListHandle h3 = create_list();
+	for(int i = 0; i < 8; ++i){
+		set_random_person(&p);
+		push_front(h3,&p);
+	}
+	print_list(h1);
+	print_list(h2);
+	print_list(h3);
+}
+```
+
+
+## Alignment (Hizalama)
+- Bellekteki değişkenler byte'lardan oluşan adreslerde tutulur.
+- Örneğin `int` türü 4 byte'lık bloklarda tutulur.
+- **Sisteme göre farklılık göstermesine karşın; bellekte değişkenler belirli tam sayıların katları olan adreslerde tutulur.**
+	- Bu durum işlemcinin nesnelere erişimini kolaylaştırır.
+	- Buna **data alignment** denir.
+```c
+int main(void){
+	int x = 5;
+	int y = 10;
+	double d1 = 3.4;
+
+	double d2 = 2.2;
+
+	printf("%d\n",(unsigned)&x % 4 == 0);
+	printf("%d\n",(unsigned)&y % 4 == 0);
+	printf("%d\n",(unsigned)&d1 % 8 == 0);
+	printf("%d\n",(unsigned)&d2 % 8 == 0);
+}
+
+/*
+out:
+1
+1
+1
+1
+*/
+```
+- Görüldüğü üzere işlemci, `double` türden nesneleri 8 byte'lık adreslere yerleştirirken `int` türden nesneleri 4 byte'lık adreslere yerleştirir.
+	- Buna **alignment requirement** denir.
+	- Türün önemli özelliklerinden biridir.
+	- C99 standardı ile compile time'da **`_Alignof`** anahtar sözcüğü ile elde edilebilir.
+		- Yine C99 ile dile eklenen `stdalign.h` kütüphanesinde bulunan **`alignof()`** makrosu kullanılarak da pre-processing sırasında elde edilebilir.
+	- sizeof değeri ile her zaman aynı değerde olmak zorunda değildir.
+```c
+/* alignment requirement */
+/* alignment requirement */
+typedef struct {
+	int x,y,z;
+	char c1,c2;
+}data;
+
+int main(void){
+	printf("sizeof(int) = %d\n",sizeof(int));
+	printf("_Alignof(int) = %d\n",_Alignof(int));
+	printf("sizeof(double) = %d\n",sizeof(double));
+	printf("_Alignof(double) = %d\n",_Alignof(double));
+	printf("sizeof(int[100]) = %d\n",sizeof(int[100]));
+	printf("_Alignof(int[100]) = %d\n",_Alignof(int[100]));
+	printf("sizeof(data) = %d\n",sizeof(data));
+	printf("_Alignof(data) = %d\n",_Alignof(data));
+}
+
+/*
+out:
+sizeof(int) = 4
+_Alignof(int) = 4
+sizeof(double) = 8
+_Alignof(double) = 8
+sizeof(int[100]) = 400
+_Alignof(int[100]) = 4
+sizeof(data) = 16
+_Alignof(data) = 4
+*/
+```
+
+- Dizilerin alignment requirement değeri dizinin 1 elemanının align. req. değeridir.
+- Yapıların alignment requirement değeri yapının en yüksek elemanının align. req. değeridir.
+
+#### Neden işlemci bu şekilde yerleştiriyor?
+- İşlemci veriye byte byte erişmez. Kelime kelime erişir.
+- Diyelim ki kelime 4 byte olsun, işlemci 4 byte'a erişir.
+- bir nesnenin 2 kelimeye bölünmesi bazı işlemcilerin istese de yapabileceği bir işlem değilken, bazı işlemciler için de zorlu bir işlemdir. 
+
+- Hizalama işlemini default olan alignment req. yerine başka bir değer ile hizalamak için C11 ile dile eklenen `_Alignas(64)` anahtar sözcüğü kullanılabilmektedir.
+```c
+_Alignas(64) char buf[64]; /*derleyici diziyi 64 ün katı olan bir yere yerleştirir.*/
+```
+
+
+### Yapılar ve Alignment
+
+- Hizalama konusu yapılarda ayrıca önemlidir.
+
+```c
+typedef struct {
+	char c1;
+	int i;
+	char c2;
+	long long lval;
+	char c3;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+/*
+out:
+sizeof(data) = 32
+*/
+```
+- char c1 = 1 byte, int i = 4 byte, char c2 = 1 byte, long long lval = 8 byte, char c3 = 1 byte TOPLAMDA 15 BYTE OLMASINA RAĞMEN SONUÇ 32 ÇIKTI NEDEN?
+- Bellekteki görünüm aşağıdaki gibidir:
+
+| Adress | variable |         |
+| ------ | -------- | ------- |
+| 1000   | c1       |         |
+| 1001   | **       | padding |
+| 1002   | **       | padding |
+| 1003   | **       | padding |
+| 1004   | i        |         |
+| 1005   | i        |         |
+| 1006   | i        |         |
+| 1007   | i        |         |
+- Görüldüğü üzere işlemci c1 i yerleştirdikten sonra 4 byte yerleştireceği için ve 4 ün katı olan bir yere yerleştirmesi gerektiği için 1002 yerine 1004 e yerleştirmiştir. 
+	- Bu şekilde yerleştirme devam eder ve sonuç olarak 32 byte yer ayırılır.
+	- 15 byte yerine 32 byte alan kaplanarak 17 byte boşa alan kaplanmış olur. Bu durum Gömülü Sistem Programlama gibi alanlarda ciddi öneme sahiptir.
+- Bu durumu engellemek için derleyicilerin bazılarında `pack()` isimli pragra kullanılır.
+```c
+/* alignment requirement pack(1) pragma*/
+#include "stdalign.h"
+#pragma pack(1)
+typedef struct {
+	char c1;
+	int i;
+	char c2;
+	long long lval;
+	char c3;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+/*
+out:
+sizeof(data) = 15
+*/
+```
+
+- Bu durum verimlilik anlamında kötü de olsa memory usage anlamında iyileştirici bir etkendir.
+- Derleyici extension'larını kullanmadan da bu işlemi yapmanın en basit yolu align. req. a göre **büyükten küçüğe** doğru struct içerisindeki nesneleri sırasıyla yerleştirmek olur.
+```c
+/* alignment requirement */
+#include "stdalign.h"
+typedef struct {
+	long long lval;
+	int i;
+	char c1;
+	char c2;
+	char c3;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+/*
+out:
+sizeof(data) = 16
+*/
+```
+
+- padding oluşturacak bir yapı örneği:
+```c
+/* alignment requirement */
+#include "stdalign.h"
+typedef struct {
+	char c1;
+	int i1;
+	char c2;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+/*
+out:
+sizeof(data) = 12
+*/
+```
+- bellek yerleşimi aşağıdaki gibidir:
+
+
+| c1      |
+| ------- |
+| padding |
+| padding |
+| padding |
+| i1      |
+| i1      |
+| i1      |
+| i1      |
+| c2      |
+| padding |
+| padding |
+| padding |
+- **Sondaki 3 padding'in sebebi struct'ın align req. değerinin en büyük tür olan `int` dolayısıyla 4 byte olmasıdır.**
+
+>[!ERROR]
+>- Yapı nesnesinin başında padding olamaz.
+>- Yapının align. req. i en büyük elemanının align. req. i olduğuna göre, bu değer aynı zamanda işlemcinin okuyacağı kelime uzunluğudur.
+>- yapıların sizeof'unu kullanırken her zaman `sizeof()` operatörünü kullanmalısınız.
+>- Bir pointer değişkenin gösterdiği nesneden sonra bir sonraki değişkene erişmek için pointer aritmetiği kullanılırken padding'lere dikkat edilmelidir.
+>	- **Örneğin yukarıdaki yapıda c1 i işaret eden bir pointer değişkenin değeri 1 arttırılırsa i1 e erişilemez. **
+>	- Bunun için `OFFSETOF` makrosu kullanılabilir.
+>- İki aynı türden yapı nesnesinin equality karşılaştırmasında tüm değerlerin kontrol edilmesi yerine `memcmp()` fonksiyonu kullanılarak yapılan karşılaştırma doğru olmayacaktır. Çünkü padding'lerde ne değer olduğunu bilemeyiz! Paddinglerin temizlenmesi sonrasında bu işlem yapılabilir.
+
+
+### `offsetof()` Macro
+```c
+offsetof(type, member);
+```
+#### Parametreler
+**type**: Bir yapı veya bileşimi gösteren veri türüdür.
+**member**: Type parametresinde gösterilen yapı veya bileşime ait bir değişkeni gösterir.
+- Fonksiyonel yapıda olan bu makro, bir yapı veya bileşim veri türü içinde yer alan değişkenin offset adres değerini size_t türünde bir sabit tamsayı olarak geri döndürür.
+#### Dönüş değeri
+- Type parametresinde yer alan yapı veya bileşime ait olup member parametresi ile gösterilen değişkenin offset adres değeri geri döndürülür.
+```c
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+int main(void){
+	data mydata = {
+		.c1 = 55,
+		.i = 32425,
+		.c2 = 78
+	};
+	printf("offset for c1 = %zu\n",offsetof(data,c1));
+	printf("offset for c2 = %zu\n",offsetof(data,c2));
+	printf("offset for i = %zu\n",offsetof(data,i));
+
+
+}
+/*
+out:
+offset for c1 = 0
+offset for c2 = 8
+offset for i = 4
+*/
+```
+
+---
+### Klasik Mülakat Sorusu
+- `offsetof()` makrosunu kendiniz implemente ediniz.
+
+```c
+#define Offsetof(s,m)		((size_t)&(((s*)0)->m))
+```
+
+---
+
+
+- `offsetof()` makrosu ile pointer aritmetiği ile yapı elemanlarına erişim çok daha rahattır.
+```c
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+int main(void){
+	data mydata = {
+		.c1 = 55,
+		.i = 32425,
+		.c2 = 78
+	};
+	char* pchar = &mydata.c1;
+	int* iptr = (int*)(pchar + offsetof(data,i));
+	printf("mydata.i = %d\n",*iptr);
+
+}
+/*
+out:
+mydata.i = 32425
+*/
+```
+
+2.08.00

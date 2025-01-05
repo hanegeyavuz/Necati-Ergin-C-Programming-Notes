@@ -5785,18 +5785,19 @@ int main(void){
 int main(void){
 	Person p;
 	randomize();
-	for(int i = 0; i < 100000; ++i){
+	for(int i = 0; i < 500000; ++i){
 		set_random_person(&p);
 		push_front(&p);
 	}
 
 	printf("listede %d kisi var\n",get_size());
+	(void)getchar();
 	print_list();
 	make_empty();
 	//...
 }
 #endif
-#if 1
+#if 0
 /* 3-test code for personlist.h  */
 #include "personlist.h"
 int main(void){
@@ -5813,4 +5814,158 @@ int main(void){
 	}
 
 }
+#endif
+
+
+#if 0
+#include "personlist.h"
+/*test code for handle system*/
+int main(void){
+	randomize();
+	Person p;
+
+	ListHandle h1 = create_list();
+	for(int i = 0; i < 10; ++i){
+		set_random_person(&p);
+		push_front(h1,&p);
+	}
+	ListHandle h2 = create_list();
+	for(int i = 0; i < 20; ++i){
+		set_random_person(&p);
+		push_front(h2,&p);
+	}
+	ListHandle h3 = create_list();
+	for(int i = 0; i < 8; ++i){
+		set_random_person(&p);
+		push_front(h3,&p);
+	}
+	print_list(h1);
+	print_list(h2);
+	print_list(h3);
+}
+#endif
+
+
+#if 0
+/* alignment */
+int main(void){
+	int x = 5;
+	int y = 10;
+	double d1 = 3.4;
+
+	double d2 = 2.2;
+
+	printf("%d\n",(unsigned)&x % 4 == 0);
+	printf("%d\n",(unsigned)&y % 4 == 0);
+	printf("%d\n",(unsigned)&d1 % 8 == 0);
+	printf("%d\n",(unsigned)&d2 % 8 == 0);
+}
+
+#endif
+#if 0
+/* alignment requirement pack(1) pragma*/
+#include "stdalign.h"
+#pragma pack(1)
+typedef struct {
+	char c1;
+	int i;
+	char c2;
+	long long lval;
+	char c3;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+
+#endif
+#if 0
+/* alignment requirement */
+#include "stdalign.h"
+typedef struct {
+	char c1;
+	int i1;
+	char c2;
+}data;
+
+int main(void){
+	printf("sizeof(data) = %zu\n",sizeof(data));
+}
+
+#endif
+
+#if 0
+/*offsetof macro usage*/
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+int main(void){
+	data mydata = {
+		.c1 = 55,
+		.i = 32425,
+		.c2 = 78
+	};
+	printf("offset for c1 = %zu\n",offsetof(data,c1));
+	printf("offset for c2 = %zu\n",offsetof(data,c2));
+	printf("offset for i = %zu\n",offsetof(data,i));
+
+
+}
+#endif
+
+#if 0
+/*offsetof macro implementation*/
+
+#define Offsetof(s,m)		((size_t)&(((s*)0)->m))
+
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+int main(void){
+	data mydata = {
+		.c1 = 55,
+		.i = 32425,
+		.c2 = 78
+	};
+	printf("offset for c1 = %zu\n",Offsetof(data,c1));
+	printf("offset for c2 = %zu\n",Offsetof(data,c2));
+	printf("offset for i = %zu\n",Offsetof(data,i));
+
+}
+#endif
+
+#if 1
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+int main(void){
+	data mydata = {
+		.c1 = 55,
+		.i = 32425,
+		.c2 = 78
+	};
+	char* pchar = &mydata.c1;
+	int* iptr = (int*)(pchar + offsetof(data,i));
+	printf("mydata.i = %d\n",*iptr);
+
+}
+
 #endif
