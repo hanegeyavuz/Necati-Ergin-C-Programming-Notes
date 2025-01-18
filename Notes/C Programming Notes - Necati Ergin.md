@@ -594,6 +594,79 @@ int w = '\054'   // Octal
 |            | `&= ^=         | =`                                                | Assignment by bitwise AND, XOR, and OR |            |
 |     15     | `,`            | Comma                                             | Left-to-right                          |            |
 
+
+## Necati Ergin Operator Öncelik Tablosu
+
+```c
+/*
+
+  ----------------------------------------------------------------
+  |                     OPERATOR PRIORITY LIST                   |
+  ----------------------------------------------------------------
+  1.  ()      function call operator
+      []      subscript operator
+      .       dot operator    (member-selection operators)
+      ->      arrow operator  (member-selection operators)      
+  ----------------------------------------------------------------
+  2.  !       logical NOT
+      ~       bitwise NOT
+      +       sign operator (plus)
+      -       sign operator (minus)
+      ++      increment operator              [RIGHT ASSOCIATIVE]
+      --      decrement operator
+      &       address-of operator
+      *       dereferencing operator
+      sizeof  sizeof operator
+      (type)  type-cast operator
+  ----------------------------------------------------------------
+  3.  *       multplication operator
+      /       division operator
+      %       modulus operator
+  ----------------------------------------------------------------
+  4.  +       addition operator
+      -       substraction operator
+  ----------------------------------------------------------------
+  5.  >>      bitwise right shift
+      <<      bitwise left shift
+  ----------------------------------------------------------------
+  6.  >       greater than
+      >=      greater or equal
+      <       less than
+      <=      less or equal     (relational / comparison operators)
+  ----------------------------------------------------------------
+  7.  ==      equal to 
+      !=      not equal         (equality / comparison operators)
+  ----------------------------------------------------------------
+  8.  &       bitwise AND
+  ----------------------------------------------------------------
+  9.  ^       bitwise XOR
+  ----------------------------------------------------------------
+  10. |       bitwise OR
+  ----------------------------------------------------------------
+  11. &&      logical AND
+  ----------------------------------------------------------------
+  12. ||      logical OR
+  ----------------------------------------------------------------
+  13. ? :     ternary operator                  [RIGHT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  14. =       assignment operator
+      +=      assignment by sum
+      -=      assignment by difference
+      *=      assignment by product
+      /=      assignment by quotient
+      %=      assignment by remainder           [RIGHT ASSOCIATIVE]
+      &=      assignment by bitwise AND
+      ^=      assignment by bitwise XOR
+      |=      assignment by bitwise OR
+      >>=     assignment by bitwise left shift 
+      <<=     assignment by bitwise right shift 
+  ----------------------------------------------------------------
+  15. ,       comma operator
+  ----------------------------------------------------------------
+*/
+
+```
+
 # 09.08.2024
 
 ## Operators Cont'd
@@ -11741,7 +11814,7 @@ sizeof(data) = 32
 - Görüldüğü üzere işlemci c1 i yerleştirdikten sonra 4 byte yerleştireceği için ve 4 ün katı olan bir yere yerleştirmesi gerektiği için 1002 yerine 1004 e yerleştirmiştir. 
 	- Bu şekilde yerleştirme devam eder ve sonuç olarak 32 byte yer ayırılır.
 	- 15 byte yerine 32 byte alan kaplanarak 17 byte boşa alan kaplanmış olur. Bu durum Gömülü Sistem Programlama gibi alanlarda ciddi öneme sahiptir.
-- Bu durumu engellemek için derleyicilerin bazılarında `pack()` isimli pragra kullanılır.
+- Bu durumu engellemek için derleyicilerin bazılarında `pack()` isimli pragma kullanılır.
 ```c
 /* alignment requirement pack(1) pragma*/
 #include "stdalign.h"
@@ -11910,4 +11983,332 @@ mydata.i = 32425
 */
 ```
 
-2.08.00
+
+>[!NOTE]
+>`memset()` fonksiyonu ile yapıyı temizledikten sonra yapıların `memcmp()` ile karşılaştırılmasında herhangi bir sakınca yoktur.
+
+
+```c
+#include <stddef.h>
+#include <stdalign.h>
+
+typedef struct {
+	char c1; // offset = 0
+	int i;	 // offset = 4
+	char c2; // offset = 8
+}data;
+
+#define clear_struct(x)    (memset(&x,0,sizeof(x)))
+
+int main(void){
+	Data dx,dy;
+
+	clear_struct(dx);
+	clear_struct(dy);
+
+	if(!memcmp(&dx,&dy,sizeof(Data))){
+		printf("yapilar esit\n");
+	}
+	else{
+		printf("yapilar esit degil\n");
+	}
+}
+
+/*
+out:
+yapilar esit
+
+*/
+
+```
+
+---
+# Lesson 54
+
+## Unions
+
+- Belirli başlı bazı özellikler dışında `yapılar` ile aynı özellikleri taşırlar.
+```c
+union Data {
+	int x,y;
+	double d;
+	char s[12];
+};
+```
+
+
+### Struct - Union Differences
+
+- **Union `sizeof` değeri en büyük `sizeof` değerine sahip elemanının sizeof değerine eşittir.**
+- Birlik nesnelerinin(Unions) tüm elemanlarının adresleri aynıdır.
+- Elemanların hepsi aynı belleği **paylaşır**.
+- Bir elemanın değeri değişince diğer elemanlar da değişir.
+
+### Unions Initialization 
+- Struct nesnelerine nazaran union'lara ilk değer verilirken yalnızca tek bir elemana ilk değer verilebilir. 
+- Designated Initialization Union yapıları için de geçerlidir.
+
+```c
+typedef union {
+	int x
+	int y;
+	double d;
+	char s[12];
+}Udata;
+
+int main(void){
+	Udata u = {23}; /* x = 23 */
+	// or
+	Udata u = {.d = 2.2};
+
+}
+```
+
+
+### En Sık Kullanım Senaryosu
+1. Bir varlığın farklı iki şekilde temsil edilmesi
+- Örnek olarak:
+	- Öyle bir tamsayı türü olsun ki hem 4 byte lık bir tamsayı olarak hem 2 byte lık 2 adet tamsayı olarak hem de 1 byte lık 4 adet tamsayı olarak kullanabilsin.
+```c
+typedef struct
+{
+	uint16_t high_bytes;
+	uint16_t low_bytes;
+
+}Word;
+
+typedef union
+{
+	uint32_t uval;
+	Word w;
+	uint8_t per_bytes[4];
+}Myint;
+
+
+
+/* UNIONS */
+int main(void)
+{
+	Myint m;
+	printf("sizeof(Myint) = %zu\n",sizeof(Myint));
+	printf("sizeof(Word) = %zu\n",sizeof(Word));
+	printf("sizeof(m.per_bytes) = %zu\n",sizeof(m.per_bytes));
+}
+/*
+out:
+sizeof(Myint) = 4
+sizeof(Word) = 4
+sizeof(m.per_bytes) = 4
+*/
+```
+
+2. Aynı anda kullanılmayacak elemanların bellek tasarrufu ile tanımlanması
+	- Bir bireyin kadın ise *kızlık soyadına* erkek ise *askerlik durumuna* erişebilen bir yapı oluşturulmak istenirse aşağıdaki gibi oluşturulabilir: 
+```c
+typedef struct{
+	int no;
+	int gender;
+	char name[20];
+	union{
+		struct {
+			int status;
+			char place[20];
+		};
+		char maiden_name[24];
+	};
+}Person;
+
+```
+- **Yukarıdaki örnekte `maiden_name` değişkeni ve askerlik bilgileri `union` içerisinde tanımlanarak aynı belleği paylaşmaları sağlanmıştır. Aynı kişi için ikisi de birlikte kullanılmayacağından bellek tasarrufu sağlanmıştır.**
+
+3. *tagged union*: Bir değişkenin başka bir değişken türünden değere sahip olunacağı derleme zamanından önce bilinerek oluşturulan değişkenlerdir. C++'da bunlar `variant` olarak isimlendirilir.
+	- Örneğin bir değişken hem tam sayı, hem tarih, hem isim hem bir gerçek sayı olabilsin
+```c
+/* tagged union*/
+#define NAME 0
+#define DOUBLE 1
+#define DATE 2
+#define NUMBER 3
+
+#include "date.h"
+typedef struct
+{
+	union
+	{
+		char name[20];
+		double dval;
+		Date dt;
+		int ival;
+	};
+	int type;
+} NecType;
+
+void set_nec(NecType *p)
+{
+	switch (rand() % 4)
+	{
+	case NAME:
+		p->type = NAME;
+		strcpy(p->name, get_random_name());
+		break;
+	case DOUBLE:
+		p->type = DOUBLE;
+		p->dval = rand() % 31;
+		break;
+	case DATE:
+		p->type = DATE;
+		set_random_date(&p->dt);
+		break;
+	case NUMBER:
+		p->type = NUMBER;
+		p->ival = rand() % 31;
+		break;
+	default:
+		break;
+	}
+}
+
+void print_necc(const NecType *p)
+{
+	switch (p->type)
+	{
+	case NAME:
+		printf("%s\n", p->name);
+		break;
+	case DOUBLE:
+		printf("%f\n", p->dval);
+		break;
+	case DATE:
+		print_date(&p->dt);
+		break;
+	case NUMBER:
+		printf("%d\n", p->ival);
+		break;
+	default:
+		break;
+	}
+}
+
+int main(void)
+{
+	NecType n;
+	for (int i = 0; i < 31; ++i)
+	{
+		set_nec(&n);
+		print_necc(&n);
+		putchar('\n');
+	}
+}
+
+```
+
+## Enumerations
+
+### Syntax
+
+```c
+enum color{ /* color -> enum tag -> zorunlu değil */
+	WHITE, /* enum constants */
+	YELLOW,
+	GRAY,
+	GREEN,
+	BLACK
+};
+```
+
+- typedef bildirimi mümkündür.
+```c
+typedef enum color{ /* color -> enum tag -> zorunlu değil */
+	WHITE, /* enum constants */
+	YELLOW,
+	GRAY,
+	GREEN,
+	BLACK
+}color;
+
+/* or */
+
+typedef enum { /* color -> enum tag -> zorunlu değil */
+	WHITE, /* enum constants */
+	YELLOW,
+	GRAY,
+	GREEN,
+	BLACK
+}color;
+
+
+```
+
+- **Özel bir numaralandırma verilmediği sürece enum nesnelerinin elemanlarının değeri ilk eleman 0 olacak şekilde birer birer artarak gider.**
+```c
+typedef enum { /* color -> enum tag -> zorunlu degil */
+	WHITE, /* enum constants */
+	YELLOW,
+	GRAY,
+	GREEN,
+	BLACK
+}color;
+
+int main(void){
+	color c = YELLOW;
+	printf("yellow enum constant value is %d\n",c);
+	printf("yellow enum constant value is %d\n",YELLOW);
+}
+
+/*
+out:
+yellow enum constant value is 1
+yellow enum constant value is 1
+
+*/
+```
+
+>[!ERROR]
+> C dilindeki enum'lara ait tür kontrolleri çok zayıftır. Yalnızca int türden değer kontrolü yapılır.
+
+```c
+typedef enum{
+	MONDAY,TUESDAS,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY,SUNDAY
+}day_e;
+
+typedef struct{
+	day_e day = 35; /* no syntax error but this is a logical error */
+}tp_t;
+
+```
+
+>[!ERROR]
+>- C dilinde iki ayrı header dosyasından gelen farklı dosyalarda aynı enum elemanı varsa ve scope'ları aynı ise bu bir syntax hatasıdır. C dilinin zayıf yönlerinden bir tanesi bu özelliktir.
+>- Sebebi ise Enum elemanlarının scope'unun Enum scope'u ile aynı olmak zorunda olmasından kaynaklanmaktadır.
+
+```c
+enum ScreenColor{
+	White,
+	Yellow,
+	Green,
+};
+
+enum trafficlight{
+	Yellow,
+	Green,
+	Red,
+};
+
+/* SYNTAX ERROR */
+```
+
+- Son elemanı number of x yaparak tüm elemanların sayısına erişebilirsiniz.
+```c
+enum Color{
+	a,
+	b,
+	c,
+	d,
+	number_of_color /* value is 4 */
+
+};
+```
+
+## Bitwise Operators and Bitwise Operations
+
+1:57:50

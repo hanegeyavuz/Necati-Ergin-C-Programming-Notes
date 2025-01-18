@@ -5816,7 +5816,6 @@ int main(void){
 }
 #endif
 
-
 #if 0
 #include "personlist.h"
 /*test code for handle system*/
@@ -5844,7 +5843,6 @@ int main(void){
 	print_list(h3);
 }
 #endif
-
 
 #if 0
 /* alignment */
@@ -5922,7 +5920,7 @@ int main(void){
 #if 0
 /*offsetof macro implementation*/
 
-#define Offsetof(s,m)		((size_t)&(((s*)0)->m))
+#define Offsetof(s, m) ((size_t) & (((s *)0)->m))
 
 #include <stddef.h>
 #include <stdalign.h>
@@ -5946,7 +5944,7 @@ int main(void){
 }
 #endif
 
-#if 1
+#if 0
 #include <stddef.h>
 #include <stdalign.h>
 
@@ -5968,4 +5966,126 @@ int main(void){
 
 }
 
+#endif
+
+#if 0
+/* UNIONS */
+typedef struct
+{
+	uint16_t high_bytes;
+	uint16_t low_bytes;
+
+}Word;
+
+typedef union
+{
+	uint32_t uval;
+	Word w;
+	uint8_t per_bytes[4];
+}Myint;
+
+
+int main(void)
+{
+	Myint m;
+	printf("sizeof(Myint) = %zu\n",sizeof(Myint));
+	printf("sizeof(Word) = %zu\n",sizeof(Word));
+	printf("sizeof(m.per_bytes) = %zu\n",sizeof(m.per_bytes));
+}
+
+#endif
+
+#if 0
+/* tagged union*/
+#define NAME 0
+#define DOUBLE 1
+#define DATE 2
+#define NUMBER 3
+
+#include "date.h"
+typedef struct
+{
+	union
+	{
+		char name[20];
+		double dval;
+		Date dt;
+		int ival;
+	};
+	int type;
+} NecType;
+
+void set_nec(NecType *p)
+{
+	switch (rand() % 4)
+	{
+	case NAME:
+		p->type = NAME;
+		strcpy(p->name, get_random_name());
+		break;
+	case DOUBLE:
+		p->type = DOUBLE;
+		p->dval = rand() % 31;
+		break;
+	case DATE:
+		p->type = DATE;
+		set_random_date(&p->dt);
+		break;
+	case NUMBER:
+		p->type = NUMBER;
+		p->ival = rand() % 31;
+		break;
+	default:
+		break;
+	}
+}
+
+void print_necc(const NecType *p)
+{
+	switch (p->type)
+	{
+	case NAME:
+		printf("%s\n", p->name);
+		break;
+	case DOUBLE:
+		printf("%f\n", p->dval);
+		break;
+	case DATE:
+		print_date(&p->dt);
+		break;
+	case NUMBER:
+		printf("%d\n", p->ival);
+		break;
+	default:
+		break;
+	}
+}
+
+int main(void)
+{
+	NecType n;
+	for (int i = 0; i < 31; ++i)
+	{
+		set_nec(&n);
+		print_necc(&n);
+		putchar('\n');
+	}
+}
+
+#endif
+
+#if 1
+typedef enum { /* color -> enum tag -> zorunlu degil */
+	WHITE, /* enum constants */
+	YELLOW,
+	GRAY,
+	GREEN,
+	BLACK
+}color;
+
+int main(void){
+	color c = YELLOW;
+	printf("yellow enum constant value is %d\n",c);
+	printf("yellow enum constant value is %d\n",YELLOW);
+}
 #endif
