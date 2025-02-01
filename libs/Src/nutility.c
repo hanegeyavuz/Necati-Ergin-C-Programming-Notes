@@ -522,3 +522,13 @@ const char* get_random_name(void){
 "aslihan", "cihat", };
     return r_elem(p_names);
 }
+
+void bprint(unsigned int x){
+    unsigned int mask = ~(~0u >> 1);
+
+    while(mask){
+        putchar(mask & x ? '1':'0');
+        mask >>= 1;
+    }
+    putchar('\n');
+}

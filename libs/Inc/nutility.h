@@ -44,5 +44,6 @@ void gbsort(void *vpa,size_t size,size_t sz,int (*fcmp)(const void*,const void*)
 char *my_strdup(const char *str);
 int isprime(int n);
 const char* get_random_name(void);
+void bprint(unsigned int x);
 /*------------------------------------------------------------------*/
 #endif // NUTILITY_H

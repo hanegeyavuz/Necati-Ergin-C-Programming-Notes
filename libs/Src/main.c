@@ -9,6 +9,8 @@
 #include <time.h>
 #include "date.h"
 #include "person.h"
+#include <limits.h>
+
 #if 0
 
 #define NGAMES 10000000
@@ -6074,7 +6076,7 @@ int main(void)
 
 #endif
 
-#if 1
+#if 0
 typedef enum { /* color -> enum tag -> zorunlu degil */
 	WHITE, /* enum constants */
 	YELLOW,
@@ -6089,3 +6091,317 @@ int main(void){
 	printf("yellow enum constant value is %d\n",YELLOW);
 }
 #endif
+
+#if 0
+/*bprint function test (implementation detail is later)*/
+int main(void)
+{
+	uint16_t reg = 31;
+
+	bprint(reg);
+}
+
+#endif
+
+#if 0
+
+int main(void){
+	int x = 23;
+	bprint(x);
+	bprint(~x);
+	printf("printf(x) = %d\n",x);
+	printf("printf(~x) = %d\n",~x);
+
+}
+
+#endif
+
+#if 0
+/*bitwise left shift*/
+int main(void){
+	unsigned int x = 23;
+	while(x){
+		bprint(x);
+		x <<=1;
+	}
+	printf("%u\n",x);
+}
+
+#endif
+#if 0
+/*bitwise left shift*/
+int main(void){
+	unsigned int x = 23;
+	while(x){
+		bprint(x);
+		x <<=1;
+	}
+	printf("%u\n",x);
+}
+
+#endif
+#if 0
+/*bitwise left shift*/
+int main(void){
+	int x = -1;
+	bprint(x >> 5);
+}
+
+#endif
+#if 0
+/* bitwise and */
+int main(void){
+	int x,y;
+	printf("birinci sayiyi giriniz: ");
+	scanf("%d",&x);
+	printf("ikinci sayiyi giriniz: ");
+	scanf("%d",&y);
+	bprint(x);
+	bprint(y);
+	bprint(x & y);
+}
+
+#endif
+
+#if 0
+/* 2'nin kuvveti oldugunu bulmak */
+int main(void)
+{
+	int x;
+
+	printf("bir tam sayi giriniz: ");
+	scanf("%d", &x);
+
+	if (x && !(x & (x - 1)))
+	{
+		printf("girdiginiz sayi 2'nin kuvvetidir.");
+	}
+	else
+	{
+		printf("girdiginiz sayi 2'nin kuvveti degildir.");
+	}
+}
+
+#endif
+
+#if 0
+/*Kernigham Algorithm*/
+
+int set_bit_count(int x)
+{
+	int count = 0;
+	while (x)
+	{
+		x &= x - 1;
+		++count;
+	}
+	return count;
+}
+
+int main(void)
+{
+	int x;
+
+	printf("bir tam sayi giriniz: ");
+	scanf("%d", &x);
+
+	printf("%d sayisinin %d adet set biti vardir\n", x, set_bit_count(x));
+}
+#endif
+
+#if 0
+/*bitwise or*/
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	bprint(x);
+	bprint(y);
+	bprint(x | y);
+}
+#endif
+
+#if 0
+/*bitwise xor*/
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	bprint(x);
+	bprint(y);
+	bprint(x ^ y);
+}
+#endif
+
+#if 0
+/*xor swap*/
+#define xor_swap(x, y) ((x) ^= (y), (y) ^= (x), (x) ^= (y)) /*macro definition*/
+
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	printf("x = %d y = %d\n",x,y);/* x = 0000 1011 y = 0010 0001 */ 
+	// x ^= y; /* x = 0010 1010*/
+	// y ^= x; /* y = 0000 1011*/
+	// x ^= y; /*x = 0010 0001*/
+	xor_swap(x,y);
+	printf("x = %d y = %d\n",x,y);
+}
+#endif
+
+#if 0
+/*set nth bit*/
+#define SET_NTH_BIT(x, n) ((x) |= (1 << n))
+
+void to_set_nth_bit(int *x, int n)
+{
+	*x |= (1 << n);
+}
+
+int main(void)
+{
+	int x, n;
+	printf("bir tam sayi giriniz");
+	scanf("%d", &x);
+	printf("x = %d\n", x);
+	bprint(x);
+	printf("kacinci biti 1 olsun: ");
+	scanf("%d", &n);
+	//to_set_nth_bit(&x, n);
+	SET_NTH_BIT(x, n);
+	printf("new x = %d\n", x);
+	bprint(x);
+}
+
+#endif
+
+#if 0
+/*reset nth bit*/
+#define RESET_NTH_BIT(x, n) ((x) &= ~(1 << n))
+
+void to_reset_nth_bit(int *x, int n)
+
+{
+
+	*x &= ~(1 << n);
+}
+
+int main(void)
+
+{
+
+	int x, n;
+
+	printf("bir tam sayi giriniz");
+
+	scanf("%d", &x);
+
+	printf("x = %d\n", x);
+
+	bprint(x);
+
+	printf("kacinci biti 0 olsun: ");
+
+	scanf("%d", &n);
+
+	// to_reset_nth_bit(&x, n);
+
+	RESET_NTH_BIT(x, n);
+
+	printf("new x = %d\n", x);
+
+	bprint(x);
+}
+#endif
+
+#if 0
+/*toggle nth bit*/
+#define TOGGLE_NTH_BIT(x, n) ((x) ^= (1 << n))
+
+void to_toggle_nth_bit(int *x, int n)
+
+{
+
+	*x ^= (1 << n);
+}
+
+int main(void)
+
+{
+
+	int x, n;
+
+	printf("bir tam sayi giriniz: ");
+
+	scanf("%d", &x);
+
+	printf("x = %d\n", x);
+
+	bprint(x);
+
+	printf("kacinci biti degistirilsin olsun: ");
+
+	scanf("%d", &n);
+
+	// to_toggle_nth_bit(&x, n);
+
+	TOGGLE_NTH_BIT(x, n);
+
+	printf("new x = %d\n", x);
+
+	bprint(x);
+}
+#endif
+
+#if 0
+/*get nth bit*/
+#define GET_NTH_BIT(x, n) (!((x) & (1 << (n))) ? 0 : 1)
+int to_get_nth_bit(const int *x, int n)
+
+{
+	return !(*x & (1 << n)) ? 0 : 1;
+}
+
+int main(void)
+
+{
+	int x, n;
+
+	printf("bir tam sayi giriniz: ");
+
+	scanf("%d", &x);
+
+	printf("x = %d\n", x);
+
+	bprint(x);
+
+	printf("kacinci biti alinsin: ");
+
+	scanf("%d", &n);
+
+	//printf("%dth bit value = %d\n", n, to_get_nth_bit(&x, n));
+	printf("%dth bit value = %d\n", n, GET_NTH_BIT(x, n));
+}
+#endif
+
+#if 0
+/*alternative bprint function implementation*/
+void bprint_alt(uint32_t val){
+	for(int i = sizeof(uint32_t) * CHAR_BIT - 1; i >= 0; --i){
+		putchar((val >> i) & 1 ? '1' : '0');
+	}
+}
+
+int main(void){
+	int x;
+	printf("bir sayi giriniz: ");
+
+	scanf("%d",&x);
+
+	bprint_alt(x);
+
+}
+
+#endif
+

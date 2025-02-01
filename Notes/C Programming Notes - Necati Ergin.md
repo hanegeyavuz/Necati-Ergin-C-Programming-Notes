@@ -12309,6 +12309,479 @@ enum Color{
 };
 ```
 
+---
+
+# Lesson 55
+
 ## Bitwise Operators and Bitwise Operations
 
-1:57:50
+### Operatör Önceliği
+
+```c
+/*
+                  operator precedence levels 
+              <--- check ../operators/main.c  --->
+  ----------------------------------------------------------------
+  ----------------------------------------------------------------
+  2.  ~       bitwise NOT                     [RIGHT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  5.  >>      bitwise right shift     
+      <<      bitwise left shift
+      (bitwise shift operators)               [LEFT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  8.  &       bitwise AND                     [LEFT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  9.  ^       bitwise XOR                     [LEFT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  10. |       bitwise OR                      [LEFT ASSOCIATIVE]
+  ----------------------------------------------------------------
+  14. &=      assignment by bitwise AND
+      ^=      assignment by bitwise XOR       
+      |=      assignment by bitwise OR
+      >>=     assignment by bitwise left shift 
+      <<=     assignment by bitwise right shift 
+      (bitwise compound assignment operators)   [RIGHT ASSOCIATIVE]
+  ----------------------------------------------------------------
+*/
+
+```
+
+- Bu operatörler için tam sayı zorunluluğu vardır.
+>[!TIP]
+> Öncelik farklılığı sebebiyle birden fazla bitwise işleminin bulunduğu yerlerde **öncelik parantezi** kullanımı önerilir.
+
+### Unary Prefix Operator `(~)`
+- **Bitwise not**
+- Operandı tam sayı türünden olmalı
+- no side-effect (değişkenin kendi değeri değişmez.)
+- bitlerin tersini alır
+
+```c
+int main(void){
+	int x = 23;
+	bprint(x);
+	bprint(~x);
+	printf("printf(x)%d\n",x);
+	printf("printf(~x)%d\n",~x);
+
+}
+/*
+out:
+00000000000000000000000000010111
+11111111111111111111111111101000
+printf(x) = 23
+printf(~x) = -24
+*/
+
+```
+
+- x = ~(~x)
+
+
+## Bitwise Left Shift `(<<)`
+
+- 2 operandı vardır.
+- İşlem sol operanda göre yapılır
+- sağ operand pozisyon sayısı olarak geçer
+- Integral Promotion (tam sayıya yükseltme) geçerlidir.
+
+>[!ERROR]
+>**Eğer Sağ Operand:**
+>- negatif bir değerde ise
+>- işlemin yapıldığı türün bit sayısına eşit ise
+>- işlemin yapıldığı türün bit sayısından daha büyük ise
+>
+>**Eğer Sol Operand:**
+>- İşaretli negatif bir değerde ise
+>UNDEFINED BEHAVIOUR!!
+
+- **Bir sayısının soldan 1 bit kaydırılması: Soldan bir adet bitin çıkıp sağdan bir adet bitin gelmesi demektir.**
+- **Sola kaydırma işleminde sağdan yapılan besleme 0 bitleriyle olur.**
+- Sola kaydırmak, sayıyı 2 ile çarpmaya eşdeğerdir.
+```c
+/*bitwise left shift*/
+int main(void){
+	unsigned int x = 23;
+	while(x){
+		bprint(x);
+		x <<=1;
+	}
+	printf("%u\n",x);
+}
+
+/*
+out:
+00000000000000000000000000010111
+00000000000000000000000000101110
+00000000000000000000000001011100
+00000000000000000000000010111000
+00000000000000000000000101110000
+00000000000000000000001011100000
+...
+...
+...
+0
+*/
+
+```
+
+## Bitwise Right Shift `(>>)`
+- 2 operandı vardır.
+- İşlem sol operanda göre yapılır
+- sağ operand pozisyon sayısı olarak geçer
+- Integral Promotion (tam sayıya yükseltme) geçerlidir.
+- Sol operand İşaretli pozitif bir değer veya işaretsiz ise Soldan yapılan besleme her zaman 0 bitleri ile olur.
+
+>[!WARNING] Sağa kaydırma işleminde negatif sayıların kaydırılması Implementation Defined'dır. 1 veya 0 ile yapılabilir. Derleyiciye bağlıdır.
+
+
+## Bitwise And `&`
+
+- Karşılıklı bitler `mantıksal ve` işlemine tabi tutulur.
+```c
+/* bitwise and */
+int main(void){
+	int x,y;
+	printf("birinci sayiyi giriniz: ");
+	scanf("%d",&x);
+	printf("ikinci sayiyi giriniz: ");
+	scanf("%d",&y);
+	bprint(x);
+	bprint(y);
+	bprint(x & y);
+}
+
+/*
+out:
+birinci sayiyi giriniz: 31
+ikinci sayiyi giriniz: 122
+00000000000000000000000000011111
+00000000000000000000000001111010
+00000000000000000000000000011010
+
+*/
+```
+
+
+>[!TIP] 
+>Bir sayıyı kendisinin 1 eksiği ile `&` işlemine sokarsak sonuç sayının en sağdaki `1` değerli bitinin 0 olması anlamına gelir.
+
+
+---
+### Mülakat Sorusu
+- Bir sayının 2'nin kuvveti olup olmadığını bulmak:
+
+```c
+int main(void)
+{
+	int x;
+
+	printf("bir tam sayi giriniz: ");
+	scanf("%d", &x);
+
+	if (x && !(x & (x - 1)))
+	{
+		printf("girdiginiz sayi 2'nin kuvvetidir.");
+	}
+	else
+	{
+		printf("girdiginiz sayi 2'nin kuvveti degildir.");
+	}
+}
+```
+
+---
+### Mülakat Sorusu
+- **Kernighan Algorithm** 
+	- Bir sayının 1 olan bitlerini sayma algoritması
+
+```c
+/*Kernigham Algorithm*/
+
+int set_bit_count(int x)
+{
+	int count = 0;
+	while (x)
+	{
+		x &= x - 1;
+		++count;
+	}
+	return count;
+}
+
+int main(void)
+{
+	int x;
+
+	printf("bir tam sayi giriniz: ");
+	scanf("%d", &x);
+
+	printf("%d sayisinin %d adet set biti vardir\n", x, set_bit_count(x));
+}
+```
+
+---
+
+
+## Bitwise And `|`
+-  Karşılıklı bitler `mantıksal veya` işlemine tabi tutulur.
+
+```c
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	bprint(x);
+	bprint(y);
+	bprint(x | y);
+}
+```
+
+## Bitwise Xor `^`
+-  Karşılıklı bitler `mantıksal yada` işlemine tabi tutulur.
+
+```c
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	bprint(x);
+	bprint(y);
+	bprint(x ^ y);
+}
+```
+
+---
+### Mülakat Sorusu
+
+- XOR Swap
+	- iki değişkeni üçüncü bir değişken kullanmadan takas etmek için kullanılan algoritmadır.
+
+```c
+/*xor swap*/
+#define xor_swap(x,y)	((x) ^= (y),(y) ^= (x),(x) ^= (y)) /*macro definition*/
+
+int main(void){
+	int x,y;
+	printf("iki tam sayi giriniz");
+	scanf("%d%d",&x,&y);
+	printf("x = %d y = %d\n",x,y);/* x = 0000 1011 y = 0010 0001 */ 
+	// x ^= y; /* x = 0010 1010*/
+	// y ^= x; /* y = 0000 1011*/
+	// x ^= y; /*x = 0010 0001*/
+	xor_swap(x,y);
+	printf("x = %d y = %d\n",x,y);
+}
+```
+
+---
+## Bitwise Manipulations
+
+1. **Bir tam sayının belirli bir bitini set etmek(to set the bit)**
+2. **Bir tam sayının belirli bir bitini reset etmek(to reset the nth bit)**
+3. **Bir tam sayının belirli bir bitini değiştirmek (to toggle the nth bit)**
+4. **Bir tam sayının belirli bir bitinin değerini elde etmek**
+
+
+### to set the nth bit
+
+- 1 sayısını istenen bit sayısı kadar sola kaydırarak bit-mask oluşturulur.
+- Daha sonrasında sayı bit-mask ile `bit-wise or` işlemine sokulur.
+```c
+#define SET_NTH_BIT(x,n)        ((x) |= (1 << n))
+
+  
+
+void to_set_nth_bit(int *x, int n)
+
+{
+
+    *x |= (1 << n);
+
+}
+
+  
+
+int main(void)
+
+{
+
+    int x, n;
+
+    printf("bir tam sayi giriniz");
+
+    scanf("%d", &x);
+
+    printf("x = %d\n", x);
+
+    bprint(x);
+
+    printf("kacinci biti 1 olsun: ");
+
+    scanf("%d", &n);
+
+    //to_set_nth_bit(&x, n);
+
+    SET_NTH_BIT(x, n);
+
+    printf("new x = %d\n", x);
+
+    bprint(x);
+
+}
+```
+
+
+
+### to reset the nth bit
+- 1 sayısını istenen bit sayısı kadar sola kaydırarak bit-mask oluşturulur.
+	- Bu mask in `bit-wise not` işlemi ile değili alınır.
+- Daha sonrasında sayı bit-mask ile `bit-wise and` işlemine sokulur.
+```c
+#define SET_NTH_BIT(x,n)        ((x) &= ~(1 << n))
+
+  
+
+void to_set_nth_bit(int *x, int n)
+
+{
+
+    *x &= ~(1 << n);
+
+}
+
+  
+
+int main(void)
+
+{
+
+    int x, n;
+
+    printf("bir tam sayi giriniz");
+
+    scanf("%d", &x);
+
+    printf("x = %d\n", x);
+
+    bprint(x);
+
+    printf("kacinci biti 1 olsun: ");
+
+    scanf("%d", &n);
+
+    //to_set_nth_bit(&x, n);
+
+    SET_NTH_BIT(x, n);
+
+    printf("new x = %d\n", x);
+
+    bprint(x);
+
+}
+```
+
+
+### to toggle the nth bit
+- 1 sayısını istenen bit sayısı kadar sola kaydırarak bit-mask oluşturulur.
+	- Bu mask in `bit-wise not` işlemi ile değili alınır.
+- Daha sonrasında sayı bit-mask ile `bit-wise xor` işlemine sokulur.
+```c
+/*toggle nth bit*/
+#define TOGGLE_NTH_BIT(x, n) ((x) ^= (1 << n))
+
+void to_toggle_nth_bit(int *x, int n)
+
+{
+
+	*x ^= (1 << n);
+}
+
+int main(void)
+
+{
+
+	int x, n;
+
+	printf("bir tam sayi giriniz: ");
+
+	scanf("%d", &x);
+
+	printf("x = %d\n", x);
+
+	bprint(x);
+
+	printf("kacinci biti degistirilsin olsun: ");
+
+	scanf("%d", &n);
+
+	// to_toggle_nth_bit(&x, n);
+
+	TOGGLE_NTH_BIT(x, n);
+
+	printf("new x = %d\n", x);
+
+	bprint(x);
+}
+```
+
+### Get the nth bit
+- 1 sayısını istenen bit sayısı kadar sola kaydırarak bit-mask oluşturulur.
+	- Bu mask in `bit-wise not` işlemi ile değili alınır.
+- Daha sonrasında sayı bit-mask ile `bit-wise and` işlemine sokulur.
+
+```c
+/*get nth bit*/
+#define GET_NTH_BIT(x,n)	(!((x) & (1 << (n))) ? 0 : 1)
+int to_get_nth_bit(const int *x, int n)
+
+{
+	return !(*x & (1 << n)) ? 0 : 1;
+}
+
+int main(void)
+
+{
+
+	int x, n;
+
+	printf("bir tam sayi giriniz: ");
+
+	scanf("%d", &x);
+
+	printf("x = %d\n", x);
+
+	bprint(x);
+
+	printf("kacinci biti alinsin: ");
+
+	scanf("%d", &n);
+
+	//printf("%dth bit value = %d\n", n, to_get_nth_bit(&x, n));
+	printf("%dth bit value = %d\n", n, GET_NTH_BIT(x, n));
+}
+
+```
+
+>[!NOTE ]
+>Lojik yorumlama yapmak yerine `(*x & (1 << n)) >> n` işlemi ile de aynı sonuç elde edilebilir.
+
+---
+### `bprint()` Function
+
+```c
+void bprint(unsigned int x){
+    unsigned int mask = ~(~0u >> 1);
+
+    while(mask){
+        putchar(mask & x ? '1':'0');
+        mask >>= 1;
+    }
+    putchar('\n');
+}
+
+```
+
+- Maske olarak `10000000000000000` sayısı kullanılır.
+- Maske ile sayı bitsel ve işlemine tabi tutulur ve sonrasında lojik olarak yorumlanır.
+	- Bitin değeri 1 ise 1,0 ise 0 yazdırılır.
