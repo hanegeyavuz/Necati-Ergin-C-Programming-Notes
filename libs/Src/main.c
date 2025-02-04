@@ -10,6 +10,7 @@
 #include "date.h"
 #include "person.h"
 #include <limits.h>
+#include <ctype.h>
 
 #if 0
 
@@ -5922,7 +5923,7 @@ int main(void){
 #if 0
 /*offsetof macro implementation*/
 
-#define Offsetof(s, m) ((size_t) & (((s *)0)->m))
+#define Offsetof(s, m) ((size_t)&(((s *)0)->m))
 
 #include <stddef.h>
 #include <stdalign.h>
@@ -6405,3 +6406,265 @@ int main(void){
 
 #endif
 
+#if 0
+/*results for nec_type library's look-up tablelookup table*/
+#include "nec_type.h"
+int main(void){
+	for(int i = 0; i < 128; ++i){
+		if(i && i % 8 == 0){putchar('\n');}
+		int flag = 0;	
+		if(isupper(i)){flag |= UPPER;}
+		if(islower(i)){flag |= LOWER;}
+		if(isdigit(i)){flag |= DIGIT;}
+		if(isxdigit(i)){flag|= HEX;}
+		if(ispunct(i)){flag |= PUNCT;}
+		if(isspace(i)){flag |= SPACE;}
+		if(isprint(i)){flag |= PRINT;}
+		if(iscntrl(i)){flag |= CNTRL;}
+		printf("%3d,",flag);	
+	}
+}
+#endif
+
+#if 0
+/*test code for implemented ctype lib*/
+#include "nec_type.h"
+
+int main(void){
+
+	printf("bir karakter giriniz: ");
+	int ch = getchar();
+
+	if(ISUPPER(ch)){
+		printf("girdiginiz karakter buyuk harf\n");
+	}
+	else{
+		printf("buyuk harf degil\n");
+	}
+
+
+}
+#endif
+
+#if 0
+/*bit-fields*/
+
+typedef struct{
+	unsigned int mday: 5;
+	unsigned int mon: 4;
+	unsigned int year: 7;
+	unsigned int hour: 5;
+	unsigned int min: 6;
+	unsigned int sec: 5;
+}DateTime;
+
+void print_date_(const DateTime dt){
+	printf("mday = %u mon = %u year = %u hour = %u min = %u sec = %u\n",dt.mday,dt.mon,dt.year+1980,dt.hour,dt.min,dt.sec*2);
+}
+
+int main(void){
+	DateTime dt = {2,2,2025-1980,23,8,20};
+	print_date_(dt);
+}
+#endif
+
+#if 0
+typedef union {
+    struct {
+      unsigned int mb_bit0   : 1;
+      unsigned int mb_bit1   : 1;
+      unsigned int mb_bit2   : 1;
+      unsigned int mb_bit3   : 1;
+      unsigned int mb_bit4   : 1;
+      unsigned int mb_bit5   : 1;
+      unsigned int mb_bit6   : 1;
+      unsigned int mb_bit7   : 1;
+      unsigned int mb_bit8   : 1;
+      unsigned int mb_bit9   : 1;
+      unsigned int mb_bit10  : 1;
+      unsigned int mb_bit11  : 1;
+      unsigned int mb_bit12  : 1;
+      unsigned int mb_bit13  : 1;
+      unsigned int mb_bit14  : 1;
+      unsigned int mb_bit15  : 1;
+      unsigned int mb_bit16  : 1;
+      unsigned int mb_bit17  : 1;
+      unsigned int mb_bit18  : 1;
+      unsigned int mb_bit19  : 1;
+      unsigned int mb_bit20  : 1;
+      unsigned int mb_bit21  : 1;
+      unsigned int mb_bit22  : 1;
+      unsigned int mb_bit23  : 1;
+      unsigned int mb_bit24  : 1;
+      unsigned int mb_bit25  : 1;
+      unsigned int mb_bit26  : 1;
+      unsigned int mb_bit27  : 1;
+      unsigned int mb_bit28  : 1;
+      unsigned int mb_bit29  : 1;
+      unsigned int mb_bit30  : 1;
+      unsigned int mb_bit31  : 1;
+    };
+    uint32_t m_value;
+  } Bits_t;
+
+  int main(void)
+  {
+    Bits_t b1 = { .m_value = 0 };
+
+    // ------------------------------------------------------
+
+    b1.mb_bit4 = 1;
+    printf("%u\n", b1.m_value); // output -> 16
+
+    // ------------------------------------------------------
+
+    b1.m_value = 15;
+    printf("%u\n", b1.mb_bit0); // output -> 1
+    printf("%u\n", b1.mb_bit1); // output -> 1
+    printf("%u\n", b1.mb_bit2); // output -> 1
+    printf("%u\n", b1.mb_bit3); // output -> 1
+    printf("%u\n", b1.mb_bit4); // output -> 0
+
+    // ------------------------------------------------------
+  }
+#endif
+
+#if 0
+/*command line arguments*/
+int main(int argc, char const *argv[])
+{
+	printf("agrc = %d\n",argc);
+	for (size_t i = 0; i < argc; i++)
+	{
+		printf("argv[%d] = %s\n",i,argv[i]);
+	}
+	
+}
+#endif
+
+#if 0
+/*filecopy with command line arg*/
+
+int main(int argc, char const *argv[])
+{
+	if (argc != 3){
+		printf("usage: <filecopy> <source_file_name> <dest file name>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("file %s copied as file %s\n",argv[1],argv[2]);
+}
+
+/*
+out:
+C:\Users\yhane\Necati-Ergin-C-Programming-Notes\libs\Src>main ali.txt veli.txt
+file ali.txt copied as file veli.txt
+*/
+#endif
+
+#if 0
+/*command line arg. calculator example*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 4)
+	{
+		printf("kullanim: <hes> <sol operand> <isaret> <sag operand>\n");
+		exit(EXIT_FAILURE);
+	}
+	int left_operand = atoi(argv[1]);
+	int right_operand = atoi(argv[3]);
+	switch (*(argv[2]))
+	{
+	case '+':
+		printf("%d + %d = %d", left_operand, right_operand, left_operand + right_operand);
+		break;
+	case '-':
+		printf("%d - %d = %d", left_operand, right_operand, left_operand - right_operand);
+		break;
+	case '/':
+		if (!right_operand)
+		{
+			printf("paydada sifir olamaz.\n");
+			exit(EXIT_FAILURE);
+		}
+		printf("%d / %d = %f", left_operand, right_operand, (double)left_operand / right_operand);
+		break;
+	case '*':
+		printf("%d * %d = %d", left_operand, right_operand, left_operand * right_operand);
+		break;
+	default:
+		printf("lutfen dogru sekilde kullaniniz");
+		exit(EXIT_FAILURE);
+		break;
+	}
+}
+
+#endif
+
+
+#if 0
+  // weekday program 
+  int main(int argc, char** argv)
+  {
+    if (argc != 4)
+    {
+      printf("Usage: %s <day> <month> <year>\n", argv[0]);
+      exit(EXIT_FAILURE);
+    }
+
+    int day = atoi(argv[1]);
+    int month = atoi(argv[2]);
+    int year = atoi(argv[3]);
+
+    Date d1;
+    set_date(&d1, day, month, year);
+    print_date(&d1);
+  }
+
+  // command line -> prog.exe 1 1 2001 12
+  // output -> Usage: prog.exe <day> <month> <year>
+
+  // command line -> prog.exe 1 1 2001
+  // output -> 01 Ocak 2001 Pazartesi
+
+  // command line -> prog.exe 30 11 2024
+  // output -> 30 Kasım 2024 Cumartesi
+
+
+#endif
+
+#if 1
+  #define   FILE_NAME_SIZE  100
+
+  int main(int argc, char** argv) 
+  {
+    char source_file_name[FILE_NAME_SIZE];
+    char destination_file_name[FILE_NAME_SIZE];
+
+    if (argc != 3) {
+      printf("Usage: %s <source> <destination>\n", argv[0]);
+      printf("Enter source file name: ");
+      scanf("%s", source_file_name);
+
+      printf("Enter destination file name: ");
+      scanf("%s", destination_file_name);
+    }
+    else {
+      strcpy(source_file_name, argv[1]);
+      strcpy(destination_file_name, argv[2]);
+    }
+
+    printf("file %s copied to %s\n",  source_file_name, 
+                                      destination_file_name);
+  }
+
+  // command line -> prog.exe a.txt
+  // output -> Usage: prog.exe <source> <destination>
+  // input  -> Enter source file name: a.txt
+  // input  -> Enter destination file name: b.txt
+  // output -> file a.txt copied to b.txt
+
+  // command line -> prog.exe a.txt b.txt
+  // output -> file a.txt copied to b.txt
+
+#endif

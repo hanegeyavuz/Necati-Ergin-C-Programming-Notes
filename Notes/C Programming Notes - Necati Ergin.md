@@ -12785,3 +12785,216 @@ void bprint(unsigned int x){
 - Maske olarak `10000000000000000` sayısı kullanılır.
 - Maske ile sayı bitsel ve işlemine tabi tutulur ve sonrasında lojik olarak yorumlanır.
 	- Bitin değeri 1 ise 1,0 ise 0 yazdırılır.
+
+
+---
+# Lesson 56
+
+>[!TIP] C programlama dilinde standart fonksiyonlarda da karşılaşılan bir olay aşağıdaki gibidir:
+>- Eğer bir fonksiyona birden fazla bool değer parametre olarak geçilecekse bu işlem tek tek int parametre olarak değil de bir türden parametrenin bitleri ile gerçekleştirilebilir.
+
+
+## Bit-Fields
+
+**Soru:** Bir tam sayı değişkenin belirli bitlerden oluşan kısmını sanki bir tam sayı değişkenmiş gibi kullanabilir miyim? 
+- **Cevap**: EVET
+**Soru:** Böyle bir ihtiyaç var mı?
+	Cevap: EVET!
+	Belirli türden değişkenleri ayrı ayrı tanımlamak yerine bir değişkenin bitleri olarak tanımlanabilir.
+	- **Kullanılan bellek alanı daha az olur.**
+	- Hızlı erişim sağlar.
+
+ - Bu durumlarda bitlere erişim, set-get işlemleri için standart kütüphane yapılarını da kullanabilirsiniz. Kendiniz de implement edebilirsiniz.
+
+
+- Eğer bir `struct` bit-field olacaksa elemanları:
+	- int
+	- unsigned int
+	- signed int
+	- `_Bool`
+	olabilir.
+
+ ```c
+struct Nec {
+	unsigned int x : 3; /* 3 must be constant expression */
+};
+```
+
+- Yukarıdaki görüldüğü gibi `:` token'ından sonra gelen sabit kaç adet bite sahip olacağını belirler.
+
+- C programlamada `signed int` ile `int` arasındaki tek fark burada gözlenir. 
+	- `int` kullanımında alabileceği değer aralığı **implementation defined**'dır.
+```c
+struct Nec {
+	unsigned int x : 4; /* [0-15] */
+	signed int y : 4;   /* [-8-7] */
+	int z : 4;          /* IMPELEMENTATION DEFINED!! */
+};
+
+```
+- `_Bool` kullanımında token sonrası bit sayısı değeri `1` olmak zorundadır.
+- Bir yapının elemanlarının hepsi bit-field olmak zoruna değildir.
+- Bit-field elemanlarının bellekteki yeri tamamen derleyiciye bağlıdır.
+
+```c
+/*bit-fields*/
+
+typedef struct{
+	unsigned int mday: 5;
+	unsigned int mon: 4;
+	unsigned int year: 7;
+	unsigned int hour: 5;
+	unsigned int min: 6;
+	unsigned int sec: 5;
+}DateTime;
+
+void print_date_(const DateTime dt){
+	printf("mday = %u mon = %u year = %u hour = %u min = %u sec = %u\n",dt.mday,dt.mon,dt.year+1980,dt.hour,dt.min,dt.sec*2);
+}
+
+int main(void){
+	DateTime dt = {2,2,2025-1980,23,8,20};
+	print_date_(dt);
+}
+
+```
+
+- Güzel bir örnek: Bit-field ile bit manipülasyonu yapmak:
+
+```c
+typedef union {
+    struct {
+      unsigned int mb_bit0   : 1;
+      unsigned int mb_bit1   : 1;
+      unsigned int mb_bit2   : 1;
+      unsigned int mb_bit3   : 1;
+      unsigned int mb_bit4   : 1;
+      unsigned int mb_bit5   : 1;
+      unsigned int mb_bit6   : 1;
+      unsigned int mb_bit7   : 1;
+      unsigned int mb_bit8   : 1;
+      unsigned int mb_bit9   : 1;
+      unsigned int mb_bit10  : 1;
+      unsigned int mb_bit11  : 1;
+      unsigned int mb_bit12  : 1;
+      unsigned int mb_bit13  : 1;
+      unsigned int mb_bit14  : 1;
+      unsigned int mb_bit15  : 1;
+      unsigned int mb_bit16  : 1;
+      unsigned int mb_bit17  : 1;
+      unsigned int mb_bit18  : 1;
+      unsigned int mb_bit19  : 1;
+      unsigned int mb_bit20  : 1;
+      unsigned int mb_bit21  : 1;
+      unsigned int mb_bit22  : 1;
+      unsigned int mb_bit23  : 1;
+      unsigned int mb_bit24  : 1;
+      unsigned int mb_bit25  : 1;
+      unsigned int mb_bit26  : 1;
+      unsigned int mb_bit27  : 1;
+      unsigned int mb_bit28  : 1;
+      unsigned int mb_bit29  : 1;
+      unsigned int mb_bit30  : 1;
+      unsigned int mb_bit31  : 1;
+    };
+    uint32_t m_value;
+  } Bits_t;
+
+  int main(void)
+  {
+    Bits_t b1 = { .m_value = 0 };
+
+    // ------------------------------------------------------
+
+    b1.mb_bit4 = 1;
+    printf("%u\n", b1.m_value); // output -> 16
+
+    // ------------------------------------------------------
+
+    b1.m_value = 15;
+    printf("%u\n", b1.mb_bit0); // output -> 1
+    printf("%u\n", b1.mb_bit1); // output -> 1
+    printf("%u\n", b1.mb_bit2); // output -> 1
+    printf("%u\n", b1.mb_bit3); // output -> 1
+    printf("%u\n", b1.mb_bit4); // output -> 0
+
+    // ------------------------------------------------------
+  }
+
+/*
+out:
+16
+1
+1
+1
+1
+0
+*/
+```
+
+>[!WARNING]
+>Yukarıdaki kod taşınabilir değildir. Çünkü ardışık bit-field elemanlarının bellekte ardışık olup olmayacağı derleyiciye bağlıdır.
+
+
+## Command Line Arguments
+
+- C programlarında, `main` fonksiyonu komut satırı argümanlarını alabilir. Bunun için fonksiyon şu parametreleri kabul eder:
+	- `argc` (**argument count**): Komut satırından girilen argüman sayısını belirtir.
+	- `argv` (**argument vector**): Argümanları içeren bir **pointer to pointer** dizisidir. Bu, argümanların string (karakter dizisi) olarak tutulduğu bir diziyi ifade eder.
+
+Aşağıdaki `main` fonksiyonu bu yapıyı göstermektedir:
+
+```c
+int main(int argc, char **argv) {
+    // argc: Argüman sayısı
+    // argv: Argümanları içeren char* dizisi
+}
+```
+
+Bu yapı, komut satırından programa girilen parametreleri işlemek için kullanılır.
+
+
+
+```c
+/*command line arguments*/
+
+int main(int argc, char const *argv[])
+{
+	printf("agrc = %d\n",argc);
+	for (size_t i = 0; i < argc; i++)
+	{
+		printf("argv[%d] = %s\n",i,argv[i]);
+	}
+	
+}
+```
+
+Yukarıdaki programın ürettiği `.exe` dosyasını command line'da `main ali veli` argümanları ile çağırırsak sonuç aşağıdaki gibi olur:
+
+```bash
+agrc = 3
+argv[0] = main
+argv[1] = main
+argv[2] = main
+```
+
+- Basit bir örnek:
+```c
+/*filecopy with command line arg*/
+
+int main(int argc, char const *argv[])
+{
+	if (argc != 3){
+		printf("usage: <filecopy> <source_file_name> <dest file name>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("file %s copied as file %s\n",argv[1],argv[2]);
+}
+
+/*
+out:
+C:\Users\yhane\Necati-Ergin-C-Programming-Notes\libs\Src>main ali.txt veli.txt
+file ali.txt copied as file veli.txt
+*/
+```
