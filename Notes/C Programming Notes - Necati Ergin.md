@@ -12998,3 +12998,336 @@ C:\Users\yhane\Necati-Ergin-C-Programming-Notes\libs\Src>main ali.txt veli.txt
 file ali.txt copied as file veli.txt
 */
 ```
+
+
+---
+# Lesson 57
+
+## File Operations
+- Dosya esasen bitlerden oluşan bir kümedir.
+	- Bu bitler ikincil saklama ortamındadır(hard disk, flash etc...)
+- Bir dosya ile ilgili işlem yapılabilmesi için o dosyanın formatının bilinmesi gerekmektedir.
+	- Bu bilgi genellikle açıktır.
+- Dosya işlemlerinden sorumlu fonksiyonlar `<stdio.h>` kütüphanesinde bulunur.
+- Dosya işlemleri **handle** sistemini kullanır.
+
+- C programlama dilinde genellikle `FILE* fopen(const char*, const char*)` fonksiyonu ile başlangıç işlemi yapılır.
+- Sonrasında her biri `FILE*` parametreli çeşitli dosya işlemleri fonksiyonları kullanılır.
+- İşlemler tamamlandığında ise `int fclose(FILE*)` fonksiyonu kullanılarak handler yaşamı sonlandırılır.
+
+- Genellikle 3 çeşit dosya işlemi bulunur.
+	- Dosyadan Okuma (Read From File)
+	- Dosyaya Yazma (Write to File)
+	- File Pointer (dosya konum göstericisi)
+
+- **Dosya okuma yazma işlemlerinde dosya içerisindeki hangi byte ile işlem yapılacağı file pointer değerine göre index olarak alınır ve işlem sonunda file pointer değeri 1 arttırılır.**
+	- Dosyanın herhangi bir byte'ında işlem yapmak için öncelikle file pointer'ın manipüle edilmesi gerekiyor.
+	- Bunun için çeşitli fonksiyonlar bulunmaktadır.
+
+
+## `fopen` Function
+
+- `FILE* fopen(const char* pfilename, const char *fopenmode)`
+
+### File Open Modes
+- İki şeyi belirler
+	- Dosya varsa ne olur dosya yoksa ne olur?
+	- Dosyadan okuyabilir miyim? / Dosyaya yazabilir miyim?
+
+- **Modlar:**
+	- **Okuma (Read)**
+		- Dosya varsa açılır yoksa açılmaz
+		- Dosyadan okunabilir fakat yazılamaz
+	- **Yazma (Write)**
+		- Dosya varsa budanır. (**truncate**) (Diyelim içi dolu bir dosyamız var, yazma modunda açarsak dosya sıfırlanır.)
+		- Dosya yoksa **oluşturulur**.
+		- Dosyadan yazılabilir fakat okunamaz
+	- **Sona ekleme (append)**
+		- Dosya varsa budanmadan(sıfırlanmadan) açılır.
+		- Dosya yoksa **oluşturulur**.
+		- Dosyaya yalnızca ekleme yoluyla yazılabilir. Dosyadan okunamaz
+	- ** Okuma+ (Read+)**
+		- Dosya varsa açılır yoksa açılmaz
+		- Dosyadan okunabilir ve *dosyaya yazılabilir*.
+	- **Yazma+ (Write+)**
+		- Dosya varsa budanır. (**truncate**) (Diyelim içi dolu bir dosyamız var, yazma modunda açarsak dosya sıfırlanır.)
+		- Dosya yoksa **oluşturulur**.
+		- Dosyadan yazılabilir ve *okunabilir*.
+	- **Sona ekleme (append)**
+		- Dosya varsa budanmadan(sıfırlanmadan) açılır.
+		- Dosya yoksa **oluşturulur**.
+		- *Dosyaya yalnızca ekleme yoluyla yazılabilir ve dosyadan okuma yapılabilir.*
+
+- Dosya açış modunun da iki farklı çeşidi bulunur
+	- Dosyanın text modunda açılması
+	- Dosyanın binary modda açılması
+
+Parametreler:
+filename: Açılarak dosya akışına bağlanacak dosya adıdır.
+mode: Dosya erişim modunu gösteren karakter dizisidir.
+streamptr: Fonksiyonun sonucu aktardığı işaretçiyi gösteren bir işaretçidir.
+
+| Mod | Anlamı                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------- |
+| r   | Okuma için bir metin dosyası açar. Dosya mevcut olmalıdır.                                              |
+| w   | Yazma için bir metin dosyası oluşturur. Aynı isimde bir dosya zaten mevcut ise, içeriği silinir.        |
+| a   | Bir metin dosyasını ekleme yapmak için açar. Dosya yok ise oluşturulur.                                 |
+| r+  | Okuma ve yazma için bir metin dosyası açar. Dosya mevcut olmalıdır.                                     |
+| w+  | Okuma ve yazma için bir metin dosyası oluşturur.                                                        |
+| a+  | Okuma ve ekleme için bir metin dosyası açar.                                                            |
+| rb  | Okuma için bir ikili sistem dosyası açar. Dosya mevcut olmalıdır.                                       |
+| wb  | Yazma için bir ikili sistem dosyası oluşturur. Aynı isimde bir dosya zaten mevcut ise, içeriği silinir. |
+| ab  | Bir ikili sistem dosyasını ekleme yapmak için açar. Dosya yok ise oluşturulur.                          |
+| r+b | Okuma ve yazma için bir ikili sistem dosyası açar. Dosya mevcut olmalıdır.                              |
+| w+b | Okuma ve yazma için bir ikili sistem dosyası oluşturur.                                                 |
+| a+b | Okuma ve ekleme için bir ikili sistem dosyası açar.                                                     |
+
+- Dosya açma girişimi başarılı olma garantisine sahip değildir.
+
+## `fclose()` Fonksiyonu
+
+```c
+int fclose(FILE*);
+```
+
+- İlgili dosyaya ait dosya işlemlerini kapatan, handler'ı sonlandıran fonksiyondur.
+
+- Standartta bulunmayan fakat çoğu derleyicinin verdiği bazı fonksiyonlar vardır.
+	- `int fcloseall(void);`
+
+
+## `fgetc` Fonksiyonu
+
+`int fgetc(FILE*)` 
+- Dosyanın byte-byte okunmasını sağlar.
+- Byte okundukça file pointer artar.
+- Okunan byte'ın değerini döndürür.
+- `fgetc` fonksiyonu başarısız olabilir.
+	- Dosyanın byte sayısı `fgetc` fonksiyonunun file pointer sayısına eşit olduğu zaman `fgetc` fonksiyonu `EOF` değerini yani `-1` değerini döndürür.
+```c
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Inc\\date.h","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int ch;
+	while((ch = fgetc(f)) != EOF){
+		putchar(ch);
+	}
+	fclose(f);
+}
+```
+
+
+---
+### Orta Seviye Bir Mülakat Sorusu
+
+- Dosya içerisinde alfabetik karakterlerin hangisinden kaç tane olduğunu ekrana yazdıran ve komut satırı argümanlarıyla "karsay" komutuyla çalışan bir uygulama yazınız.
+
+```c
+#if 1
+/*dosyadaki her karakterden kac tane oldugunu bulma kodu*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 3)
+	{
+		printf("karsay kullanim: <%c> <karsay> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	FILE *f = fopen(argv[2], "r");
+	if (!f)
+	{
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int ch;
+	int chr_cnt[26] = {0};
+
+	while ((ch = fgetc(f)) != EOF)
+	{
+		if (isalpha(ch))
+		{
+			++chr_cnt[toupper(ch) - 'A'];
+		}
+	}
+	fclose(f);
+	for (size_t i = 0; i < 26; ++i)
+	{
+
+		printf("%c %d\n", 'A' + i, chr_cnt[i]);
+	}
+}
+
+#endif
+```
+
+
+### Biraz daha zor hali
+
+- Bunları ekrana sorted bir şekilde en çok kullanılan harften en aza doğru sırala
+
+```c
+#if 1
+typedef struct
+{
+	int ch;
+	int cnt;
+} data_t;
+
+int cmpdata(const void *p1, const void *p2)
+{
+
+	return ((const data_t *)p2)->cnt - ((const data_t *)p1)->cnt;
+}
+
+/*dosyadaki her karakterden kac tane oldugunu bulma kodu*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 3)
+	{
+		printf("karsay kullanim: <%c> <karsay> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	FILE *f = fopen(argv[2], "r");
+	if (!f)
+	{
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int ch;
+	data_t chr_cnt[26] = {
+		{'A', 0}, {'B', 0}, {'C', 0}, {'D', 0}, {'E', 0}, {'F', 0}, {'G', 0}, {'H', 0}, {'I', 0}, {'J', 0}, {'K', 0}, {'L', 0}, {'M', 0}, {'N', 0}, {'O', 0}, {'P', 0}, {'Q', 0}, {'R', 0}, {'S', 0}, {'T', 0}, {'U', 0}, {'V', 0}, {'W', 0}, {'X', 0}, {'Y', 0}, {'Z', 0}};
+
+	while ((ch = fgetc(f)) != EOF)
+	{
+		if (isalpha(ch))
+		{
+			++(chr_cnt[toupper(ch) - 'A'].cnt);
+		}
+	}
+	fclose(f);
+	qsort(chr_cnt, 26, sizeof(data_t), cmpdata);
+	for (size_t i = 0; i < 26; ++i)
+	{
+		if (chr_cnt[i].cnt)
+		{
+			printf("%c %d\n", chr_cnt[i].ch, chr_cnt[i].cnt);
+		}
+	}
+}
+
+#endif
+```
+
+out:
+
+```cmd
+E 173
+T 125
+I 115
+R 109
+O 106
+N 102
+A 100
+S 100
+U 63
+D 61
+C 53
+M 45
+G 43
+H 41
+P 40
+L 39
+F 29
+Y 24
+B 19
+W 18
+V 16
+K 9
+X 5
+Z 3
+Q 2
+
+```
+
+---
+
+## `fputc` Fonksiyonu
+ - `putchar` fonksiyonunun dosya işlemi karşılığıdır.
+```c
+int fputc(int ch, FILE*);
+```
+
+- Yazma modunda açılmış dosyaya karakter yazar.
+
+```c
+/*fputc() function*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuz.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	for (size_t i = 'A'; i < 'Z'; i++)
+	{
+		fputc(i,f);
+	}
+	fputc('\n',f);
+	for (size_t i = 'a'; i < 'z'; i++)
+	{
+		fputc(i,f);
+	}
+	fclose(f);
+}
+/*out:
+ABCDEFGHIJKLMNOPQRSTUVWXY
+abcdefghijklmnopqrstuvwxy
+*/
+
+```
+
+- Bir dosyaya random karakterler yazdırma:
+
+
+```c
+/*grfile*/
+/*main grfile yavuz.txt 10000 40 70 */
+
+int get_rand_char(void){
+	int ch;
+	while(!isalnum(ch = rand() % 128))
+		; //null statement
+
+	return ch;
+}
+
+int main(int argc, char const *argv[])
+{
+	if(argc != 6 ){
+		printf("grfile kullanim: <.exe name> <file name> <total char count> <min char count in line> <max char count in line>");
+	}
+	randomize();
+	FILE* f = fopen(argv[2],"w");
+
+	for (size_t i = 0; i < atoi(argv[3]); i++)
+	{
+		int linelen = rand() % (atoi(argv[5])-atoi(argv[4]) + 1) + atoi(argv[4]);
+		while (linelen--)
+		{
+			fputc(get_rand_char(),f);
+		}	
+		fputc('\n',f);
+	}
+	fclose(f);
+	
+}
+```
+

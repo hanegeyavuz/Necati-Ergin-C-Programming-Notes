@@ -6633,7 +6633,7 @@ int main(int argc, char const *argv[])
 
 #endif
 
-#if 1
+#if 0
   #define   FILE_NAME_SIZE  100
 
   int main(int argc, char** argv) 
@@ -6666,5 +6666,207 @@ int main(int argc, char const *argv[])
 
   // command line -> prog.exe a.txt b.txt
   // output -> file a.txt copied to b.txt
+
+#endif
+
+
+#if 0
+/* FILE OPERATIONS */
+int main(int argc, char const *argv[])
+{
+	
+	FILE* f = fopen("yavuz.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		abort();
+	}
+	printf("dosya olusturuldu.");
+	fclose(f);
+}
+
+#endif
+
+#if 0
+/* FILE OPERATIONS */
+int main(int argc, char const *argv[])
+{
+	
+	FILE* f = fopen("yavuz.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		abort();
+	}
+	printf("dosya acildi.");
+	fclose(f);
+}
+
+#endif
+#if 0
+/* FILE OPERATIONS */
+int main(int argc, char const *argv[])
+{
+	
+	FILE* f = fopen("C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Src\\yavuz.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		abort();
+	}
+	printf("dosya olusturuldu.");
+	fclose(f);
+}
+#endif
+
+#if 0
+/*fgetc function */
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("C:\\Users\\yhane\\Necati-Ergin-C-Programming-Notes\\libs\\Inc\\date.h","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int ch;
+	while((ch = fgetc(f)) != EOF){
+		putchar(ch);
+	}
+	fclose(f);
+}
+
+#endif
+#if 0
+/*fgetc function */
+/*komut satirindan calistirilan dosyaz isimli programi yazdiriniz*/
+int main(int argc, char const *argv[])
+{
+	if(argc != 2){
+		printf("kullanim: <dosyaz> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	FILE* f = fopen(argv[1],"r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int ch;
+	while((ch = fgetc(f)) != EOF){
+		putchar(ch);
+	}
+	fclose(f);
+}
+
+#endif
+
+#if 0
+/*interview question*/
+typedef struct
+{
+	int ch;
+	int cnt;
+} data_t;
+
+int cmpdata(const void *p1, const void *p2)
+{
+
+	return ((const data_t *)p2)->cnt - ((const data_t *)p1)->cnt;
+}
+
+/*dosyadaki her karakterden kac tane oldugunu bulma kodu*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 3)
+	{
+		printf("karsay kullanim: <%c> <karsay> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	FILE *f = fopen(argv[2], "r");
+	if (!f)
+	{
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int ch;
+	data_t chr_cnt[26] = {
+		{'A', 0}, {'B', 0}, {'C', 0}, {'D', 0}, {'E', 0}, {'F', 0}, {'G', 0}, {'H', 0}, {'I', 0}, {'J', 0}, {'K', 0}, {'L', 0}, {'M', 0}, {'N', 0}, {'O', 0}, {'P', 0}, {'Q', 0}, {'R', 0}, {'S', 0}, {'T', 0}, {'U', 0}, {'V', 0}, {'W', 0}, {'X', 0}, {'Y', 0}, {'Z', 0}};
+
+	while ((ch = fgetc(f)) != EOF)
+	{
+		if (isalpha(ch))
+		{
+			++(chr_cnt[toupper(ch) - 'A'].cnt);
+		}
+	}
+	fclose(f);
+	qsort(chr_cnt, 26, sizeof(data_t), cmpdata);
+	for (size_t i = 0; i < 26; ++i)
+	{
+		if (chr_cnt[i].cnt)
+		{
+			printf("%c %d\n", chr_cnt[i].ch, chr_cnt[i].cnt);
+		}
+	}
+}
+
+#endif
+
+#if 0
+/*fputc() function*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuz.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	for (size_t i = 'A'; i < 'Z'; i++)
+	{
+		fputc(i,f);
+	}
+	fputc('\n',f);
+	for (size_t i = 'a'; i < 'z'; i++)
+	{
+		fputc(i,f);
+	}
+	fclose(f);
+}
+
+
+#endif
+
+#if 0
+/*grfile*/
+/*main grfile yavuz.txt 10000 40 70 */
+
+int get_rand_char(void){
+	int ch;
+	while(!isalnum(ch = rand() % 128))
+		; //null statement
+
+	return ch;
+}
+
+int main(int argc, char const *argv[])
+{
+	if(argc != 6 ){
+		printf("grfile kullanim: <.exe name> <file name> <total char count> <min char count in line> <max char count in line>");
+	}
+	randomize();
+	FILE* f = fopen(argv[2],"w");
+
+	for (size_t i = 0; i < atoi(argv[3]); i++)
+	{
+		int linelen = rand() % (atoi(argv[5])-atoi(argv[4]) + 1) + atoi(argv[4]);
+		while (linelen--)
+		{
+			fputc(get_rand_char(),f);
+		}	
+		fputc('\n',f);
+	}
+	fclose(f);
+	
+}
 
 #endif
