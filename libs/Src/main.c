@@ -6870,3 +6870,359 @@ int main(int argc, char const *argv[])
 }
 
 #endif
+
+
+#if 0
+/*file copy with command line arguments*/
+/*usage: <.exe name> <filecopy> <source_file_name> <dest file name>*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 4){
+		printf("usage: <%s> <filecopy> <source_file_name> <dest file name>\n",argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	FILE* fsource = fopen(argv[2],"r");
+	FILE* fdest = fopen(argv[3],"w");
+	if(!fdest || !fsource){
+		printf("fopen() fail!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int ch;
+	while ((ch = fgetc(fsource)) != EOF )
+	{
+		fputc(ch,fdest);
+	}
+
+	fclose(fdest);
+	fclose(fsource);
+	printf("source file %s copied as dest file %s\n",argv[2],argv[3]);
+}
+#endif
+
+
+#if 0
+/*Dosbol*/
+/*<dosbol> <ali.exe> 1000*/
+// ali.exe 11760
+// parca001.par 	1000
+// parca002.par 	1000
+// parca0011.par 	1000
+// parca0012.par 	760
+
+#define MAX_FILENAME_LEN 79
+
+int main(int argc, char const *argv[])
+{
+	printf("program calistiirliyor...\n");
+	if (argc != 3){
+		printf("usage: <dosbol> <dosya ismi> <parca boyutu(byte)>\n");
+		exit(EXIT_FAILURE);
+	}	
+	FILE* fs = fopen(argv[1],"rb");
+	if(!fs){
+		perror("fopen fail!");
+		exit(EXIT_FAILURE);
+	}
+	int chunk_size = atoi(argv[2]);
+	int file_count = 0;
+	char dest_file_name[MAX_FILENAME_LEN + 1];
+	int ch;
+	int byte_count = 0;
+	FILE* fd = NULL; /*flag */
+
+
+	while((ch = fgetc(fs)) != EOF){
+		if(!fd){
+			sprintf(dest_file_name,"parca%03d.par",file_count+1);
+			fd = fopen(dest_file_name,"wb");
+			if(!fd){
+				printf("can not create file\n");
+				fclose(fs);
+				exit(EXIT_FAILURE);
+			}
+			++file_count;
+		}
+		fputc(ch,fd);
+		++byte_count;
+		if(byte_count % chunk_size == 0){
+			fclose(fd);
+			fd = NULL;
+		}
+	}
+	fclose(fs);
+	if(fd){
+		fclose(fd);
+	}
+	printf("%d byte'lik %s dosyasi %d byte'lik %d parcaya bolundu\n",byte_count,argv[2],chunk_size,file_count);
+
+}
+#endif
+
+
+
+#if 0
+/*dosbir ali.exe*/
+// remove function
+// rename function
+int main(int argc, char const *argv[])
+{
+	if (argc != 2)
+	{
+		printf("usage: <dosbir> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+	FILE *fd = fopen(argv[1], "wb");
+	if (!fd)
+	{
+		perror("fopen fail!");
+		exit(EXIT_FAILURE);
+	}
+	char filename[100];
+	int file_count = 0;
+	int byte_count = 0;
+
+	while (1)
+	{
+		sprintf(filename, "parca%03d.par", file_count + 1);
+		FILE *fs = fopen(filename, "rb");
+		if (!fs)
+		{
+			break;
+		}
+		++file_count;
+		int ch;
+		while ((ch = fgetc(fs)) != EOF)
+		{
+			fputc(ch, fd);
+			++byte_count;
+		}
+		fclose(fs);
+	}
+	fclose(fd);
+	printf("%d dosya %d byte'lik %s dosyasi olarak birlestirildi\n", file_count, byte_count, argv[1]);
+
+	for (size_t i = 1; i <= file_count; i++)
+	{
+		sprintf(filename, "parca%03d.par", i);
+		if (remove(filename))
+		{
+			printf("%s dosyasi silinemedi\n", filename);
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+#endif
+
+
+#if 0
+int main(int argc, char** argv)
+  {
+    if (argc != 3){
+      printf("usage: %s <source_file> <seed>\n", argv[0]);
+      exit(EXIT_FAILURE);
+    }
+
+    FILE* f_src = fopen(argv[1], "rb");
+    if (f_src == NULL){
+      printf("%s could not be opened.\n", argv[1]);
+      exit(EXIT_FAILURE);
+    }
+
+    char dest_filename[L_tmpnam];
+    tmpnam(dest_filename);
+
+    FILE* f_dst = fopen(dest_filename, "wb");  
+    if (f_dst == NULL){
+      printf("%s temp file could not be created.\n", dest_filename);
+      fclose(f_src);
+      exit(EXIT_FAILURE);
+    }
+
+    long long seed = atoll(argv[2]);
+    srand((unsigned)seed);
+
+    int ch;
+    while ((ch = fgetc(f_src)) != EOF)
+      fputc(ch ^ rand(), f_dst);
+
+    fclose(f_src);
+    fclose(f_dst);
+
+    if (remove(argv[1])){
+      printf("%s could not be deleted.\n", argv[1]);
+      exit(EXIT_FAILURE);
+    }
+
+    if (rename(dest_filename, argv[1])){
+      printf("%s file could not be renamed\n", dest_filename);
+      exit(EXIT_FAILURE);
+    }
+  }
+
+
+#endif
+
+
+#if 0
+/*fscanf and fprintf functions*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("out.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+	}
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		fprintf(f,"%d\n",i);
+	}
+	fclose(f);
+}
+
+#endif
+#if 0
+/*fscanf and fprintf functions*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("kayitlar.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+	}
+
+	for (size_t i = 0; i < 1000; i++)
+	{
+		fprintf(f,"%-5d  %-16s %d\n",rand(),get_random_name(), rand() % 101);
+	}
+	fclose(f);
+}
+
+#endif
+
+#if 0
+/*fscanf and fprintf functions*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("asal1.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+	}
+	int prime_count = 0;
+	for (size_t i = 2; i < 10000; i++)
+	{
+		if(isprime(i)){
+			if(i && i % 10 == 0){
+				
+				fprintf(f,"\n");
+			}
+			fprintf(f,"%12d ",i);
+			++prime_count;
+		}
+
+	}
+	fclose(f);
+}
+
+#endif
+
+#if 0
+/*fscanf*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuz.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	char str[900];
+	while ((fscanf(f,"%s",str)) != EOF)
+	{
+		printf("%s",str);
+		(void)getchar();
+	}
+	
+	fclose(f);
+}
+
+#endif
+#if 0
+/*fscanf*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("kayitlar.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int num;
+	char name[40];
+	int grade;
+	while ((fscanf(f,"%d %s %d",&num,name,&grade)) != EOF)
+	{
+		printf("%d %s %d\n",num,name,grade);
+	}
+	fclose(f);
+}
+#endif
+#if 0
+/*fscanf*/
+/*interview question*/
+int main(int argc, char const *argv[])
+{
+	char file_name[40];
+	int num;
+	char name[40];
+	int grade = 0;
+
+	FILE* fa[101];
+	for (size_t i = 0; i <= 100; i++)
+	{	
+		sprintf(file_name,"grade%d.txt",i);
+
+		fa[i] = fopen(file_name,"w");
+		if(!fa[i]){
+			printf("dosya acilamadi\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+	FILE* fs = fopen("kayitlar.txt","r");
+	if(!fs){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	while ((fscanf(fs,"%d%s%d",&num,name,&grade)) != EOF)
+	{
+		fprintf(fa[grade],"%-5d %-12s %d\n",num,name,grade);
+		printf("%-5d %-12s %d\n",num,name,grade);
+		fflush(fa[grade]);
+
+	}
+	fclose(fs);
+	for (size_t i = 0; i <= 100; i++)
+	{
+		fclose(fa[i]);
+	}
+
+
+}
+#endif
+
+
+#if 0
+/*fgets function*/
+int main(int argc, char const *argv[])
+{
+	char buf[100];
+	FILE* f = fopen("kayitlar.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	while(fgets(buf,asize(buf),f)){
+		printf("%s",buf); /*no newline, the file is already exists*/
+	}
+}
+
+#endif

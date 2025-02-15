@@ -13331,3 +13331,328 @@ int main(int argc, char const *argv[])
 }
 ```
 
+
+>[!NOTE] 
+>Dosyayı binary modda açmak için aşağıdaki 2 durumdan biri olmalıdır:
+>- Dosya text dosyası değil
+>- Dosyanın text dosyası olup olmaması önemli değil
+
+>[!WARNING]
+>İşletim sistemine göre dosya açış modu ciddi hayati farklılıklar gösterebilir.
+
+- Windows işletim sisteminde `\n` karakteri 2 byte iken, bazı işletim sistemlerinde bu karakter 1 byte büyüklüğündedir.
+- Eskiden 26 değerine sahip karakter `ctrl z` dosya sonu karakteri olarak kullanılırdı. Eğer text modunda açılıp dosya okunursa `ctrl z` karakteri dosya sonu olarak algılanır.
+
+
+### Örnek 1
+- Komut satırından çalışan dosya kopyalama işlemi yapan bir kod yazınız.
+```c
+/*file copy with command line arguments*/
+/*usage: <.exe name> <filecopy> <source_file_name> <dest file name>*/
+int main(int argc, char const *argv[])
+{
+	if (argc != 4){
+		printf("usage: <%s> <filecopy> <source_file_name> <dest file name>\n",argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	FILE* fsource = fopen(argv[2],"r");
+	FILE* fdest = fopen(argv[3],"w");
+	if(!fdest || !fsource){
+		printf("fopen() fail!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int ch;
+	while ((ch = fgetc(fsource)) != EOF )
+	{
+		fputc(ch,fdest);
+	}
+
+	fclose(fdest);
+	fclose(fsource);
+	printf("source file %s copied as dest file %s\n",argv[2],argv[3]);
+}
+```
+
+
+### Örnek 2
+
+- Dosbol programı
+- `<dosbol> <ali.exe> 1000`
+- ali.exe'yi 1000 byte'lık parçalara böler.
+	- parca001.par
+	- parca002.par
+	- etc...
+- `<dosbir> <veli.exe>` 
+	- Bu program da parca001, parca002 gibi dosyaları birleştirerek komut satırından aldığı exe dosyasında birleştirecek
+
+
+
+- dosbol
+```c
+/*Dosbol*/
+/*<dosbol> <ali.exe> 1000*/
+// ali.exe 11760
+// parca001.par 	1000
+// parca002.par 	1000
+// parca0011.par 	1000
+// parca0012.par 	760
+
+#define MAX_FILENAME_LEN 79
+
+int main(int argc, char const *argv[])
+{
+	printf("program calistiirliyor...\n");
+	if (argc != 4){
+		printf("usage: <%s> <dosbol> <dosya ismi> <parca boyutu(byte)>\n",argv[0]);
+		exit(EXIT_FAILURE);
+	}	
+	FILE* fs = fopen(argv[2],"rb");
+	if(!fs){
+		perror("fopen fail!");
+		exit(EXIT_FAILURE);
+	}
+	int chunk_size = atoi(argv[3]);
+	int file_count = 0;
+	char dest_file_name[MAX_FILENAME_LEN + 1];
+	int ch;
+	int byte_count = 0;
+	FILE* fd = NULL; /*flag */
+
+
+	while((ch = fgetc(fs)) != EOF){
+		if(!fd){
+			sprintf(dest_file_name,"parca%03d.par",file_count+1);
+			fd = fopen(dest_file_name,"wb");
+			if(!fd){
+				printf("can not create file\n");
+				fclose(fs);
+				exit(EXIT_FAILURE);
+			}
+			++file_count;
+		}
+		fputc(ch,fd);
+		++byte_count;
+		if(byte_count % chunk_size == 0){
+			fclose(fd);
+			fd = NULL;
+		}
+	}
+	fclose(fs);
+	if(fd){
+		fclose(fd);
+	}
+	printf("%d byte'lik %s dosyasi %d byte'lik %d parcaya bolundu\n",byte_count,argv[2],chunk_size,file_count);
+
+}
+```
+
+
+- dosbir
+```c
+/*dosbir ali.exe*/
+// remove function
+// rename function
+int main(int argc, char const *argv[])
+{
+	if (argc != 2)
+	{
+		printf("usage: <dosbir> <dosya ismi>\n");
+		exit(EXIT_FAILURE);
+	}
+	FILE *fd = fopen(argv[1], "wb");
+	if (!fd)
+	{
+		perror("fopen fail!");
+		exit(EXIT_FAILURE);
+	}
+	char filename[100];
+	int file_count = 0;
+	int byte_count = 0;
+
+	while (1)
+	{
+		sprintf(filename, "parca%03d.par", file_count + 1);
+		FILE *fs = fopen(filename, "rb");
+		if (!fs)
+		{
+			break;
+		}
+		++file_count;
+		int ch;
+		while ((ch = fgetc(fs)) != EOF)
+		{
+			fputc(ch, fd);
+			++byte_count;
+		}
+		fclose(fs);
+	}
+	fclose(fd);
+	printf("%d dosya %d byte'lik %s dosyasi olarak birlestirildi\n", file_count, byte_count, argv[1]);
+
+	for (size_t i = 1; i <= file_count; i++)
+	{
+		sprintf(filename, "parca%03d.par", i);
+		if (remove(filename))
+		{
+			printf("%s dosyasi silinemedi\n", filename);
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+```
+
+
+## `fprintf()` and `fscanf()` Functions
+
+- printf ve scanf fonksiyonlarının dosyalar özelinde kullanılan halleridir.
+
+```c
+int fprintf(FILE *stream, const char *format, ...);
+int fscanf(FILE *stream, const char *format, ...);
+
+```
+
+
+```c
+/*fscanf and fprintf functions*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("out.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+	}
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		fprintf(f,"%d\n",i);
+	}
+	fclose(f);
+}
+
+```
+
+```c
+/*fscanf and fprintf functions*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("asal1.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+	}
+	int prime_count = 0;
+	for (size_t i = 2; i < 10000; i++)
+	{
+		if(isprime(i)){
+			if(i && i % 10 == 0){
+				
+				fprintf(f,"\n");
+			}
+			fprintf(f,"%12d ",i);
+			++prime_count;
+		}
+
+	}
+	fclose(f);
+}
+```
+
+
+
+```c
+/*fscanf*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("kayitlar.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int num;
+	char name[40];
+	int grade;
+	while ((fscanf(f,"%d %s %d",&num,name,&grade)) != EOF)
+	{
+		printf("%d %s %d\n",num,name,grade);
+	}
+	fclose(f);
+}
+```
+
+
+---
+
+#### Bir Mülakat sorusu
+- kayıtlar.txt dosyasından numara, ad, not bilgilerini okuyup
+- Her bir not için ayrı dosya açıp o notu alanları o dosyaya yaz.
+
+```c
+int main(int argc, char const *argv[])
+{
+	char file_name[40];
+	int num;
+	char name[40];
+	int grade = 0;
+
+	FILE* fa[101];
+	for (size_t i = 0; i <= 100; i++)
+	{	
+		sprintf(file_name,"grade%d.txt",i);
+
+		fa[i] = fopen(file_name,"w");
+		if(!fa[i]){
+			printf("dosya acilamadi\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+	FILE* fs = fopen("kayitlar.txt","r");
+	if(!fs){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	while ((fscanf(fs,"%d%s%d",&num,name,&grade)) != EOF)
+	{
+		fprintf(fa[grade],"%-5d %-12s %d\n",num,name,grade);
+		printf("%-5d %-12s %d\n",num,name,grade);
+		fflush(fa[grade]);
+
+	}
+	fclose(fs);
+	for (size_t i = 0; i <= 100; i++)
+	{
+		fclose(fa[i]);
+	}
+}
+```
+
+
+---
+## `fgets()` Function
+
+- Dosyadan Satır-Satır Okuma işlevini sağlar.
+
+```c
+char* fgets(char* Buffer,int _MaxCount, FILE* _Stream)
+```
+
+- line by line okuma yaparken formatlama kısmında newline karakterine ihtiyaç yoktur çünkü okunacak dosya newline karakterini zaten içerir.
+
+```c
+/*fgets function*/
+int main(int argc, char const *argv[])
+{
+	char buf[100];
+	FILE* f = fopen("kayitlar.txt","r");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	while(fgets(buf,asize(buf),f)){
+		printf("%s",buf); /*no newline, the file is already exists*/
+	}
+}
+```
+
+# Lesson 59
