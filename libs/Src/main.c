@@ -7226,3 +7226,140 @@ int main(int argc, char const *argv[])
 }
 
 #endif
+
+#if 0
+/*fputs function*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("kayitlar.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	char str[100];
+	for(int i = 0; i < 5; ++i){
+		printf("giris yapiniz: ");
+		sgets(str);
+		fputs(str,f);
+		fputs("\n",f);
+	}
+	fclose(f);
+}
+#endif
+
+
+#if 0
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("sayilar.dat","wb");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int x = 12321;
+	fwrite(&x,sizeof(x),1,f);
+
+}
+
+#endif
+
+#if 0
+#define SIZE 100
+int main(int argc, char const *argv[])
+{
+	int n;
+	printf("ilk kac asal sayi: ");
+	scanf("%d",&n);
+	char filename[SIZE];
+	sprintf(filename,"f_asal%d.txt",n);
+	FILE* f = fopen(filename,"wb");
+	if(!f){
+		exit(EXIT_FAILURE);
+	}
+	int x = 2;
+	int prime_count = 0;
+
+	while(prime_count <= n){
+		if(isprime(x)){
+			fwrite(&x,sizeof(x),1,f);
+			++prime_count;
+		}
+		++x;
+	}
+
+	fclose(f);
+}
+
+#endif
+
+#if 0
+/*fread() function*/
+#define SIZE 15
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int n;
+	int ar[SIZE];
+	while((n = fread(&ar,sizeof(int),SIZE,f)) != 0){
+		print_array(ar,n);
+	}
+	fclose(f);
+
+}
+#endif
+
+#if 0
+#define BUF_SIZE 10
+int main(int argc, char const *argv[])
+{
+	if (argc != 4){
+		printf("usage: <%s> <filecopy> <source_file_name> <dest file name>\n",argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
+	FILE* fsource = fopen(argv[2],"rb");
+	FILE* fdest = fopen(argv[3],"wb");
+	if(!fdest || !fsource){
+		printf("fopen() fail!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int n;
+	char buf[BUF_SIZE];
+	while ((n = fread(buf,1,BUF_SIZE,fsource)) != 0 )
+	{
+		fwrite(buf,sizeof(char),n,fdest);
+	}
+
+	fclose(fdest);
+	fclose(fsource);
+	printf("source file %s copied as dest file %s\n",argv[2],argv[3]);
+}
+#endif
+
+
+#if 0
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	int n = 0;
+	int x;
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("kacinci asal sayi: ");
+	scanf("%d",&n);
+	fseek(f,(n-1)*sizeof(int),SEEK_SET);
+	fread(&x,(long)sizeof(x),1,f);
+	printf("%d. asal sayi = %d\n",n,x);
+	
+	fclose(f);
+}
+
+#endif

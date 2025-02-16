@@ -13655,4 +13655,250 @@ int main(int argc, char const *argv[])
 }
 ```
 
+
+---
 # Lesson 59
+
+## `fputs()` Function
+- Sık kullanılan bir fonksiyon değil, fprintf ile de aynı işlevler gerçekleştirilebilir.
+- puts fonksiyonunun dosya işlemleri için özelleştirilmiş halidir.
+- Başarısız olduğunda EOF döndürür.
+- Başarılı olduğunda 0 döndürür.
+
+```c
+/*fputs function*/
+int main(int argc, char const *argv[])
+{
+	char str[100];
+	FILE* f = fopen("kayitlar.txt","w");
+	if(!f){
+		printf("dosya olusturulamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	for(int i = 0; i < 5; ++i){
+		printf("giris yapiniz: ");
+		sgets(str);
+		fputs(str,f);
+		fputs("\n",f);
+	}
+	fclose(f);
+}
+```
+
+## Dosyadan Formatsız Okuma ve Yazma
+
+### `fwrite()` Function
+- Dosyaya formatsız yazma işlemini gerçekleştirir.
+```c
+size_t fwrite(const void* vp, size_t sz size_t n, , FILE* f);
+```
+
+- Her biri size parametre değeri kadar bayt boyutunda olan count parametre değeri kadar elemanı ptr parametresi ile gösterilen bellekten okur stream parametresi ile gösterilen akışa yazar.
+
+- Akışın konum göstergesi, yazılan toplam bayt miktarı kadar (size * count) ile ileri alınır.
+
+- Bu fonksiyon akışa bir karakter dizisi yazarken karakter dizisinin sonuna otomatik olarak boş sonlandırıcı karakteri ('\0') eklemediğinden, yazılan karakter dizisi dosyadan okunduktan sonra, bu karakterin program ile ayrıca karakter dizisi sonuna eklenmesi gerekir.
+
+#### Parametreler
+
+*vp*: Minimum boyutu size * count kadar olan bir bellek bloğunu gösteren işaretçidir.
+
+*sz*: Yazılacak olan her bir elemanın boyutunu gösterir.
+
+*n*: Yazılacak eleman sayısını gösterir.
+
+*f*: Karakterlerin yazılacağı akışı tanımlayan FILE nesnesi işaretçisidir.
+
+##### Dönüş değeri
+
+Başarıyla yazılan toplam öğe sayısı geri döndürülür.
+
+Eğer bu sayı count parametresinden farklıysa, yazma hatası fonksiyonun işlemi tamamlamasını engeller. Bu durumda, akış için hata göstergesi ayarlanır.
+
+Eğer size veya count parametrelerinden birisi sıfır ise, fonksiyon sıfır değeri döndürür ve hata göstergesi değişmeden kalır.
+
+
+### `fread()` Function
+
+#### Bildirim
+
+`size_t fread(void *ptr, size_t size, size_t count, FILE *stream);`
+
+#### Açıklama
+
+Her biri size parametre değeri kadar bayt boyutunda olan count parametre değeri kadar elemanı stream parametresi ile gösterilen akıştan okur ve bunları ptr parametresi ile gösterilen belleğe yükler.
+
+Akışın konum göstergesi, okunan toplam bayt miktarı kadar (size * count) ile ileri alınır.
+
+Bu fonksiyon akıştan bir karakter dizisi okuduğunda, karakter dizisinin sonuna otomatik olarak boş sonlandırıcı karakteri ('\0') eklemediğinden, bu karakterin program ile ayrıca eklenmesi gerekir.
+
+#### Parametreler
+
+*ptr*: Minimum boyutu size * count kadar olan bir bellek bloğunu gösteren işaretçidir.
+
+*size*: Okunacak olan her bir elemanın boyutunu gösterir.
+
+*count*: Okunacak eleman sayısını gösterir.
+
+*stream*: Karakterlerin okunacağı akışı tanımlayan FILE nesnesi işaretçisidir.
+
+#### Dönüş değeri
+
+Başarıyla okunan toplam öğe sayısı geri döndürülür.
+
+Eğer bu sayı count parametresinden farklıysa, okuma esnasında okuma hatası oluşur veya dosyanın sonuna ulaşılır. Her iki durumda da, sırasıyla ferror() ve feof() fonksiyonları ile kontrol edilebilen uygun gösterge ayarlanır.
+
+Eğer size veya count parametrelerinden birisi sıfır ise, fonksiyon sıfır değeri döndürür ve hem akış durumu hem de ptr ile gösterilen bellek içeriği değişmeden kalır.
+
+
+```c
+#define SIZE 100
+int main(int argc, char const *argv[])
+{
+	int n;
+	printf("ilk kac asal sayi: ");
+	scanf("%d",&n);
+	char filename[SIZE];
+	sprintf(filename,"f_asal%d.txt",n);
+	FILE* f = fopen(filename,"wb");
+	if(!f){
+		exit(EXIT_FAILURE);
+	}
+	int x = 2;
+	int prime_count = 0;
+
+	while(prime_count <= n){
+		if(isprime(x)){
+			fwrite(&x,sizeof(x),1,f);
+			++prime_count;
+		}
+		++x;
+	}
+
+	fclose(f);
+}
+```
+
+
+- Dosyadan 15'er blok halinde sayı okumak:
+
+```c
+#define SIZE 15
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	int n;
+	int ar[SIZE];
+	while((n = fread(&ar,sizeof(int),SIZE,f)) != 0){
+		print_array(ar,n);
+	}
+	fclose(f);
+
+}
+
+```
+
+
+
+## File Pointer Manipulator Functions
+
+- Dosyanın istenilen yerinden okuma ve yazma yapabilmek için file pointer değerini set etmek gerekmektedir.
+- Bunun için 3 farklı fonksiyon bulunmaktadır
+	- `fseek()`
+	- `rewind()`
+	- `fsetpos`
+### `fseek()` Function
+- dönüş değeri 0 ise başarılı, non-zero ise başarısızdır.
+`int fseek(FILE* f, long n, int origin)`
+
+- 3. parametreye özel makrolardan biri geçilmelidir
+	- `SEEK_SET` -> dosyanın başı
+	- `SEEK_CUR` -> file pointer current değeri
+	- `SEEK_END` -> dosyanın sonu
+- Örnek olarak
+	- `fseek(f,1000L,SEEK_SET)` çağrısı file pointer'ı dosyanın baştan 1000 indexine(byte) almak demektir.
+- `fseek(f,0L,SEEK_SET)` çağrısı file pointer'ı dosyanın başına alır. Bunu yapan `rewind` adlı fonksiyon da vardır.
+>[!NOTE]
+>SEEK_END kullanılarak yapılan çağrıda 2. parametreye negatif değerler verilmelidir.
+### `rewind` Function
+
+#### Bildirim
+
+`void rewind(FILE *stream);`
+
+#### Açıklama
+
+Stream parametresi ile gösterilen akışın aktif dosya konumunu en başa alır.
+
+#### Parametreler
+
+stream: İşlem yapılacak akışı tanımlayan FILE nesnesi işaretçisidir.
+
+
+
+>[!ERROR]
+>- En son okuma işlemi yapılmış ise ancak bir sonraki işlem yazma işlemi ise 
+>- En son yazma işlemi yapılmış ise ancak bir sonraki işlem okuma işlemi ise 
+>	- FILE POINTER MUTLAKA SET EDILMELIDIR.
+
+```c
+fseek(f,0L,SEEK_CUR)
+```
+- Bu çağrı yukarıdaki durumlar için kullanılabilmektedir.
+
+
+### `ftell() function
+
+#### Bildirim
+
+`long ftell(FILE *stream);`
+
+#### Açıklama
+
+Stream parametresi ile gösterilen akışın aktif dosya konumunu geri döndürür.
+
+Akış ikili modda açıldığında, bu fonksiyon tarafından elde edilen değer dosyanın başından itibaren bayt değeridir.
+
+Akış metin modunda açıldığında, bu fonksiyon tarafından döndürülen değer anlamsız bir değerdir. Sadece, fseek() fonksiyonu ile kullanılacağı zaman bir anlam ifade eder.
+
+#### Parametreler
+
+stream: İşlem yapılacak akışı tanımlayan FILE nesnesi işaretçisidir.
+
+#### Dönüş değeri
+
+Başarı durumunda dosyanın aktif konumu, hata durumunda ise -1L değeri geri döndürülür.
+
+
+
+
+- Look-up table kullanımı için dosya içerisinden okuma da yapılabilir.
+
+```c
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	int n = 0;
+	int x;
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("kacinci asal sayi: ");
+	scanf("%d",&n);
+	fseek(f,(n-1)*sizeof(int),SEEK_SET);
+	fread(&x,(long)sizeof(x),1,f);
+	printf("%d. asal sayi = %d\n",n,x);
+	
+	fclose(f);
+}
+
+```
+
+
+---
+# Lesson 60
