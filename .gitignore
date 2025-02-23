@@ -56,3 +56,6 @@ dkms.conf
 
 # .obsidian file
 .obsidian/
+
+# text files
+*.txt
