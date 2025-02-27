@@ -13873,9 +13873,6 @@ stream: İşlem yapılacak akışı tanımlayan FILE nesnesi işaretçisidir.
 
 Başarı durumunda dosyanın aktif konumu, hata durumunda ise -1L değeri geri döndürülür.
 
-
-
-
 - Look-up table kullanımı için dosya içerisinden okuma da yapılabilir.
 
 ```c
@@ -13902,3 +13899,601 @@ int main(int argc, char const *argv[])
 
 ---
 # Lesson 60
+
+### `fsetpos` Function
+
+`int fsetpos(FILE *stream, const fpos_t *pos);`
+
+#### Açıklama
+
+Stream parametresi ile gösterilen akışın aktif dosya konumunu pos parametre değeri ile gösterilen değere ayarlar.
+
+#### Parametreler
+
+stream: Aktif konumu değiştirilecek akışı tanımlayan FILE nesnesi işaretçisidir.
+
+pos: Dosya konum göstergesinin ayarlanacağı fpos_t değişken işaretçidir.
+
+#### Dönüş değeri
+
+Başarı durumunda 0, aksi takdirde sıfır olmayan bir değer geri döndürülür
+
+```c
+/*fsetpos function*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	int n = 0;
+	int x;
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("kacinci asal sayi: ");
+	scanf("%d",&n);
+	const fpos_t pos = (fpos_t)(n * sizeof(int));
+	fsetpos(f,&pos);
+	fread(&x,(long)sizeof(x),1,f);
+	printf("%d. asal sayi = %d\n",n,x);
+	
+	fclose(f);
+}
+```
+
+### `fgetpos()` Function
+
+`int fgetpos(FILE *stream, fpos_t *pos);`
+
+#### Açıklama
+
+Akışın aktif dosya konumunu stream parametre değerinden alır ve pos parametre değişkenine yazar.
+
+#### Parametreler
+
+stream: Aktif konumu alınacak akışı tanımlayan FILE nesnesi işaretçisidir.
+
+pos: Dosya konum göstergesinin yükleneceği fpos_t değişken işaretçidir.
+
+#### Dönüş değeri
+
+Başarı durumunda 0, aksi takdirde sıfır olmayan bir değer geri döndürülür.
+
+
+```c
+int main(void)
+{
+    FILE *fp;
+    fpos_t pos;
+    int id;
+
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    fgetpos(fp, &pos);
+    printf("Dosyanın aktif konumu: %ld\n", pos);
+
+    fputs("Bilgisayar", fp);
+
+    fgetpos(fp, &pos);
+    printf("Dosyanın aktif konumu: %ld\n", pos);
+
+    rewind(fp);
+    while ((id=getc(fp))!= EOF) { /* Dosya sonuna kadar (EOF) karakter karakter okuma işlemi */
+       printf("%c", id);
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+```
+
+
+### `feof()` Function
+
+`int feof(FILE *stream);`
+
+#### Açıklama
+
+Fonksiyon stream parametresi ile gösterilen dosya akışının sonuna erişilip erişilmediğini kontrol eder.
+
+>[!WARNING]
+>- `feof` fonksiyonu dosya göstericisinin dosyanın sonunda olup olmadığını kontrol etmez. EOF bayrağının set edilip edilmediğini kontrol eder. 
+>- Eof Bayrağının set edilmesinin yolu ise dosya konum göstericisinin dosyanın sonuna ulaştıktan sonra okuma yapılmaya devam edilmesidir.
+>
+
+#### Parametreler
+
+stream: Kontrol edilecek dosya akışını tanımlayan FILE nesnesi işaretçisidir.
+
+#### Dönüş değeri
+
+Eğer akışın sonuna erişilirse sıfır olmayan bir değer, aksi takdirde 0 değeri geri döndürülür.
+
+>[!TIP] 
+>Dosya konum göstericisinin dosyanın sonunda olması tek başına yeterli değildir. Dosyadan okuma yapılması eof bayrağı değişimi için gereklidir.
+
+
+```c
+int main (void)
+{
+    FILE *fp;
+
+    /* Dosyayı oluşturarak okuma ve azma için açma */
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+	printf("eof flag is %s\n",(feof(f) ? "set":"unset"));
+	fseek(f,0L,SEEK_END);
+	printf("eof flag is %s\n",(feof(f) ? "set":"unset"));
+	
+    fclose(fp);
+
+    return 0;
+}
+```
+out:
+```bash
+eof flag is unset
+eof flag is unset
+```
+
+- dosya sonunda iken okuma yapıldığında EOF bayrağı set edilir.
+```c
+int main (void)
+{
+    FILE *fp;
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+	fseek(fp,0L,SEEK_END);
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+	int c = fgetc(fp);
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+    fclose(fp);
+}
+```
+out:
+```bash
+eof flag is unset
+eof flag is unset
+eof flag is set
+
+```
+
+### `ferror()` Function
+
+`int ferror(FILE *stream);`
+
+#### Açıklama
+
+Fonksiyon stream parametresi ile gösterilen dosya akışını hatalar için kontrol eder.
+
+#### Parametreler
+
+stream: Kontrol edilecek dosya akışını tanımlayan FILE nesnesi işaretçisidir.
+
+#### Dönüş değeri
+
+Eğer akışla ilgili bir hata varsa sıfır olmayan bir değer, aksi takdirde 0 değeri geri döndürülür.
+
+```c
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+    FILE *fp;
+
+    if ((fp = fopen ("dosya.txt", "r")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    fputc('A', fp);
+
+    if(ferror(fp)) {
+       printf("Dosyaya yazma hatası!\n");
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+```
+
+Yukarıdaki örnekte, program aşağıdaki satırı ekrana yazar:
+
+`Dosyaya yazma hatası!`
+
+Yukarıdaki program, fopen() fonksiyonu ile okuma modunda (r) açtığı dosyaya fputc() fonksiyonu ile bir karakter yazmaya çalışır. Ancak, dosya okuma modunda açıldığından, bir hata oluşur ve ferror() fonksiyonu ile hata kontrol edildikten sonra "Dosyaya yazma hatası!" ifadesi ekrana yazılır.
+
+
+### `clearerr()` Function
+
+`void clearerr(FILE *stream);`
+
+#### Açıklama
+
+Fonksiyon stream parametresi ile gösterilen dosya akışının hata göstergeleri ile EOF göstergesini resetler.
+
+#### Parametreler
+
+stream: Dosya akışını tanımlayan FILE nesnesi işaretçisidir.
+
+```c
+int main (void)
+{
+    FILE *fp;
+
+    if ((fp = fopen ("dosya.txt", "r")) == NULL) {
+         printf("Dosya acma hatasi!");
+         exit(1);
+    }
+
+    fputc('A', fp);
+
+    if(ferror(fp)) {
+       printf("Dosyaya yazma hatasi!\n");
+       clearerr(fp);
+
+       if(ferror(fp)) {
+          printf("Dosyaya yazma hatasi!\n");
+       }
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+```
+out:
+`Dosyaya yazma hatasi!`
+
+
+### Flush İşlemi
+- Dosyaya yazma işlemi aslen yazılması istenen karakterlerin belirli aralıklarla bir tampona(buffer) yazılarak daha sonrasında fiilen dosyaya **flush** edilmesine dayanır.
+- Hangi Koşullarda **flush** işlemi yapılır?
+	- Buffer'ın dolması 
+	- Sistem destekliyorsa tamponlama işlemleri *line-buffered* olarak yapılabilir.
+		- `\n` geldiğinde flush yapılması etc...
+	- Program normal terminate ettiğinde (`exit` ile yapılan terminate işlemleri `abort` işlemi ile DEĞİL!!)
+	- Bufferlama tamamen kapatıldıysa
+
+### `fflush()` Function
+
+`int fflush(FILE *stream);`
+
+#### Açıklama
+
+- Çıkış akışları için, akışın arabelleğindeki yazılmamış veriyi ilgili çıkış aygıtına yazar.
+- Eğer stream parametre değeri NULL ise, fflush() fonksiyonu programın tüm açık akışlarının çıktı tamponlarını temizler.
+
+#### Parametreler
+- stream: Yazılacak dosya akışını tanımlayan FILE nesnesi işaretçisidir.
+
+#### Dönüş değeri 
+- Başarı durumunda 0 değeri geri döndürülür. Hata oluşursa, EOF değeri geri döndürülür ve hata göstergesi ayarlanır.
+
+>[!ERROR]
+>`fflush` işlemi okuma amaçlı file pointerlar ile yapılması tanımsız davranıştır.(UB!)
+
+
+```c
+/*fflush function*/
+int main(void)
+{
+    FILE *fp;
+    char cdizi[20];
+    int id;
+
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    fputs("B2ilg3isa5yar", fp);
+
+    rewind(fp);
+    if (fgets(cdizi, 20, fp)) printf("%s\n", cdizi);
+
+    rewind(fp);
+    while ((id=getc(fp))!= EOF) {      /* Dosya sonuna kadar (EOF) karakter karakter okuma işlemi */
+       if (isdigit(id)) {              /* Eğer bir sayı ise */
+           fseek(fp, -1, SEEK_CUR);    /* Sayı değerinin olduğu yere dönüş */
+           fputc('A', fp);             /* A karakteri ile değiştirme */
+           fflush(fp);                 /* Akış belleğini temizleme */
+       }
+    }
+
+    rewind(fp);
+    if (fgets(cdizi, 20, fp)) printf("%s", cdizi);
+
+    fclose(fp);
+
+    return 0;
+}
+```
+
+
+
+### `setvbuf()` Function
+
+`int setvbuf(FILE *stream, char *buffer, int mode, size_t size);`
+
+#### Açıklama
+
+- Dosya akışı ara belleğini değiştirir. Akış için bir ara bellek tanımlar. Fonksiyon, ara bellek modunu ve boyutunu (byte cinsinden) belirler.
+
+- Buffer parametre değeri NULL bir değer ise, fonksiyon size parametre değerini kullanarak otomatik olarak bir ara bellek ayırır. Aksi takdirde, buffer ile gösterilen dizi boyutu bellek boyut olarak kullanılır.
+
+- Bu fonksiyon dosya akışı ile ilgili herhangi bir giriş veya çıkış işlemi gerçekleştirilmeden önce çağrılarak akışa bağlantı yapılmalıdır.
+
+- Akış ara bellekleri fflush() fonksiyonu çağrılarak dosyaya yapılan yazma veya okuma işlemleri sonuçlandırılır. Ayrıca, fclose() ve freopen() fonksiyonları çağrıldığında veya program normal şekilde sona erdiğinde ara bellek otomatik olarak temizlenir.
+
+#### Parametreler
+
+*stream*: Açık bir dosya akışını tanımlayan FILE nesnesi işaretçisidir.
+
+*buffer*: Kullanıcı tarafından tanımlanan ara belelktir. En az size parametre değeri kadar boyuta sahip olmalıdır.
+
+*mode*: Dosya ara bellek işlemleri için aşağıdaki değerlerden birini mod olarak tanımlar.
+>[!NOTE]
+>**_IOFBF**: Komple ara bellek işlemi: Dosyaya yazma işlemlerinde, arabellek dolduğunda veya fflush() fonksiyonu kullanıldığında, veriler yazılır. Dosyadan okuma işlemlerinde, bir okuma işlemi yapıldığında ve ara bellek boş olduğunda ara bellek doldurulur.
+**_IOLBF**: Satır ara bellek işlemi: Dosyaya yazma işlemlerinde, veri akışına yeni satır karakteri eklendiğinde veya arabellek dolduğunda veya fflush() fonksiyonu kullanıldığında veriler yazılır. Dosyadan okuma işlemlerinde, bir okuma işlemi yapıldığında ve ara bellek boş olduğunda ara bellek bir sonraki satır sonu karakterine kadar doldurulur.
+**_IONBF** Ara belleksiz işlem: Ara bellek kullanılmaz. Her Giriş/Çıkış işlemi en kısa sürede yazılır. Bu durumda, buffer ve size parametreleri dikkate alınmaz.
+
+*size*: Buffer parametresini boyutunu byte olarak gösterir. Eğer buffer parametresi NULL bir değer içerirse, bu değer fonksiyonunun tahsis edeceği ara bellek boyutunu belirler.
+
+#### Dönüş değeri
+- Başarı durumunda ​0​ değeri, hata durumunda sıfır olmayan bir değer geri döndürülür.
+```c
+
+int main(void)
+{
+    FILE *fp1, *fp2;
+    char gdizi[40];
+
+    if ((fp1 = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    setvbuf (fp1, NULL, _IOFBF, 1024);
+
+    fputs("Bilgisayar", fp1);
+
+    /* Dosya içeriğini okuma ve ekrana yazma */
+    if ((fp2 = fopen ("dosya.txt", "r")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+    printf("Dosya içeriği: %s\n", fgets(gdizi, 40, fp2) != NULL ? gdizi : "");
+
+    fclose(fp2);
+
+    fflush(fp1); /* Ara belleği dosya.txt dosyasına yazar. */
+
+    /* Dosya içeriğini okuma ve ekrana yazma */
+    if ((fp2 = fopen ("dosya.txt", "r")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+    printf("Dosya içeriği: %s\n", fgets(gdizi, 40, fp2) != NULL ? gdizi : "");
+
+    fclose(fp1);
+    fclose(fp2);
+
+    return 0;
+}
+/*
+out:
+Dosya içeriği:
+Dosya içeriği: Bilgisayar
+*/
+```
+
+### `setbuf()` Function
+
+`void setbuf(FILE *stream, char *buffer);`
+
+#### Açıklama
+
+- Dosya akışı işlemleri için ara bellek kullanımı düzenlemesi yapar. Buffer parametre değeri kadar ara bellek tanımlar. Eğer buffer parametre değeri NULL bir değer ise, dosya akışı için ara bellek devre dışı kalır.
+
+- Bu fonksiyon dosya akışı ile ilgili herhangi bir giriş veya çıkış işlemi gerçekleştirilmeden önce çağrılarak akışa bağlantı yapılmalıdır.
+
+- Arabellek boyutunun en az BUFSIZ byte kadar olduğu kabul edilir.
+
+- Akış ara bellekleri fflush() fonksiyonu çağrılarak dosyaya yapılan yazma veya okuma işlemleri sonuçlandırılır. Ayrıca, fclose() ve freopen() fonksiyonları çağrıldığında veya program normal şekilde sona erdiğinde ara bellek otomatik olarak temizlenir.
+
+#### Parametreler
+
+*stream*: Ara bellek tanımlanacak akışı tanımlayan FILE nesnesi işaretçisidir.
+
+*buffer*: Dosya akışı tarafından kullanılacak ara bellek işaretçisidir.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+    FILE *fp1, *fp2, *fp3;
+    char cdizi1[1024], cdizi2[1024];
+    char gdizi[40];
+
+    if ((fp1 = fopen ("dosya1.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    if ((fp2 = fopen ("dosya2.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    setbuf (fp1, cdizi1);
+    setbuf (fp2, cdizi2);
+
+    fputs("Bilgisayar", fp1);
+    fputs("Programlama", fp2);
+
+    printf("cdizi1 ara bellek içeriği: %s\n", cdizi1);
+    printf("cdizi2 ara bellek içeriği: %s\n", cdizi2);
+
+    /* dosya1.txt içeriğini okuma ve ekrana yazma */
+    if ((fp3 = fopen ("dosya1.txt", "r")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+	printf("dosya1.txt içeriği: %s\n", fgets(gdizi, 40, fp3) != NULL ? gdizi : "");
+
+    /* dosya2.txt içeriğini okuma ve ekrana yazma */
+    if (freopen("dosya2.txt", "r", fp3) == NULL) {
+        printf("FILE dosya değişimi gerçekleşmedi!\n");
+        exit(1);
+    }
+    printf("dosya2.txt içeriği: %s\n", fgets(gdizi, 40, fp3) != NULL ? gdizi : "");
+
+    fclose(fp3);
+
+    fflush(fp1); /* Ara belleği dosya1.txt dosyasına yazar. */
+    fclose(fp2); /* Ara belleği dosya2.txt dosyasına yazar. */
+
+    /* Dosya içeriklerini tekrar okuma ve yazma */
+
+    /* dosya1.txt içeriğini okuma ve ekrana yazma */
+    if ((fp3 = fopen ("dosya1.txt", "r")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+    printf("dosya1.txt içeriği: %s\n", fgets(gdizi, 40, fp3) != NULL ? gdizi : "");
+
+    /* dosya2.txt içeriğini okuma ve ekrana yazma */
+    if (freopen("dosya2.txt", "r", fp3) == NULL) {
+        printf("FILE dosya değişimi gerçekleşmedi!\n");
+        exit(1);
+    }
+    printf("dosya2.txt içeriği: %s\n", fgets(gdizi, 40, fp3) != NULL ? gdizi : "");
+
+    fclose(fp1);
+    fclose(fp2);
+    fclose(fp3);
+
+    return 0;
+}
+
+/*
+out:
+cdizi1 ara bellek içeriği: Bilgisayar
+cdizi2 ara bellek içeriği: Programlama
+dosya1.txt içeriği: 
+dosya2.txt içeriği: 
+dosya1.txt içeriği: Bilgisayar
+dosya2.txt içeriği: Programlama
+*/
+```
+
+## Std Handlers
+- stdout
+- stdin
+- stderr
+- Bunlar `stdio.h` kütüphanesinde bulunan `FILE*` türü handlerlardır.
+	- stdout ve stderr direkt monitöre(ekrana) bağlıdır.
+```c
+int main(int argc, char const *argv[])
+{
+	fprintf(stdout,"yavuzhanege\n");
+}
+
+```
+
+### tmpfile() fonksiyonu
+
+`FILE* tmpfile(void);`
+
+#### Açıklama
+
+Güncelleme modunda (wb+) geçici bir ikili sistem dosyası oluşturur ve açar. Açılan dosya adı dosya sistemi içinde benzersiz olarak oluşturulur. Bir program süresince en azından TMP_MAX kadar geçici dosya açılabilir.
+
+Oluşturulan geçici dosya, fclose() fonksiyonu ile akış kapatıldığında veya program sonlandığında otomatik olarak silinir.
+
+Tmpfile_s() fonksiyonu aynı işlemleri yapar. Farklı olarak, en az TMP_MAX_S değeri kadar dosya açılabilir. Eğer streamptr parametresi NULL bir işaretçi ise yüklenmiş olan kısıtlayıcı işlem fonksiyonu çağrılır.
+
+#### Parametreler
+
+Tmpfile() fonksiyonu için parametre tanımı yoktur.
+
+Tmpfile()_s fonksiyonu için:
+
+streamptr: Bu fonksiyona çağrı ile güncellenen işaretçiyi gösteren bir işaretçidir.
+
+#### Dönüş değeri
+
+Tmpfile() fonksiyonu, başarı durumunda oluşturulan geçici dosyayı gösteren bir akış işaretçisi, hata durumunda ise NULL bir değer geri döndürür.
+
+Tmpfile_s() fonksiyonu, eğer dosya başarılı bir şekilde oluşturulur ve açılırsa 0 değeri, dosya oluşturulamaz veya açılamazsa veya streamptr parametre değeri NULL bir işaretçi ise, sıfır olmayan bir değer geri döndürür. Streamptr parametresine, başarı durumunda ilgili dosya akışını gösteren bir işaretçi aksi takdirde NULL bir işaretçi değeri atanır.
+
+
+## Hatalar ve Hataların İşlenmesi
+
+- İki kategoriye ayrılır
+	- Yanlış kod yazmak
+		- Başa çıkmak için kullanılan ana teknik: **Assertions**
+	- runtime hataları (exception)
+
+### Assertions
+- Varlık nedeni kodlama hatasını yakalamaktır.
+- İki kategoriye ayrılır
+	- Static Assertions(Compile Time)
+	- Dynamic Assertions(Run Time)
+#### Static Assertion
+- Static Assertion için C diline C11 standardı ile birlikte `_Static_assert` sözcüğü eklenmiştir.
+- Öncesinde mini trickler kullanılırdı.
+
+```c
+_Static_assert(sizeof(int) > 4,"int turunun sizeof degeri kucuk");
+int main(int argc, char const *argv[])
+{
+	
+}
+
+```
+- yukarıdaki ifadede build edildiğinde derleyici aşağıdaki hatayı verir:
+```bash
+C:\Users\yhane\Necati-Ergin-C-Programming-Notes/libs/Src/main.c:7506:1: error: static assertion failed: "int turunun sizeof degeri kucuk"
+ _Static_assert(sizeof(int) > 4,"int turunun sizeof degeri kucuk");
+```
+
+#### Dynamic Assertion
+- Program çalışma zamanında hata ayıklaması için kullanılır.
+- `assert.h` dosyasında bulunan `assert` fonksiyonel makrosu ile icra edilir.
+```c
+/* Dynamic Assertion */
+#include "assert.h"
+int foo_assert(void){
+	return 0;
+}
+int main(int argc, char const *argv[])
+{
+	int x = 12;
+	int y = foo_assert();
+	///
+	assert(y != 0);
+	int a = x / y;
+
+}
+```
+Yukarıdaki program çalıştırıldığında oluşan çıktı aşağıdaki gibidir:
+```bash
+Assertion failed: y != 0, file C:\Users\yhane\Necati-Ergin-C-Programming-Notes/libs/Src/main.c, line 7525
+```

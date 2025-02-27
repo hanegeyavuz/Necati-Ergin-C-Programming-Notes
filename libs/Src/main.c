@@ -7363,3 +7363,168 @@ int main(int argc, char const *argv[])
 }
 
 #endif
+
+
+#if 0
+/*fsetpos function*/
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("f_asal100.txt","rb");
+	int n = 0;
+	int x;
+	if(!f){
+		printf("dosya acilamadi\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("kacinci asal sayi: ");
+	scanf("%d",&n);
+	const fpos_t pos = (fpos_t)(n * sizeof(int));
+	fsetpos(f,&pos);
+	fread(&x,(long)sizeof(x),1,f);
+	printf("%d. asal sayi = %d\n",n,x);
+	
+	fclose(f);
+}
+#endif
+
+#if 0
+/*feof function*/
+const char* name = "yavuz";
+int main (void)
+{
+    FILE *fp;
+//    int id;
+    /* Dosyayı oluşturarak okuma ve azma için açma */
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    //for (id=0; id<10; id++) fputc('E', fp);
+
+	fprintf(fp,name);
+    rewind(fp);
+
+    printf("Dosya icerigi: ");
+    while (!feof(fp)) {
+       printf("%c", fgetc(fp));
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+#endif
+
+#if 0
+int main (void)
+{
+    FILE *fp;
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+	fseek(fp,0L,SEEK_END);
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+	int c = fgetc(fp);
+	printf("eof flag is %s\n",(feof(fp) ? "set":"unset"));
+    fclose(fp);
+}
+#endif
+
+#if 0
+int main (void)
+{
+    FILE *fp;
+
+    if ((fp = fopen ("dosya.txt", "r")) == NULL) {
+         printf("Dosya açma hatasi!");
+         exit(1);
+    }
+
+    fputc('A', fp);
+
+    if(ferror(fp)) {
+       printf("Dosyaya yazma hatasi!\n");
+    }
+
+    fclose(fp);
+
+    return 0;
+}
+#endif
+
+
+#if 0
+/*fflush function*/
+int main(void)
+{
+    FILE *fp;
+    char cdizi[20];
+    int id;
+
+    if ((fp = fopen ("dosya.txt", "w+")) == NULL) {
+         printf("Dosya açma hatası!");
+         exit(1);
+    }
+
+    fputs("B2ilg3isa5yar", fp);
+
+    rewind(fp);
+    if (fgets(cdizi, 20, fp)) printf("%s\n", cdizi);
+
+    rewind(fp);
+    while ((id=getc(fp))!= EOF) {      /* Dosya sonuna kadar (EOF) karakter karakter okuma işlemi */
+       if (isdigit(id)) {              /* Eğer bir sayı ise */
+           fseek(fp, -1, SEEK_CUR);    /* Sayı değerinin olduğu yere dönüş */
+           fputc('A', fp);             /* A karakteri ile değiştirme */
+           fflush(fp);                 /* Akış belleğini temizleme */
+       }
+    }
+
+    rewind(fp);
+    if (fgets(cdizi, 20, fp)) printf("%s", cdizi);
+
+    fclose(fp);
+
+    return 0;
+}
+#endif
+
+
+#if 0
+int main(int argc, char const *argv[])
+{
+	fprintf(stdout,"yavuzhanege\n");
+}
+
+#endif
+
+#if 0
+/*Static Assertion*/
+_Static_assert(sizeof(int) > 4,"int turunun sizeof degeri kucuk");
+int main(int argc, char const *argv[])
+{
+	
+}
+#endif
+
+#if 1
+/* Dynamic Assertion */
+#include "assert.h"
+int foo_assert(void){
+	return 0;
+}
+int main(int argc, char const *argv[])
+{
+	int x = 12;
+	int y = foo_assert();
+	///
+	assert(y != 0);
+	int a = x / y;
+
+}
+
+#endif
