@@ -14443,7 +14443,7 @@ Tmpfile() fonksiyonu, başarı durumunda oluşturulan geçici dosyayı gösteren
 
 Tmpfile_s() fonksiyonu, eğer dosya başarılı bir şekilde oluşturulur ve açılırsa 0 değeri, dosya oluşturulamaz veya açılamazsa veya streamptr parametre değeri NULL bir işaretçi ise, sıfır olmayan bir değer geri döndürür. Streamptr parametresine, başarı durumunda ilgili dosya akışını gösteren bir işaretçi aksi takdirde NULL bir işaretçi değeri atanır.
 
-
+# Lesson 61
 ## Hatalar ve Hataların İşlenmesi
 
 - İki kategoriye ayrılır
@@ -14496,4 +14496,231 @@ int main(int argc, char const *argv[])
 Yukarıdaki program çalıştırıldığında oluşan çıktı aşağıdaki gibidir:
 ```bash
 Assertion failed: y != 0, file C:\Users\yhane\Necati-Ergin-C-Programming-Notes/libs/Src/main.c, line 7525
+```
+
+
+>[!ERROR]
+>Eğer `#include assert.h` ifadesinden önce **NDEBUG** makrosu tanımlanırsa assertion devre dışı kalır ve assert makrosu bulunduğu konumda bir kod üretmez. (`(void)0`)
+
+```c
+  // one of implementation of ASSERT macro
+
+  #ifndef NDEBUG      // NOT_DEBUG                                       
+  #define ASSERT(EXPR) ((EXPR)                                  \
+    ? (void)0                                                   \
+    : (void)printf("Assertion failed: %s, file %s, line %d\n",  \
+                    #EXPR, __FILE__, __LINE__),                 \
+            abort())                                      
+  #else
+  #define ASSERT(EXPR) ((void)0)
+  #endif
+
+```
+
+- Yukarıdaki `#EXPR` ifadesi makrolarda **stringification** işlemini sağlar ve ifadeyi stringe çevirerek yazdırır.
+- `,` operatörü ise solundaki ifadeden sonra `abort` çağrısını sağlar. Virgül operatörü solundaki ifadenin sağındaki ifadeden önce çağırılmasını garanti eder.
+
+>[!NOTE]
+>Assert makrosu içerisine birden fazla logic değerin logic ve/veya operatörleriyle kullanılması mantıksızdır. Çünkü hatanın hangi logic  kısımdan kaynaklandığı anlaşılamamaktadır.
+
+## Error Handling
+- Birden fazla error handling metodu vardır.
+- Standart error handling için `errno.h` kütüphanesini kullanır.
+- errno bir makro olabilir.
+	- errno değerinin alabileceği bir çok değer vardır. bu değerlere göre farklı hata anlamları taşır.
+	
+```c
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	printf("errno = %d\n",errno);
+	FILE* f = fopen("yavuzzzz.dat","rb");
+	printf("errno = %d\n",errno);
+}	
+
+/*
+out:
+errno = 0
+errno = 2
+*/
+```
+
+- errno değerlerinin ne amlama geldiğini anlamlandırmak için 2 adet utility vardır:
+	- `perror`
+	- `strerror`
+`void perror(const char* p);`
+- `perror` fonksiyonu errno'nun değerine karşılık gelen hatayı ve argümanı olan hata yazısını ekrana yazdırır.
+```c
+/*perror*/
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuzzzz.dat","rb");
+	printf("errno = %d\n",errno);
+	if(!f){
+		perror("file not opened");
+	}
+}
+
+/*
+out:
+errno = 2
+file not opened: No such file or directory
+*/
+```
+
+- `strerror` ise errno parametresinin anlamına gelen hatayı string olarak döndürür.
+```c
+/*strerror*/
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	for (size_t i = 0; i < 20; i++)
+	{
+
+		printf("errno value %d is: %s\n", i, strerror(i));
+	}
+}
+```
+out:
+```bash
+errno value 0 is: No error
+errno value 1 is: Operation not permitted
+errno value 2 is: No such file or directory
+errno value 3 is: No such process
+errno value 4 is: Interrupted function call
+errno value 5 is: Input/output error
+errno value 6 is: No such device or address
+errno value 7 is: Arg list too long
+errno value 8 is: Exec format error
+errno value 9 is: Bad file descriptor
+errno value 10 is: No child processes
+errno value 11 is: Resource temporarily unavailable
+errno value 12 is: Not enough space
+errno value 13 is: Permission denied
+errno value 14 is: Bad address
+errno value 15 is: Unknown error
+errno value 16 is: Resource device
+errno value 17 is: File exists
+errno value 18 is: Improper link
+errno value 19 is: No such device
+```
+
+## Variadic Functions
+
+- Çağıran kodun değişken sayıda argümanla çağırabileceği fonksiyonlardır.
+- C dilinde bir fonksiyonun variadic olduğunu **son parametresinde** elipsis(`...`) atomu olmasından anlaşılır.
+	- `void func(intx,...)`
+	
+>[!ERROR]
+>- Birden fazla variadic parametre olmaz.
+>- C23 standardından önceki standartlarda sadece variadic parametre alan fonksiyonlar geçerli değildir.
+>
+
+>[!IMPORTANT]
+>- Variadic fonksiyonların bazı dezavantajları vardır:
+>	- Çağıran kod dilediği kadar argüman geçebilir ancak kaç argüman gönderdiğini bir şekilde fonksiyona bildirmek zorundadır.
+>	- type-safe değillerdir.
+
+- **`stdarg.h` başlık dosyasının dahil edilmesi zorunludur.**
+
+- Fonksiyonun kaç argüman aldığının fonksiyona bildirilmesi için birkaç yöntem vardır:
+	- sabit bir parametresi ile
+	- bir parametresine geçilen özel bir değer ile
+	- Fonksiyonun bir parametresini `const char*` yaparak bu yazıdan argüman sayısının elde edilmesi (`printf`, `scanf`...)
+
+
+```c
+/*variadic functions*/
+#include "stdarg.h"
+
+int sum(int n, ...)
+{
+	va_list args;
+	va_start(args, n);
+	int sum = 0;
+
+	for (size_t i = 0; i < n; i++)
+	{
+		sum += va_arg(args, int);
+	}
+	va_end(args);
+	return sum;
+}
+
+int main(int argc, char const *argv[])
+{
+	int x = 10;
+	int y = 11;
+	int z = 12;
+	int t = 13;
+	int k = 14;
+
+	printf("sum = %d\n", sum(3, x, y, z));
+	printf("sum = %d\n", sum(5, x, y, z, t, k));
+}
+```
+- Fonksiyon yazılırken öncelikle `va_list` türünden bir değişken tanımlanır.
+- `va_start` fonksiyonuna `va_list` türünden tanımlanan değişken ve variadic parametreden önceki son değişkenin ismi geçilir.
+- `va_arg` fonksiyonuna ise `va_list` türünden değişkeni ve beklenen **değişken türü**  yazılır.  
+- En sonunda `va_end` ile işlem tamamlanır.
+- Yukarıdaki fonksiyonda fonksiyonun bir parametresi kaç adet parametre aldığını gösterir. Bu teknik kullanılmıştır.
+>[!NOTE]
+>int'ten küçük değerler için integral promotion ile int e dönüşüm yapılır.
+>float gönderilirse double a dönüştürülür.
+
+```c
+int myprint(const char* p, ...){
+	va_list args;
+	int char_count;
+	va_start(args,p);
+
+	while(*p){
+		int ch = toupper(*p);
+		if(ch == 'I'){
+			char_count += printf("%d ",va_arg(args,int));
+		}
+		else if(ch == 'F' || ch == 'D'){
+			char_count += printf("%f ",va_arg(args,double));
+		}
+		else if(ch == 'L'){
+			char_count += printf("%ld ",va_arg(args,long));
+		}
+		else if(ch == 'C'){
+			char_count += printf("%c ",va_arg(args,int));
+		}
+		else if(ch == 'S'){
+			char_count += printf("%s ",va_arg(args,const char*));
+		}
+		else if(ch == 'U'){
+			char_count += printf("%u ",va_arg(args,unsigned));
+		}
+		++p;
+	}
+	return char_count;
+}
+
+int main(int argc, char const *argv[])
+{
+	int x = 45;
+	double dval = 2.732;
+	char* name = "yavuz hanege";
+
+	int n = myprint("IDS",x,dval,name);
+
+}
+
+/*
+out:
+45 2.732000 yavuz hanege 
+*/
+```
+- Yukarıdaki print fonksiyonu örneği ise parametresi `const char*` olan bir variadic fonksiyondur.
+
+>[!NOTE]
+>ismi v ile başlayan input output fonksiyonlar variadic list parametre isteyen fonksiyonlardır.
+
+
+```c
+
 ```

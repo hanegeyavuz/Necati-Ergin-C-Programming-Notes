@@ -6601,7 +6601,6 @@ int main(int argc, char const *argv[])
 
 #endif
 
-
 #if 0
   // weekday program 
   int main(int argc, char** argv)
@@ -6630,11 +6629,10 @@ int main(int argc, char const *argv[])
   // command line -> prog.exe 30 11 2024
   // output -> 30 Kasım 2024 Cumartesi
 
-
 #endif
 
 #if 0
-  #define   FILE_NAME_SIZE  100
+#define FILE_NAME_SIZE 100
 
   int main(int argc, char** argv) 
   {
@@ -6668,7 +6666,6 @@ int main(int argc, char const *argv[])
   // output -> file a.txt copied to b.txt
 
 #endif
-
 
 #if 0
 /* FILE OPERATIONS */
@@ -6833,7 +6830,6 @@ int main(int argc, char const *argv[])
 	fclose(f);
 }
 
-
 #endif
 
 #if 0
@@ -6871,7 +6867,6 @@ int main(int argc, char const *argv[])
 
 #endif
 
-
 #if 0
 /*file copy with command line arguments*/
 /*usage: <.exe name> <filecopy> <source_file_name> <dest file name>*/
@@ -6900,7 +6895,6 @@ int main(int argc, char const *argv[])
 	printf("source file %s copied as dest file %s\n",argv[2],argv[3]);
 }
 #endif
-
 
 #if 0
 /*Dosbol*/
@@ -6960,8 +6954,6 @@ int main(int argc, char const *argv[])
 }
 #endif
 
-
-
 #if 0
 /*dosbir ali.exe*/
 // remove function
@@ -7015,7 +7007,6 @@ int main(int argc, char const *argv[])
 }
 #endif
 
-
 #if 0
 int main(int argc, char** argv)
   {
@@ -7061,9 +7052,7 @@ int main(int argc, char** argv)
     }
   }
 
-
 #endif
-
 
 #if 0
 /*fscanf and fprintf functions*/
@@ -7209,7 +7198,6 @@ int main(int argc, char const *argv[])
 }
 #endif
 
-
 #if 0
 /*fgets function*/
 int main(int argc, char const *argv[])
@@ -7246,7 +7234,6 @@ int main(int argc, char const *argv[])
 	fclose(f);
 }
 #endif
-
 
 #if 0
 int main(int argc, char const *argv[])
@@ -7342,7 +7329,6 @@ int main(int argc, char const *argv[])
 }
 #endif
 
-
 #if 0
 int main(int argc, char const *argv[])
 {
@@ -7363,7 +7349,6 @@ int main(int argc, char const *argv[])
 }
 
 #endif
-
 
 #if 0
 /*fsetpos function*/
@@ -7456,7 +7441,6 @@ int main (void)
 }
 #endif
 
-
 #if 0
 /*fflush function*/
 int main(void)
@@ -7493,7 +7477,6 @@ int main(void)
 }
 #endif
 
-
 #if 0
 int main(int argc, char const *argv[])
 {
@@ -7511,7 +7494,7 @@ int main(int argc, char const *argv[])
 }
 #endif
 
-#if 1
+#if 0
 /* Dynamic Assertion */
 #include "assert.h"
 int foo_assert(void){
@@ -7524,6 +7507,120 @@ int main(int argc, char const *argv[])
 	///
 	assert(y != 0);
 	int a = x / y;
+
+}
+
+#endif
+
+#if 0
+/*error handling*/
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuzzzz.dat","rb");
+	printf("errno = %d\n",errno);
+}
+
+#endif
+#if 0
+/*perror*/
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	FILE* f = fopen("yavuzzzz.dat","rb");
+	printf("errno = %d\n",errno);
+	if(!f){
+		perror("file not opened");
+	}
+}
+
+#endif
+#if 0
+/*strerror*/
+#include "errno.h"
+int main(int argc, char const *argv[])
+{
+	for (size_t i = 0; i < 20; i++)
+	{
+
+		printf("errno value %d is: %s\n", i, strerror(i));
+	}
+}
+
+#endif
+
+#if 0
+/*variadic functions*/
+#include "stdarg.h"
+
+int sum(int n, ...)
+{
+	va_list args;
+	va_start(args, n);
+	int sum = 0;
+
+	for (size_t i = 0; i < n; i++)
+	{
+		sum += va_arg(args, int);
+	}
+	va_end(args);
+	return sum;
+}
+
+int main(int argc, char const *argv[])
+{
+	int x = 10;
+	int y = 11;
+	int z = 12;
+	int t = 13;
+	int k = 14;
+
+	printf("sum = %d\n", sum(3, x, y, z));
+	printf("sum = %d\n", sum(5, x, y, z, t, k));
+}
+#endif
+
+#if 0
+/*variadic functions*/
+#include "stdarg.h"
+
+int myprint(const char* p, ...){
+	va_list args;
+	int char_count;
+	va_start(args,p);
+
+	while(*p){
+		int ch = toupper(*p);
+		if(ch == 'I'){
+			char_count += printf("%d ",va_arg(args,int));
+		}
+		else if(ch == 'F' || ch == 'D'){
+			char_count += printf("%f ",va_arg(args,double));
+		}
+		else if(ch == 'L'){
+			char_count += printf("%ld ",va_arg(args,long));
+		}
+		else if(ch == 'C'){
+			char_count += printf("%c ",va_arg(args,int));
+		}
+		else if(ch == 'S'){
+			char_count += printf("%s ",va_arg(args,const char*));
+		}
+		else if(ch == 'U'){
+			char_count += printf("%u ",va_arg(args,unsigned));
+		}
+		++p;
+	}
+	return char_count;
+}
+
+int main(int argc, char const *argv[])
+{
+	int x = 45;
+	double dval = 2.732;
+	char* name = "yavuz hanege";
+
+	int n = myprint("IDS",x,dval,name);
 
 }
 
