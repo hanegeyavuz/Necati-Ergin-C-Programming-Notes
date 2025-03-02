@@ -14722,5 +14722,369 @@ out:
 
 
 ```c
+#include <stdio.h>
+#include <stdarg.h>
+
+void ArgList(int write, char *buffer, const char * format, ...);
+
+int main(void)
+{
+    char buffer[100];
+    char cd;
+    int id;
+    float fd;
+    char cdizi[20];
+
+    /* Karakter dizisine yazma işlemi */
+    ArgList(1, buffer, "%c %d %.2f %s", 'P', 92, 843.25, "Bilgisayar");
+
+    /* Karakter dizisinden okuma işlemi */
+    ArgList(0, buffer, "%c %d %f %s", &cd, &id, &fd, cdizi);
+    printf("Karakter dizisinden okunan değerler: %c %d %.2f %s", cd, id, fd, cdizi);
+
+    return 0;
+}
+
+void ArgList(int write, char *buffer, const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  if (write) vsnprintf (buffer, 100, format, args);
+  else vsscanf (buffer, format, args);
+  va_end (args);
+}
+
+/*
+out:
+Karakter dizisinden okunan değerler: P 92 843.25 Bilgisayar
+*/
+```
+
+## `volatile` Keyword
+
+- **Volatile anahtar sözcüğü ile tanımlanan değişkenler program dışı kaynaklar tarafından değişkenin değerinin değiştirilebileceğini derleyiciye bildirmektir.**
+
+
+- Program dışı unsurlar tarafından nasıl değişken değeri değişir?
+	- Memory mapped input-output
+		- Genellikle gömülü sistem programlama uygulamalarında cihazlara ait belirli register'lar maplenmiş haldedir. 
+		- Bu register değerlerine pointerlar vasıtasıyla erişmek mümkündür.
+		- Bunlar donanım kaynaklı register değişimlerinden etkilenebilmektedir.
+	- Yazılımsal veya Donanımsal  Interrupt işlemleri
+	- Signals
+
+```c
+ADR_REG   (int*)0x1ACF
+
+
+int* p = ADR_REG;
 
 ```
+
+>[!NOTE]
+>Derleyiciler YALNIZCA koda bakarak optimizasyon yaparlar.
+
+```c
+volatile int x = 10;
+int volatile x = 10
+/* aynı seylerdir */
+```
+
+- Syntax'ı `const` anahtar sözcüğü gibidir. Türlerin öncesinde/sonrasında kullanılabilir.
+- Pointer kullanımında tür öncesi veya pointer değişken öncesi kullanılması arasında fark vardır.
+
+```c
+int* volatile p1 = &g; /* volatile pointer to int */
+volatile int* p2 = &g; /* pointer to volatile int */
+int volatile* p3 = &g; /* pointer to volatile int */
+```
+- İlk ifade p1  değerinin optimize edilmemesi gerektiğini belirtir.
+- İkinci ifade ise p2 nin işaret ettiği nesnenin değerinin optimize edilmeyeceğini yani kod dışı kaynaklar tarafından değiştirilebileceğini ifade eder.
+- Üçüncü ifade ile ikinci ifade tamamen **aynı şeylerdir**.
+
+Örneğin:
+- Programcı bir flag değişkeni tanımlasın.
+- Bu değişken bir interrupt veya herhangi bir dış etkenlerden dolayı değişsin.
+- Programcı bu değişkeni bir döngü içerisinde değeri değişene kadar kontrol etmeye çalışsın.
+	- **Bu değişken volatile değil ise dış etken tarafından değiştirildiğinde derleyici bunu göremeyebilir.**
+```c
+int flag = 1; /*should define as "volatile int"*/
+
+int main(void){
+	while(flag){
+		// some codes...
+	}
+}
+```
+
+>[!ERROR] 
+>`volatile int*` -> `int*` örtülü dönüşümü yoktur!!
+
+```c
+
+  // compiler optimization can be disabled 
+  // by using volatile keyword
+
+  #include <time.h>
+  #include <stdio.h>
+
+  int main(void)
+  {
+    clock_t c1 = clock();
+    double d = 0.0;
+
+    // --------------------------------------------------
+
+    for (int i = 0; i < 10000; ++i)
+      for (int k = 0; k < 10000; ++k)
+        d += d * i * k;   
+    // reads from and writes to non-volatile variable
+
+    printf( "modified non-volatile variable 100millon times\n"
+            "time elapsed: %.2f seconds\n",
+            (double)(clock() - c1) / CLOCKS_PER_SEC);
+      
+    // --------------------------------------------------
+
+    c1 = clock();
+    volatile double vd = 0.0;
+
+    for (int i = 0; i < 10000; ++i) {
+      for (int k = 0; k < 10000; ++k) {
+        double prod = vd * i * k;   
+        // reads from volatile variable
+        vd += prod;         
+        // reads from and write to volatile variable
+      }
+    }
+
+    printf( "modified volatile variable 100millon times\n"
+            "time elapsed: %.2f seconds\n",
+            (double)(clock() - c1) / CLOCKS_PER_SEC);
+
+    // --------------------------------------------------
+
+    // output -> (compiled with x86-64 gcc 14.2 -O2)
+    //  modified non-volatile variable 100millon times
+    //  modified non-volatile variable 100millon times
+    //  time elapsed: 0.00 seconds    
+    //  modified volatile variable 100millon times
+    //  time elapsed: 0.56 seconds
+
+    // because of variable "d"'s value 
+    // is not used after the loop,
+    // compiler optimized the code and deleted the loop.
+  }
+
+```
+- Yukarıdaki kodda `d` değişkeni tanımlanıp hiç kullanılmamasından dolayı derleyici optimizasyon yapıp bu kod hiç yürütmeyebilir.
+	- `d` değişkeninin `volatile` anahtar sözcüğü ile tanımlanması gerekmektedir.
+
+>[!TIP]
+>`const` anahtar sözcüğü ile `volatile` anahtar sözcüğü bir arada kullanılabilir.
+>- `volatile` anahtar sözcüğü değişkenin harici kaynaklar tarafından değiştirilebileceğini belirtirken `const` sözcüğü değişkenin PROGRAMLAYICI TARAFINDAN KOD İÇERİSİNDE DEĞİŞTİRİLEMEYECEĞİNİ derleyiciye aktarır.
+
+### `restrict` Keyword
+- C99 ile dile eklenmiştir.
+- Restrict qualifier sadece pointer değişkenleri niteleyebilir.
+- Restrict qualifier yalnızca pointer değişkenin kendisini niteleyebilir!
+```c
+restrict int x = 5; /*Syntax error*/
+restrict int* x = &a; /*syntax error*/
+int* restrict x = &a; /*NO Syntax error*/
+```
+
+- **`restrict` anahtar sözcüğü ile tanımlanmış bir pointer değişken derleyiciye gösterdiği nesneyi yalnızca kendisinin gösterdiğini belirtir.**
+	- Fonksiyon parametreleri için çok önemlidir.
+```c
+void foo(int* restrict p1, int* restrict p2)
+```
+- **Yukarıdaki bildirim derleyiciye `*p1` ve `*p2`'nin ASLA AYNI NESNE OLMA İHTİMALİ OLMADIĞINI SÖYLER**
+
+
+>[!ERROR]
+>`restrict` anahtar sözcüğü ile tanımlanmış bir değişkene/parametreye kod içerisinde tekrardan erişim sağlanacak aynı nesne geçilirse **Undefined Behaviour** oluşur.
+
+```c
+void foo(int* restrict p1, int* restrict p2)
+
+int main(void){
+	int x;
+	foo(&x,&x); /*UNDEFINED BEHAVIOUR*/
+}
+```
+
+## C99 Changes
+
+### VLA (Variable Length Array)
+- Normalde dizinin boyutu değişken olamaz iken, VLA aracı ile bu mümkündür.
+- **VLA'de ilk değer verme sentaksı geçerli değildir.**
+- `sizeof` operatörünün değer üretmesi garanti altında değildir.
+```c
+/* C99 Changes */
+/* Variable Length Array */
+void func_vla(int n){
+	int a[n];
+	printf("sizeof(a) = %zu\n",sizeof(a));
+	printf("size a = %zu\n",sizeof(a) / sizeof(a[0]));
+}
+int main(int argc, char const *argv[])
+{
+	func_vla(5);
+}
+/*
+out:
+sizeof(a) = 20
+size a = 5
+*/
+```
+
+- VLA `static` ömürlü olamaz!!
+```c
+void func_vla(int n){
+	static int a[n];
+	printf("sizeof(a) = %zu\n",sizeof(a));
+	printf("size a = %zu\n",sizeof(a) / sizeof(a[0]));
+}
+int main(int argc, char const *argv[])
+{
+	func_vla(5);
+}
+
+/*
+SYNTAX ERROR
+*/
+```
+
+- Median değeri bulma kodunu öncelikle dynamic memory allocation ile yapalım:
+```c
+int dcmp(const void* p1, const void* p2){
+	return (*(double*)p1 - *(double*)p2);
+}
+
+double get_median(const double* pa, size_t size){
+	double* pd = malloc(size*sizeof(double));
+	if(!pd){
+		fprintf(stderr,"bellek yetersiz\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(pd,pa,size*sizeof(double));
+	qsort(pd,size,sizeof(*pd),dcmp);
+	free(pd);
+	return !(size % 2) ? ((pd[(size-1)/2] + pd[((size-1)/2) + 1])/2):pd[(size-1)/2];
+}
+int main(void)
+{
+	const double arr_odd[3] = {1.2,3.6,7.3};
+	const double arr_even[6] = {1.2,3.6,7.3,5.2,8.5,9.4};
+	printf("median  = %f\n",get_median(arr_odd,asize(arr_odd)));
+	printf("median  = %f\n",get_median(arr_even,asize(arr_even)));
+}
+```
+
+- Şimdi VLA kullanalım:
+  
+```c
+/* C99 Changes */
+/* Variable Length Array */
+
+int dcmp(const void* p1, const void* p2){
+	return (*(double*)p1 - *(double*)p2);
+}
+
+double get_median(const double* pa, size_t size){
+	double ar[size];
+	memcpy(ar,pa,size*sizeof(double));
+	qsort(ar,size,sizeof(*ar),dcmp);
+	return !(size % 2) ? ((ar[(size-1)/2] + ar[((size-1)/2) + 1])/2):ar[(size-1)/2];
+}
+int main(void)
+{
+	const double arr_odd[3] = {1.2,3.6,7.3};
+	const double arr_even[6] = {1.2,3.6,7.3,5.2,8.5,9.4};
+	printf("median  = %f\n",get_median(arr_odd,asize(arr_odd)));
+	printf("median  = %f\n",get_median(arr_even,asize(arr_even)));
+}
+/*
+out:
+median  = 3.600000
+median  = 6.250000
+*/
+```
+
+
+### Compound Literals
+- Bir yapı veya dizi veya değişken nesnelerini isimlendirmeden yalnızca bir fonksiyon çağrısı çağrı vb. durumlar için kullanılmasını sağlayan araçtır.
+
+```c
+/* C99 Changes */
+/* Compound literals */
+void func_compound(int *p) { printf("%d", *p); };
+int main(int argc, char const *argv[])
+{
+	func_compound(&(int){12});
+}
+/*
+out:
+12
+*/
+```
+- Bu özellik sayesinde gereksiz değişken tanımlanmasının önüne geçilir.
+```c
+int main(int argc, char const *argv[])
+{
+	struct tm* p = localtime((time_t){time(0)});
+}
+```
+
+```c
+/* C99 Changes */
+/* Compound literals */
+int main(int argc, char const *argv[])
+{
+	print_array((int[5]){3,6,8,1,4},5);
+}
+```
+
+>[!ERROR]
+>Dangling pointer oluşturma ihtimali vardır.
+
+```c
+int main(int argc, char const *argv[])
+{
+	int* p;
+	if(1){
+		p = (int[]){1, 4, 6}
+	}
+	print_array(p,3); /*array has auto lifetime, UNDEFINED BEHAVIOUR*/
+}
+```
+
+
+### Flexible Array Member
+- C struct veri türleri, belirli bir boyutu olmayan esnek bir dizi üyesiyle bitebilir:
+- Yapının son elemanı olmak zorundadır.
+- Bir yapının içinde birden fazla Flexible array member olamaz.
+
+```c
+/* Flexible Array Member*/
+typedef struct vectord
+{
+	int len;	  // there must be at least one other data member
+	double arr[]; // the flexible array member must be last
+	// The compiler may reserve extra padding space here, like it can between struct members
+} vectord;
+
+int main(void)
+{
+	int num_vec = 12;
+	vectord *vector = malloc(sizeof(vectord) + (num_vec * sizeof(int)));
+	vector->len = num_vec;
+	for (int i = 0; i < num_vec; i++)
+	{
+		vector->arr[i] = (double)i; // transparently uses the right type (double)
+	}
+	free(vector);
+}
+```
+

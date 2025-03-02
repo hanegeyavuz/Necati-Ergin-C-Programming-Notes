@@ -7625,3 +7625,115 @@ int main(int argc, char const *argv[])
 }
 
 #endif
+
+#if 0
+/*volatile keyword*/
+#include <time.h>
+#include <stdio.h>
+
+int main(void)
+{
+  clock_t c1 = clock();
+  volatile double d = 0.0;
+
+  // --------------------------------------------------
+
+  for (int i = 0; i < 10000; ++i)
+	for (int k = 0; k < 10000; ++k)
+	  d += d * i * k;   
+  // reads from and writes to non-volatile variable
+
+  printf( "modified non-volatile variable 100millon times\n"
+		  "time elapsed: %.2f seconds\n",
+		  (double)(clock() - c1) / CLOCKS_PER_SEC);
+	
+}
+#endif
+
+#if 0
+/*restrict keyword*/
+int main(int argc, char const *argv[])
+{
+	int a = 31;
+	 int* restrict x = &a;
+}
+
+#endif
+
+#if 0
+/* C99 Changes */
+/* Variable Length Array */
+void func_vla(int n){
+	int a[n];
+	printf("sizeof(a) = %zu\n",sizeof(a));
+	printf("size a = %zu\n",sizeof(a) / sizeof(a[0]));
+}
+int main(int argc, char const *argv[])
+{
+	func_vla(5);
+}
+
+#endif
+
+#if 0
+/* C99 Changes */
+/* Variable Length Array */
+
+int dcmp(const void* p1, const void* p2){
+	return (*(double*)p1 - *(double*)p2);
+}
+
+double get_median(const double* pa, size_t size){
+	double ar[size];
+	memcpy(ar,pa,size*sizeof(double));
+	qsort(ar,size,sizeof(*ar),dcmp);
+	return !(size % 2) ? ((ar[(size-1)/2] + ar[((size-1)/2) + 1])/2):ar[(size-1)/2];
+}
+int main(void)
+{
+	const double arr_odd[3] = {1.2,3.6,7.3};
+	const double arr_even[6] = {1.2,3.6,7.3,5.2,8.5,9.4};
+	printf("median  = %f\n",get_median(arr_odd,asize(arr_odd)));
+	printf("median  = %f\n",get_median(arr_even,asize(arr_even)));
+}
+#endif
+
+#if 0
+/* C99 Changes */
+/* Compound literals */
+void func_compound(int *p) { printf("%d", *p); };
+int main(int argc, char const *argv[])
+{
+	func_compound(&(int){12});
+}
+#endif
+#if 0
+/* C99 Changes */
+/* Compound literals */
+int main(int argc, char const *argv[])
+{
+	print_array((int[5]){3,6,8,1,4},5);
+}
+#endif
+
+#if 0
+/* Flexible Array Member*/
+typedef struct vectord
+{
+	int len;	  // there must be at least one other data member
+	double arr[]; // the flexible array member must be last
+	// The compiler may reserve extra padding space here, like it can between struct members
+} vectord;
+
+int main(void)
+{
+	int num_vec = 12;
+	vectord *vector = malloc(sizeof(vectord) + (num_vec * sizeof(int)));
+	vector->len = num_vec;
+	for (int i = 0; i < num_vec; i++)
+	{
+		vector->arr[i] = (double)i; // transparently uses the right type (double)
+	}
+	free(vector);
+}
+#endif
