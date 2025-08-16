@@ -6750,7 +6750,6 @@ int main(void){
 	foo(&p);
 
 }
-
 ```
 
 
@@ -6886,12 +6885,9 @@ int main(void)
 		/* code */
 	}
 }
-
 /*
 out:
-
 0 10 20 30 40
-
 */
 ```
 
@@ -6967,7 +6963,6 @@ int main(void){
 	//p = &dval; /*Syntax Error*/
 	vp = &dval; /*Legal*/
 }
-
 ```
 
 >[!INFO] `void` pointer'ın varlık nedeni çoğu zaman herhangi bir türden değişkenin adresini tutabilmesidir.
@@ -8518,7 +8513,6 @@ int main(void){
 	inta20 a2[10];
 
 }
-
 ```
 
 ## Initializing Multi-Dimensional Arrays 
@@ -8535,8 +8529,6 @@ int a[4][3] = {{1,1,1},{2,2,2},{3,3,3},{4,4,4}};
 /* Asagidaki iki dizi de ayni degerlere sahiptir */
 int ax[4][3] = {{1,1,1},{2,2,2},{3,3,3},{4,4,4}};
 int ay[4][3] = {1,1,1,2,2,2,3,3,3,4,4,4};
-
-
 ```
 
 
@@ -15088,3 +15080,34 @@ int main(void)
 }
 ```
 
+## Inline Functions
+
+**Inline Expansion**: Derleyicinin yapabildiği noktalarda fonksiyonun inline expression olarak optimizasyon yapmasıdır.
+
+- C99 standardı sonrası dile **inline** function specifier'ı eklenmiştir.
+- `inline` anahtar sözcüğü olmasa bile inline expansion yapılabilir.
+- `inline` anahtar sözcüğü varken de compiler inline expansion yapmak zorunda değildir.
+- Fonksiyonel makrolardan çok daha safe bir kullanımdır.
+- Eğer `static` anahtar sözcüğü ile birlikte kullanılırsa bir sahip olduğu modülü include eden diğer modüller *inline expansion* yapmazlarsa fonksiyonun linkage'ı internal olacak. Yani her modüle ait o isimde farklı bir fonksiyon olacak.
+	- Genellikle `static` anahtar sözcüğü ile birlikte tanımlanırlar
+- Genellikle karmaşık olmayan, fonksiyonel makrolara alternatif olabilecek fonksiyonlar için kullanılırlar.
+```c
+static inline foo(int x, int y){
+	return x * y;
+}
+```
+
+
+## Variadic Macros
+
+```c
+/*variadic macros*/
+#define eprintf(...)	fprintf(stderr,__VA_ARGS__)
+int main(int argc, char const *argv[])
+{
+	int a = 5;
+	int b = 78;
+	double dval = 56.8;
+	eprintf("error: a = %d b = %d c = %f\n",a,b,dval);
+}
+```

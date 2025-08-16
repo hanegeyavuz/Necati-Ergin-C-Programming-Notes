@@ -7737,3 +7737,17 @@ int main(void)
 	free(vector);
 }
 #endif
+
+#if 1
+/*variadic macros*/
+#define eprintf(...)	fprintf(stderr,__VA_ARGS__)
+#define putx(a,b, ...)	
+int main(int argc, char const *argv[])
+{
+	int a = 5;
+	int b = 78;
+	double dval = 56.8;
+	eprintf("error: a = %d b = %d c = %f\n",a,b,dval);
+}
+
+#endif
