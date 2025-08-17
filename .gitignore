@@ -51,11 +51,14 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# .vscode file
+# .vscode folder
 .vscode/
 
-# .obsidian file
+# .obsidian folder
 .obsidian/
 
 # text files
-*.txt
+txt_files/
+
+# build folder
+build/
